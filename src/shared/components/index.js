@@ -1,0 +1,7 @@
+export { Button } from './Button/Button'
+export { CustomCursor } from './CustomCursor/CustomCursor'
+export { Footer } from './Footer/Footer'
+export { Loader } from './Loader/Loader'
+export { Section } from './Section/Section'
+export { SmoothScroll } from './SmoothScroll/SmoothScroll'
+export { TiltCard } from './TiltCard/TiltCard'

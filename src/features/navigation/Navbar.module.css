@@ -1,0 +1,245 @@
+.progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 1001;
+  background: var(--gradient-accent);
+  transform-origin: left;
+}
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: var(--nav-height);
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid transparent;
+  transition:
+    background-color var(--duration) var(--ease-out),
+    border-color var(--duration) var(--ease-out),
+    backdrop-filter var(--duration) var(--ease-out);
+}
+
+.scrolled {
+  background: rgba(7, 6, 13, 0.7);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border-color: var(--color-border);
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.logo {
+  position: relative;
+  z-index: 1002;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.logoDot {
+  color: var(--color-accent-2);
+}
+
+/* Links desktop */
+.links {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.3rem;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.link {
+  position: relative;
+  padding: 0.45rem 0.95rem;
+  border-radius: var(--radius-full);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  transition: color var(--duration) var(--ease-out);
+}
+
+.link:hover,
+.linkActive {
+  color: var(--color-text);
+}
+
+.linkLabel {
+  position: relative;
+  z-index: 1;
+}
+
+.pill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(120deg, rgba(168, 85, 247, 0.25), rgba(34, 211, 238, 0.18));
+  border: 1px solid rgba(168, 85, 247, 0.35);
+}
+
+.actions {
+  position: relative;
+  z-index: 1002;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Toggle de idioma */
+.langToggle {
+  display: inline-flex;
+  padding: 0.25rem;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border-strong);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.langOption {
+  position: relative;
+  padding: 0.3rem 0.65rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  transition: color var(--duration) var(--ease-out);
+}
+
+.langActive {
+  color: #0b0716;
+}
+
+.langThumb {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-full);
+  background: var(--gradient-accent);
+}
+
+.langLabel {
+  position: relative;
+  z-index: 1;
+}
+
+/* Botón hamburguesa */
+.burger {
+  display: none;
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border-strong);
+}
+
+.burger span {
+  position: absolute;
+  left: 50%;
+  width: 18px;
+  height: 1.5px;
+  background: var(--color-text);
+  border-radius: 2px;
+  translate: -50% 0;
+  transition:
+    transform 0.4s var(--ease-out),
+    top 0.4s var(--ease-out);
+}
+
+.burger span:first-child {
+  top: 18px;
+}
+
+.burger span:last-child {
+  top: 25px;
+}
+
+.burgerOpen span:first-child {
+  top: 21px;
+  transform: rotate(45deg);
+}
+
+.burgerOpen span:last-child {
+  top: 21px;
+  transform: rotate(-45deg);
+}
+
+/* Menú mobile */
+.mobileMenu {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: calc(var(--nav-height) + 2rem) var(--gutter) 2.5rem;
+  background: radial-gradient(30rem 30rem at 100% 0%, rgba(168, 85, 247, 0.25), transparent 60%),
+    radial-gradient(25rem 25rem at 0% 100%, rgba(34, 211, 238, 0.15), transparent 60%), var(--color-bg);
+}
+
+.mobileNav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.mobileLink {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 9vw, 3rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--color-text-muted);
+  transition: color var(--duration) var(--ease-out);
+}
+
+.mobileLink:hover,
+.mobileLinkActive {
+  color: var(--color-text);
+}
+
+.mobileIndex {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--color-accent);
+}
+
+.mobileFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mobileSocials {
+  display: flex;
+  gap: 1.25rem;
+  font-size: 1.35rem;
+}
+
+.mobileSocials a:hover {
+  color: var(--color-accent-2);
+}
+
+@media (max-width: 960px) {
+  .links,
+  .desktopOnly {
+    display: none;
+  }
+
+  .burger {
+    display: block;
+  }
+}

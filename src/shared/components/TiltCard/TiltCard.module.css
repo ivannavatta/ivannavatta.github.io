@@ -1,0 +1,13 @@
+.card {
+  position: relative;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.glare {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 2;
+}

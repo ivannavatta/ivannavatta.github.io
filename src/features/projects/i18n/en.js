@@ -1,0 +1,17 @@
+export const en = {
+  eyebrow: 'Projects',
+  title: 'Things I have built',
+  subtitle: 'A selection of projects where I applied software development and analysis to solve real problems.',
+  all: 'All',
+  filterLabel: 'Filter projects by technology',
+  viewDetails: 'View details',
+  cursor: 'View',
+  featured: 'Featured',
+  code: 'Code',
+  demo: 'Demo',
+  highlights: 'Highlights',
+  stack: 'Tech stack',
+  close: 'Close',
+  empty: 'No projects with that technology yet.',
+  moreOnGithub: 'See more on GitHub',
+}

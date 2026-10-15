@@ -1,0 +1,264 @@
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  padding-top: var(--nav-height);
+  overflow: hidden;
+}
+
+/* Escena 3D a la derecha en desktop */
+.scene {
+  position: absolute;
+  top: 0;
+  right: -6%;
+  width: 62%;
+  height: 100%;
+  z-index: 0;
+}
+
+.sceneInner {
+  position: absolute;
+  inset: 0;
+}
+
+.sceneGlow {
+  position: absolute;
+  inset: 20% 15%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.35), rgba(34, 211, 238, 0.12) 45%, transparent 70%);
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.text {
+  max-width: 640px;
+  pointer-events: auto;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0.9rem 0.4rem 0.7rem;
+  margin-bottom: 1.75rem;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  background: rgba(52, 211, 153, 0.07);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #a7f3d0;
+}
+
+.pulse {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-success);
+}
+
+.pulse::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--color-success);
+  animation: pulse 1.8s ease-out infinite;
+}
+
+.greeting {
+  font-family: var(--font-mono);
+  font-size: clamp(0.95rem, 1.6vw, 1.1rem);
+  color: var(--color-accent-2);
+  margin-bottom: 0.5rem;
+}
+
+.name {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 0.28em;
+  font-size: clamp(3.2rem, 9vw, 6.5rem);
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+  perspective: 600px;
+}
+
+.word {
+  display: inline-flex;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+}
+
+.letter {
+  display: inline-block;
+  transform-origin: bottom;
+}
+
+.role {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 2.2em;
+  margin-top: 1.25rem;
+  font-family: var(--font-mono);
+  font-size: clamp(1rem, 2.2vw, 1.35rem);
+  color: var(--color-text);
+}
+
+.prompt {
+  color: var(--color-accent);
+}
+
+.caret {
+  display: inline-block;
+  width: 0.55em;
+  height: 1.15em;
+  background: var(--color-accent-2);
+  animation: blink 1s steps(1) infinite;
+}
+
+.description {
+  margin-top: 1rem;
+  max-width: 540px;
+  font-size: clamp(1rem, 1.5vw, 1.12rem);
+  color: var(--color-text-muted);
+}
+
+.description strong {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  margin-top: 2.25rem;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.75rem;
+  margin-top: 2.25rem;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.meta li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.meta strong {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+}
+
+/* Indicador de scroll */
+.scrollHint {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  translate: -50% 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--color-text-subtle);
+  transition: color var(--duration) var(--ease-out);
+}
+
+.scrollHint:hover {
+  color: var(--color-text);
+}
+
+.mouse {
+  width: 24px;
+  height: 38px;
+  border: 1.5px solid currentColor;
+  border-radius: 14px;
+  display: flex;
+  justify-content: center;
+  padding-top: 7px;
+}
+
+.wheel {
+  width: 3px;
+  height: 7px;
+  border-radius: 2px;
+  background: var(--color-accent-2);
+  animation: wheel 1.8s var(--ease-out) infinite;
+}
+
+.scrollText {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+@keyframes pulse {
+  to {
+    transform: scale(2.8);
+    opacity: 0;
+  }
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes wheel {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+}
+
+/* Tablet / mobile: la escena pasa al fondo, detrás del texto */
+@media (max-width: 900px) {
+  .scene {
+    top: auto;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+    height: 55%;
+    opacity: 0.4;
+  }
+
+  .hero {
+    align-items: flex-start;
+    padding-top: calc(var(--nav-height) + 3rem);
+    padding-bottom: 6rem;
+  }
+
+  .scrollHint {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .ctas > * {
+    flex: 1 1 100%;
+  }
+}

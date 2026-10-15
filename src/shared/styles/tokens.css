@@ -1,0 +1,42 @@
+:root {
+  /* Colores */
+  --color-bg: #07060d;
+  --color-bg-elevated: #0e0c18;
+  --color-surface: rgba(255, 255, 255, 0.035);
+  --color-surface-hover: rgba(255, 255, 255, 0.06);
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 255, 255, 0.16);
+  --color-text: #f4f2ff;
+  --color-text-muted: #a19dbb;
+  --color-text-subtle: #6e6a88;
+  --color-accent: #a855f7;
+  --color-accent-2: #22d3ee;
+  --color-accent-3: #f472b6;
+  --color-success: #34d399;
+  --color-error: #fb7185;
+
+  --gradient-accent: linear-gradient(120deg, var(--color-accent) 0%, var(--color-accent-2) 100%);
+  --gradient-text: linear-gradient(120deg, #c084fc 0%, #22d3ee 55%, #a855f7 100%);
+  --glow-accent: 0 0 40px rgba(168, 85, 247, 0.35);
+
+  /* Tipografía */
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Espaciado y layout */
+  --container: 1180px;
+  --gutter: clamp(1rem, 4vw, 2rem);
+  --section-padding: clamp(5rem, 12vw, 9rem);
+  --nav-height: 72px;
+
+  /* Radios */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-full: 999px;
+
+  /* Movimiento */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration: 0.35s;
+}
