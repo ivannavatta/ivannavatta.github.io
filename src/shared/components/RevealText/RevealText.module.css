@@ -1,0 +1,14 @@
+.mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  /* Espacio extra para que no se corten descendentes ni itálicas */
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+  padding-right: 0.04em;
+}
+
+.word {
+  display: inline-block;
+  will-change: transform;
+}

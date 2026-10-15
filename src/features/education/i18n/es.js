@@ -1,6 +1,6 @@
 export const es = {
   eyebrow: 'Formación',
-  title: 'Mi recorrido',
+  title: 'Mi *recorrido*.',
   subtitle:
     'Empecé a programar con cursos intensivos y hoy lo complemento con una carrera universitaria orientada a la tecnología y los negocios.',
   certifications: {

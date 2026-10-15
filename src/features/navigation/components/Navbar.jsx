@@ -53,12 +53,12 @@ export function Navbar() {
       >
         <div className={`container ${styles.inner}`}>
           <a href="#home" className={styles.logo} onClick={(event) => navigate(event, 'home')} aria-label={t.goHome}>
-            <span className="gradient-text">{profile.initials}</span>
-            <span className={styles.logoDot}>.</span>
+            {profile.fullName}
+            <span className={styles.logoDot} aria-hidden="true" />
           </a>
 
           <nav className={styles.links} aria-label="Principal">
-            {SECTIONS.map((id) => (
+            {SECTIONS.filter((id) => id !== 'home').map((id) => (
               <a
                 key={id}
                 href={`#${id}`}
@@ -66,14 +66,8 @@ export function Navbar() {
                 onClick={(event) => navigate(event, id)}
                 aria-current={active === id ? 'true' : undefined}
               >
-                {active === id && (
-                  <motion.span
-                    layoutId="nav-pill"
-                    className={styles.pill}
-                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                  />
-                )}
-                <span className={styles.linkLabel}>{t.links[id]}</span>
+                <span className={styles.activeDot} aria-hidden="true" />
+                <span className="link-underline">{t.links[id]}</span>
               </a>
             ))}
           </nav>
@@ -88,8 +82,7 @@ export function Navbar() {
               aria-expanded={menuOpen}
               aria-controls="mobile-menu"
             >
-              <span />
-              <span />
+              {menuOpen ? t.close : t.menu}
             </button>
           </div>
         </div>

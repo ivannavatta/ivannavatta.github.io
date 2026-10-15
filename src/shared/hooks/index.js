@@ -1,6 +1,5 @@
 export { useMediaQuery } from './useMediaQuery'
 export { usePrefersReducedMotion } from './usePrefersReducedMotion'
 export { useIsTouchDevice } from './useIsTouchDevice'
-export { useMousePosition } from './useMousePosition'
 export { useYearsCoding } from './useYearsCoding'
 export { useSmoothScroll } from '../components/SmoothScroll/useSmoothScroll'

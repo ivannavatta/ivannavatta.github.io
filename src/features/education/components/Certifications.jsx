@@ -1,7 +1,6 @@
 import { motion } from 'motion/react'
-import { FiArrowUpRight, FiAward, FiClock } from 'react-icons/fi'
+import { FiArrowUpRight } from 'react-icons/fi'
 import { fadeUp, inView, stagger } from '@/shared/animations/variants'
-import { TiltCard } from '@/shared/components'
 import { certifications, thumbnail } from '../data/certifications'
 import styles from '../Certifications.module.css'
 
@@ -16,46 +15,38 @@ export function Certifications({ t, lang, localize }) {
   return (
     <div className={styles.wrapper}>
       <motion.div className={styles.header} variants={fadeUp} {...inView}>
-        <h3 className={styles.title}>
-          <FiAward aria-hidden="true" /> {t.title}
-        </h3>
+        <h3 className={styles.title}>{t.title}</h3>
         <p className={styles.summary}>
           {t.summary.replace('{count}', certifications.length).replace('{hours}', TOTAL_HOURS)}
         </p>
       </motion.div>
 
-      <motion.ul className={styles.grid} variants={stagger(0.1)} {...inView}>
+      <motion.ul className={styles.grid} variants={stagger(0.08)} {...inView}>
         {certifications.map((course) => {
           const title = localize(course.title)
           return (
             <motion.li key={course.id} variants={fadeUp}>
-              <TiltCard className={styles.card} maxTilt={7}>
-                <a
-                  href={course.image}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.link}
-                  data-cursor={t.cursor}
-                  aria-label={`${t.view}: ${title} (${course.issuer})`}
-                >
-                  <span className={styles.thumb}>
-                    <img src={thumbnail(course.image)} alt="" loading="lazy" />
-                    <span className={styles.overlay}>
-                      {t.view} <FiArrowUpRight />
-                    </span>
-                    {course.badge && <span className={styles.badge}>{course.badge}</span>}
+              <a
+                href={course.image}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.card}
+                aria-label={`${t.view}: ${title} (${course.issuer})`}
+              >
+                <span className={styles.thumb}>
+                  <img src={thumbnail(course.image)} alt="" loading="lazy" />
+                  {course.badge && <span className={styles.badge}>{course.badge}</span>}
+                </span>
+                <span className={styles.caption}>
+                  <span className={styles.course}>
+                    {title}
+                    <FiArrowUpRight className={styles.arrow} aria-hidden="true" />
                   </span>
-                  <span className={styles.body}>
-                    <span className={styles.issuer}>
-                      {course.issuer} · {formatDate(course.date)}
-                    </span>
-                    <strong className={styles.course}>{title}</strong>
-                    <span className={styles.meta}>
-                      <FiClock aria-hidden="true" /> {course.hours} {t.hours} · {course.weeks} {t.weeks}
-                    </span>
+                  <span className={styles.meta}>
+                    {course.issuer} · {formatDate(course.date)} · {course.hours} {t.hours}
                   </span>
-                </a>
-              </TiltCard>
+                </span>
+              </a>
             </motion.li>
           )
         })}

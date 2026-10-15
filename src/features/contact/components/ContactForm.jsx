@@ -1,22 +1,24 @@
 import { AnimatePresence, motion } from 'motion/react'
-import { FiAlertCircle, FiCheck, FiSend } from 'react-icons/fi'
+import { FiAlertCircle, FiArrowRight, FiCheck } from 'react-icons/fi'
 import { Button } from '@/shared/components'
 import { profile } from '@/shared/data/profile'
 import { useContactForm } from '../hooks/useContactForm'
 import styles from '../Contact.module.css'
 
+/** Campo con label flotante: el label sube cuando el input tiene foco o contenido. */
 function Field({ id, label, error, errorText, multiline = false, ...props }) {
   const Input = multiline ? 'textarea' : 'input'
   return (
     <div className={`${styles.field} ${error ? styles.fieldError : ''}`}>
-      <label htmlFor={id}>{label}</label>
       <Input
         id={id}
         name={id}
+        placeholder=" "
         aria-invalid={Boolean(error)}
         aria-describedby={error ? `${id}-error` : undefined}
         {...props}
       />
+      <label htmlFor={id}>{label}</label>
       <AnimatePresence>
         {error && (
           <motion.span
@@ -55,7 +57,6 @@ export function ContactForm({ t }) {
         <Field
           id="name"
           label={t.form.name}
-          placeholder={t.form.namePlaceholder}
           value={values.name}
           onChange={handleChange}
           onBlur={handleBlur}
@@ -67,7 +68,6 @@ export function ContactForm({ t }) {
           id="email"
           type="email"
           label={t.form.email}
-          placeholder={t.form.emailPlaceholder}
           value={values.email}
           onChange={handleChange}
           onBlur={handleBlur}
@@ -79,9 +79,8 @@ export function ContactForm({ t }) {
       <Field
         id="message"
         multiline
-        rows={5}
+        rows={4}
         label={t.form.message}
-        placeholder={t.form.messagePlaceholder}
         value={values.message}
         onChange={handleChange}
         onBlur={handleBlur}
@@ -102,7 +101,11 @@ export function ContactForm({ t }) {
       />
 
       <div className={styles.formFooter}>
-        <Button type="submit" disabled={sending} icon={sending ? <span className={styles.spinner} /> : <FiSend />}>
+        <Button
+          type="submit"
+          disabled={sending}
+          icon={sending ? <span className={styles.spinner} /> : <FiArrowRight />}
+        >
           {sending ? t.form.sending : t.form.submit}
         </Button>
       </div>

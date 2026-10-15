@@ -1,159 +1,98 @@
 .grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.25rem;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid var(--color-border);
 }
 
-.cardWrapper {
-  height: 100%;
+.column {
+  padding: 2rem 1.75rem 0 0;
 }
 
-.card {
-  height: 100%;
-  padding: clamp(1.5rem, 3vw, 2rem);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  overflow: hidden;
-  transition: border-color var(--duration) var(--ease-out);
+.column + .column {
+  padding-left: 1.75rem;
+  border-left: 1px solid var(--color-border);
 }
 
-.card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: radial-gradient(30rem 15rem at 100% 0%, rgba(168, 85, 247, 0.1), transparent 60%);
-  pointer-events: none;
+.index {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-accent);
 }
 
-.card:hover {
-  border-color: rgba(168, 85, 247, 0.4);
-}
-
-.cardIndex {
-  position: absolute;
-  top: 1.25rem;
-  right: 1.5rem;
-  font-family: var(--font-display);
-  font-size: 3.5rem;
-  font-weight: 700;
-  line-height: 1;
-  color: transparent;
-  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.08);
-}
-
-.cardTitle {
+.title {
+  margin-top: 0.75rem;
   font-size: 1.35rem;
-  transform: translateZ(30px);
+  letter-spacing: -0.025em;
 }
 
-.cardDescription {
-  margin-top: 0.4rem;
-  max-width: 85%;
-  font-size: 0.93rem;
+.description {
+  margin-top: 0.5rem;
+  min-height: 3.2em;
+  font-size: 0.92rem;
+  line-height: 1.6;
   color: var(--color-text-muted);
 }
 
-.skillList {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 1.5rem;
-  transform: translateZ(40px);
+.list {
+  margin-top: 1.75rem;
 }
 
 .skill {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.7rem 1.1rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
-  background: rgba(7, 6, 13, 0.6);
+  gap: 0.75rem;
+  padding: 0.85rem 0;
+  border-top: 1px solid var(--color-border);
   font-weight: 500;
-  font-size: 0.95rem;
-  transition:
-    border-color var(--duration) var(--ease-out),
-    box-shadow var(--duration) var(--ease-out);
+  cursor: default;
+  transition: padding-left var(--duration) var(--ease-out);
 }
 
-.skillIcon {
-  font-size: 1.4rem;
-  color: var(--color-text-muted);
-  transition:
-    color var(--duration) var(--ease-out),
-    filter var(--duration) var(--ease-out);
+.skill:last-child {
+  border-bottom: 1px solid var(--color-border);
 }
 
-.skill:hover {
-  border-color: color-mix(in srgb, var(--brand) 60%, transparent);
-  box-shadow: 0 10px 30px -10px color-mix(in srgb, var(--brand) 60%, transparent);
-}
-
-.skill:hover .skillIcon {
-  color: var(--brand);
-  filter: drop-shadow(0 0 8px var(--brand));
-}
-
-/* Marquee */
-.marquees {
-  display: flex;
-  flex-direction: column;
-  gap: 0.9rem;
-  margin-top: clamp(3rem, 7vw, 5rem);
-  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
-}
-
-.marquee {
-  overflow: hidden;
-}
-
-.marqueeTrack {
-  display: flex;
-  gap: 2.5rem;
-  width: max-content;
-  animation: marquee 40s linear infinite;
-}
-
-.reverse {
-  animation-direction: reverse;
-}
-
-.marquees:hover .marqueeTrack {
-  animation-play-state: paused;
-}
-
-.marqueeItem {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6rem;
-  font-family: var(--font-display);
-  font-size: clamp(1.4rem, 3vw, 2.2rem);
-  font-weight: 600;
+.icon {
+  font-size: 1.2rem;
   color: var(--color-text-subtle);
-  white-space: nowrap;
   transition: color var(--duration) var(--ease-out);
 }
 
-.marqueeItem svg {
+.skill:hover {
+  padding-left: 0.4rem;
+}
+
+.skill:hover .icon {
   color: var(--brand);
-  opacity: 0.6;
 }
 
-.marqueeItem:hover {
-  color: var(--color-text);
-}
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 
-@keyframes marquee {
-  to {
-    transform: translateX(-50%);
+  .column:nth-child(3) {
+    padding-left: 0;
+    border-left: none;
+  }
+
+  .column:nth-child(n + 3) {
+    padding-top: 3rem;
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 600px) {
   .grid {
     grid-template-columns: 1fr;
+  }
+
+  .column,
+  .column + .column {
+    padding: 2.5rem 0 0;
+    border-left: none;
+  }
+
+  .description {
+    min-height: 0;
   }
 }

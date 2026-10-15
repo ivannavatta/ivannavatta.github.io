@@ -1,8 +1,7 @@
 export const es = {
   eyebrow: 'Skills',
-  title: 'Mi stack tecnológico',
-  subtitle:
-    'Las herramientas con las que construyo, desde la interfaz hasta la base de datos y la forma de trabajar en equipo.',
+  title: 'Herramientas con las que *construyo*.',
+  subtitle: 'Del frontend a la base de datos, y también la forma de trabajar en equipo.',
   categories: {
     frontend: {
       title: 'Frontend',

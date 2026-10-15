@@ -1,7 +1,7 @@
 export const en = {
   eyebrow: 'Skills',
-  title: 'My tech stack',
-  subtitle: 'The tools I build with, from the interface to the database, and the way I work in a team.',
+  title: 'The tools I *build with*.',
+  subtitle: 'From the interface to the database, and the way I work in a team.',
   categories: {
     frontend: {
       title: 'Frontend',

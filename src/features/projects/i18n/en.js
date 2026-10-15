@@ -1,10 +1,11 @@
 export const en = {
   eyebrow: 'Projects',
-  title: 'Things I have built',
+  title: 'Selected *work*.',
   subtitle: 'A selection of projects where I applied software development and analysis to solve real problems.',
   all: 'All',
   filterLabel: 'Filter projects by technology',
   viewDetails: 'View details',
+  viewProject: 'View project',
   cursor: 'View',
   featured: 'Featured',
   code: 'Code',

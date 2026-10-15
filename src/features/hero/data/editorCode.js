@@ -1,13 +1,13 @@
 import { profile } from '@/shared/data/profile'
 
-/** Colores de sintaxis del editor 3D (tema oscuro tipo VS Code). */
+/** Colores de sintaxis del bloque de código (tema claro, tipo GitHub Light). */
 export const SYNTAX = {
-  keyword: '#c084fc',
-  variable: '#22d3ee',
-  property: '#93c5fd',
-  string: '#86efac',
-  boolean: '#fb923c',
-  punctuation: '#94a3b8',
+  keyword: '#cf222e',
+  variable: '#8250df',
+  property: '#0550ae',
+  string: '#0a3069',
+  boolean: '#953800',
+  punctuation: '#6e7781',
 }
 
 const k = (text) => ({ text, color: SYNTAX.keyword })

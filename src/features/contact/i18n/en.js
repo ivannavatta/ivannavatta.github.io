@@ -1,8 +1,11 @@
 export const en = {
   eyebrow: 'Contact',
-  title: "Let's work together",
+  title: "Let's work *together*.",
   subtitle:
     "I'm looking for new opportunities to keep growing as a developer. If you have an offer, a project or just want to chat, drop me a line.",
+  emailLabel: 'Email me at',
+  socialsTitle: 'Socials',
+  formTitle: 'Or leave me a message',
   form: {
     name: 'Name',
     namePlaceholder: 'Your name',

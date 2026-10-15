@@ -1,18 +1,24 @@
 export const common = {
   es: {
     footer: {
-      madeWith: 'Diseñado y desarrollado con React, Three.js y Motion.',
+      cta: '¿Tenés un proyecto o una propuesta?',
+      localTime: 'Hora local',
       rights: 'Todos los derechos reservados.',
+      madeWith: 'Diseñado y desarrollado con React y Motion.',
       backToTop: 'Volver arriba',
+      socials: 'Redes',
+      contact: 'Contacto',
     },
-    loader: 'Cargando experiencia',
   },
   en: {
     footer: {
-      madeWith: 'Designed and built with React, Three.js and Motion.',
+      cta: 'Have a project or an opportunity?',
+      localTime: 'Local time',
       rights: 'All rights reserved.',
+      madeWith: 'Designed and built with React and Motion.',
       backToTop: 'Back to top',
+      socials: 'Socials',
+      contact: 'Contact',
     },
-    loader: 'Loading experience',
   },
 }

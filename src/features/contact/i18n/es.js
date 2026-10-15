@@ -1,8 +1,11 @@
 export const es = {
   eyebrow: 'Contacto',
-  title: '¿Trabajamos juntos?',
+  title: '¿Trabajamos *juntos*?',
   subtitle:
     'Estoy buscando nuevas oportunidades para seguir creciendo como desarrollador. Si tenés una propuesta, un proyecto o simplemente querés charlar, escribime.',
+  emailLabel: 'Escribime a',
+  socialsTitle: 'Redes',
+  formTitle: 'O dejame un mensaje',
   form: {
     name: 'Nombre',
     namePlaceholder: 'Tu nombre',

@@ -1,6 +1,6 @@
 export const en = {
   eyebrow: 'About me',
-  title: 'Code with a business mindset',
+  title: 'Understand the business, *write the code*.',
   paragraphs: [
     "I'm {name}, a software developer from Buenos Aires with over {years} years of coding experience. I started with Coderhouse courses (Web Development, JavaScript, React and Backend Programming) and I'm now studying Information Technology Management at UADE, a degree that combines software development with systems analysis.",
     'That mix lets me do more than write code: I understand the context of the company (its processes, users and goals) to build solutions that deliver real value.',
@@ -19,6 +19,6 @@ export const en = {
   stats: {
     years: 'Years coding',
     technologies: 'Technologies',
-    stack: 'Front & Back',
+    courses: 'Certified courses',
   },
 }

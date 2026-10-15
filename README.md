@@ -1,6 +1,6 @@
 # Portfolio · Ivan Navatta
 
-Portfolio personal construido con **React 19 + Vite**, con escena **3D (Three.js / React Three Fiber)**, animaciones con **Motion**, smooth scroll con **Lenis**, sitio bilingüe **ES / EN** y formulario de contacto con **EmailJS**.
+Portfolio personal construido con **React 19 + Vite**, con diseño **minimalista y editorial** (tema claro, tipografía grande), animaciones sutiles con **Motion**, smooth scroll con **Lenis**, sitio bilingüe **ES / EN** y formulario de contacto con **EmailJS**.
 
 🌐 **En vivo:** https://ivannavatta.github.io
 
@@ -25,7 +25,7 @@ src/
 │   ├── main.jsx              # Punto de entrada
 │   └── providers/            # Idioma, Motion y smooth scroll
 ├── features/
-│   ├── hero/                 # Portada con escena 3D y typewriter
+│   ├── hero/                 # Portada con nombre revelado y bloque de código que se tipea
 │   ├── about/                # Sobre mí + tarjeta de perfil + contadores
 │   ├── skills/               # Stack tecnológico por categoría
 │   ├── projects/             # Proyectos, filtros y modal de detalle
@@ -105,7 +105,7 @@ Después volvé a correr el workflow (*Actions → Deploy a GitHub Pages → Run
 
 ## Accesibilidad y rendimiento
 
-- Respeta `prefers-reduced-motion`: sin smooth scroll, 3D estático y animaciones mínimas.
-- La escena 3D se carga en un chunk aparte (lazy) y deja de renderizar cuando sale de pantalla.
-- El cursor custom solo aparece en dispositivos con mouse.
+- Respeta `prefers-reduced-motion`: sin smooth scroll, sin revelados ni tipeo (el código se muestra completo).
+- La vista previa de proyectos que sigue al cursor solo aparece en dispositivos con mouse.
+- Sin librerías 3D: un único bundle liviano.
 - Navegación por teclado, `aria-*` en controles y `lang` del documento según el idioma.
