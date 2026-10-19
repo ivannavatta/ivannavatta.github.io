@@ -29,13 +29,13 @@ src/
 │   ├── about/                # Sobre mí + tarjeta de perfil + contadores
 │   ├── skills/               # Stack tecnológico por categoría
 │   ├── projects/             # Proyectos, filtros y modal de detalle
-│   ├── education/            # Línea de tiempo de formación
+│   ├── education/            # Línea de tiempo de formación + certificados
 │   ├── contact/              # Formulario (EmailJS) + redes
 │   └── navigation/           # Navbar, menú mobile, toggle de idioma
 └── shared/
     ├── animations/           # Variants reutilizables de Motion
-    ├── components/           # Button, Section, TiltCard, Loader, Cursor, Footer...
-    ├── data/profile.js       # ⭐ Tus datos personales
+    ├── components/           # Button, Section, RevealText, Divider, ArrowLink, Footer, SmoothScroll
+    ├── data/                 # ⭐ profile.js (tus datos), technologies.js, certifications.js
     ├── hooks/                # useMediaQuery, useYearsCoding, useSmoothScroll...
     ├── i18n/                 # LanguageProvider + useTranslation
     └── styles/               # Variables de diseño y estilos globales
@@ -59,7 +59,9 @@ features/projects/
 | --- | --- |
 | Nombre, carrera, email, redes, foto, año en que empezaste a programar | `src/shared/data/profile.js` |
 | **Proyectos** | `src/features/projects/data/projects.js` |
-| Tecnologías | `src/features/skills/data/skills.js` |
+| Tecnologías (catálogo con ícono y color) | `src/shared/data/technologies.js` |
+| Agrupación de tecnologías por categoría | `src/features/skills/data/skills.js` |
+| Cursos y certificados | `src/shared/data/certifications.js` |
 | Formación / experiencia | `src/features/education/data/education.js` |
 | Textos de cada sección | `src/features/<feature>/i18n/es.js` y `en.js` |
 | Colores, tipografías, espaciados | `src/shared/styles/tokens.css` |
@@ -68,7 +70,7 @@ features/projects/
 - **Años programando**: se calculan solos a partir de `startYear`, así que el número nunca queda desactualizado.
 - **Foto**: copiá tu imagen a `public/avatar.jpg` y poné `photo: '/avatar.jpg'` en `profile.js`.
 - **Capturas de proyectos**: guardalas en `public/projects/` y usá `image: '/projects/mi-proyecto.png'`. Si no hay imagen, se genera una portada automática.
-- **Proyecto destacado**: con `featured: true` la tarjeta ocupa el ancho completo.
+- **Proyecto destacado**: con `featured: true` la fila muestra la etiqueta "Destacado".
 
 ## Configurar el formulario de contacto (EmailJS)
 

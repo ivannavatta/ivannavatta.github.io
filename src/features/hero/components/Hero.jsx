@@ -43,7 +43,7 @@ export function Hero() {
         <RevealText as="h1" className={styles.name} text={profile.fullName} animate delay={0.2} stagger={0.12} />
 
         <div className={styles.grid}>
-          <div className={styles.text}>
+          <div>
             <RevealText as="p" className={styles.role} text={toSegments(t.role)} animate delay={0.55} stagger={0.04} />
 
             <motion.p className={styles.description} {...fade(0.9)}>

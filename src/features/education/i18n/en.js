@@ -7,8 +7,6 @@ export const en = {
     title: 'Courses & certifications',
     summary: '{count} courses · {hours} hours of training',
     hours: 'hours',
-    weeks: 'weeks',
     view: 'View certificate',
-    cursor: 'View',
   },
 }

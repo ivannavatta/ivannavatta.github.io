@@ -10,8 +10,4 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
-  build: {
-    // three.js se carga aparte (lazy) junto con la escena 3D
-    chunkSizeWarningLimit: 1200,
-  },
 })

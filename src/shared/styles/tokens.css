@@ -5,9 +5,10 @@
   --color-surface-muted: #f3f2ee;
   --color-text: #111111;
   --color-text-muted: #5e5e5a;
-  --color-text-subtle: #9b9a94;
+  --color-text-subtle: #6f6e68; /* 4.89:1 sobre --color-bg, 5.11:1 sobre blanco (WCAG AA) */
   --color-border: #e7e5df;
   --color-border-strong: #d4d2cb;
+  --color-border-control: #8a857a; /* bordes de inputs: 3.51:1 sobre --color-bg (WCAG 1.4.11) */
   --color-accent: #2b44ff;
   --color-accent-soft: rgba(43, 68, 255, 0.1);
   --color-success: #16a34a;

@@ -1,17 +1,23 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { FiArrowUpRight, FiCheck, FiCopy } from 'react-icons/fi'
 import { profile } from '@/shared/data/profile'
+import { externalLinkProps } from '@/shared/utils/externalLinkProps'
 import styles from '../Contact.module.css'
 
 /** Lista de contacto: copiar email, LinkedIn, GitHub y ubicación. */
 export function SocialLinks({ t, localize }) {
   const [copied, setCopied] = useState(false)
+  const timeoutRef = useRef(null)
+
+  // Si el componente se desmonta antes de los 2 s, cancelamos el timeout pendiente
+  useEffect(() => () => clearTimeout(timeoutRef.current), [])
 
   const copyEmail = async () => {
     try {
       await navigator.clipboard.writeText(profile.contact.email)
       setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+      clearTimeout(timeoutRef.current)
+      timeoutRef.current = setTimeout(() => setCopied(false), 2000)
     } catch {
       window.location.href = `mailto:${profile.contact.email}`
     }
@@ -32,7 +38,7 @@ export function SocialLinks({ t, localize }) {
       </li>
       {links.map(({ id, label, href }) => (
         <li key={id}>
-          <a href={href} target="_blank" rel="noopener noreferrer" className={styles.linkRow}>
+          <a href={href} {...externalLinkProps(href)} className={styles.linkRow}>
             <span>{label}</span>
             <FiArrowUpRight aria-hidden="true" />
           </a>

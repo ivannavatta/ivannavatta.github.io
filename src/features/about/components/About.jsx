@@ -1,6 +1,7 @@
 import { motion } from 'motion/react'
 import { fadeUp, inView, stagger } from '@/shared/animations/variants'
 import { ArrowLink, Divider, Section } from '@/shared/components'
+import { certifications } from '@/shared/data/certifications'
 import { profile } from '@/shared/data/profile'
 import { technologyList } from '@/shared/data/technologies'
 import { useYearsCoding } from '@/shared/hooks'
@@ -9,9 +10,6 @@ import { en } from '../i18n/en'
 import { es } from '../i18n/es'
 import { StatCounter } from './StatCounter'
 import styles from '../About.module.css'
-
-// Cursos con certificado (Coderhouse): Desarrollo Web, JavaScript, React Js y Backend
-const CERTIFIED_COURSES = 4
 
 export function About() {
   const { t, localize } = useTranslation({ es, en })
@@ -66,7 +64,7 @@ export function About() {
           <div className={styles.stats}>
             <StatCounter value={years} suffix="+" label={t.stats.years} />
             <StatCounter value={technologyList.length} label={t.stats.technologies} />
-            <StatCounter value={CERTIFIED_COURSES} label={t.stats.courses} />
+            <StatCounter value={certifications.length} label={t.stats.courses} />
           </div>
 
           <ol className={styles.highlights}>

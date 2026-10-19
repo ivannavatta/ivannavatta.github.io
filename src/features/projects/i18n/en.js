@@ -5,8 +5,6 @@ export const en = {
   all: 'All',
   filterLabel: 'Filter projects by technology',
   viewDetails: 'View details',
-  viewProject: 'View project',
-  cursor: 'View',
   featured: 'Featured',
   code: 'Code',
   demo: 'Demo',

@@ -4,6 +4,7 @@ const CLOUDINARY = 'https://res.cloudinary.com/dvcmgnvwi/image/upload'
  * Cursos y certificaciones.
  * `image` es la imagen del certificado completo; la miniatura se genera con Cloudinary.
  * `badge` (opcional) muestra una distinción, por ejemplo "Top 10".
+ * Vive en shared porque la usan dos features: education (tarjetas) y about (contador).
  */
 export const certifications = [
   {

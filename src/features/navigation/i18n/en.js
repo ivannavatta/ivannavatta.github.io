@@ -7,12 +7,11 @@ export const en = {
     education: 'Education',
     contact: 'Contact',
   },
-  cta: "Let's talk",
+  navLabel: 'Main',
   menu: 'Menu',
   close: 'Close',
   language: 'Language',
   openMenu: 'Open menu',
   closeMenu: 'Close menu',
-  switchLanguage: 'Switch language to Spanish',
   goHome: 'Go to home',
 }

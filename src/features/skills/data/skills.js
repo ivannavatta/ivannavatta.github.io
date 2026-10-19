@@ -12,5 +12,3 @@ export const skillCategories = [
   { id: 'data', skills: [sql, nosql] },
   { id: 'tools', skills: [git, scrum] },
 ]
-
-export const allSkills = skillCategories.flatMap((category) => category.skills)

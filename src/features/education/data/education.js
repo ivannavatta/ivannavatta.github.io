@@ -1,7 +1,7 @@
 /**
  * Formación y trayectoria (de lo más reciente a lo más antiguo).
  * Agregá acá experiencia laboral cuando la tengas.
- * type: 'education' | 'experience' | 'course' (cambia el ícono)
+ * type: 'education' | 'experience' | 'course' (dato descriptivo; hoy no cambia la vista)
  */
 export const timeline = [
   {

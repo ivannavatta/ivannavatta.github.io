@@ -35,7 +35,7 @@ export function Projects() {
       </motion.div>
 
       <ul className={styles.list} onPointerLeave={() => setHovered(null)}>
-        <AnimatePresence mode="popLayout" initial={false}>
+        <AnimatePresence mode="popLayout">
           {filtered.map((project, number) => (
             <ProjectRow
               key={project.id}

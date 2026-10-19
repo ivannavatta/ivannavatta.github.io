@@ -1,7 +1,8 @@
 import { motion } from 'motion/react'
 import { FiArrowUpRight } from 'react-icons/fi'
 import { fadeUp, inView, stagger } from '@/shared/animations/variants'
-import { certifications, thumbnail } from '../data/certifications'
+import { certifications, thumbnail } from '@/shared/data/certifications'
+import { externalLinkProps } from '@/shared/utils/externalLinkProps'
 import styles from '../Certifications.module.css'
 
 const TOTAL_HOURS = certifications.reduce((sum, course) => sum + course.hours, 0)
@@ -28,8 +29,7 @@ export function Certifications({ t, lang, localize }) {
             <motion.li key={course.id} variants={fadeUp}>
               <a
                 href={course.image}
-                target="_blank"
-                rel="noopener noreferrer"
+                {...externalLinkProps(course.image)}
                 className={styles.card}
                 aria-label={`${t.view}: ${title} (${course.issuer})`}
               >

@@ -1,3 +1,4 @@
+import { externalLinkProps } from '../../utils/externalLinkProps'
 import styles from './Button.module.css'
 
 /**
@@ -6,13 +7,12 @@ import styles from './Button.module.css'
  */
 export function Button({ children, href, variant = 'primary', size = 'md', icon, className = '', ...props }) {
   const Component = href ? 'a' : 'button'
-  const linkProps = href?.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {}
 
   return (
     <Component
       href={href}
       className={`${styles.button} ${styles[variant]} ${styles[size]} ${className}`}
-      {...linkProps}
+      {...externalLinkProps(href)}
       {...props}
     >
       <span className={styles.label}>{children}</span>

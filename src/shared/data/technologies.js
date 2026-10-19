@@ -3,7 +3,7 @@ import { SiCss, SiGit, SiHtml5, SiJavascript, SiMongodb, SiPython, SiReact } fro
 
 /**
  * Catálogo de tecnologías que manejás (nombre, ícono y color de marca).
- * Lo usan la sección Skills y la escena 3D del hero.
+ * Lo usa la sección Skills (src/features/skills/data/skills.js).
  */
 export const technologies = {
   html: { name: 'HTML', icon: SiHtml5, color: '#E34F26' },

@@ -20,7 +20,7 @@ export function Section({ id, index, eyebrow, title, subtitle, children, classNa
               {index && <span className={styles.index}>({index})</span>}
               {eyebrow}
             </motion.p>
-            <div className={styles.heading}>
+            <div>
               <RevealText as="h2" className={styles.title} text={toSegments(title)} />
               {subtitle && (
                 <motion.p className={styles.subtitle} variants={fadeUp} {...inView}>

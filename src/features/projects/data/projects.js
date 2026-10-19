@@ -12,7 +12,7 @@
  *  - repo:        link al repositorio (o null)
  *  - demo:        link a la demo online (o null)
  *  - year:        año del proyecto
- *  - featured:    true para destacarlo (ocupa más espacio en la grilla)
+ *  - featured:    true para destacarlo (muestra la etiqueta "Destacado")
  */
 export const projects = [
   {

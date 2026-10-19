@@ -7,12 +7,11 @@ export const es = {
     education: 'Formación',
     contact: 'Contacto',
   },
-  cta: 'Hablemos',
+  navLabel: 'Principal',
   menu: 'Menú',
   close: 'Cerrar',
   language: 'Idioma',
   openMenu: 'Abrir menú',
   closeMenu: 'Cerrar menú',
-  switchLanguage: 'Cambiar idioma a inglés',
   goHome: 'Ir al inicio',
 }

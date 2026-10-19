@@ -114,11 +114,15 @@
 }
 
 .langSeparator {
-  margin: 0 0.4rem;
   color: var(--color-text-subtle);
 }
 
+/* Área táctil de 44×44px (WCAG 2.5.5) sin cambiar el aspecto "ES / EN" */
 .langOption {
+  display: inline-grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 44px;
   color: var(--color-text-subtle);
   transition: color var(--duration) var(--ease-out);
 }

@@ -4,7 +4,7 @@ import { createPortal } from 'react-dom'
 import { FiCheck, FiExternalLink, FiGithub, FiX } from 'react-icons/fi'
 import { EASE_OUT } from '@/shared/animations/variants'
 import { Button } from '@/shared/components'
-import { useSmoothScroll } from '@/shared/hooks'
+import { useFocusTrap, useSmoothScroll } from '@/shared/hooks'
 import { ProjectCover } from './ProjectCover'
 import styles from '../Projects.module.css'
 
@@ -12,17 +12,14 @@ export function ProjectModal({ project, index, onClose, t, localize }) {
   const closeRef = useRef(null)
   const { lockScroll, unlockScroll } = useSmoothScroll()
 
+  // Foco atrapado en el diálogo, Escape para cerrar y foco devuelto a la fila al cerrar
+  const dialogRef = useFocusTrap(Boolean(project), { initialFocusRef: closeRef, onEscape: onClose })
+
   useEffect(() => {
     if (!project) return undefined
     lockScroll()
-    closeRef.current?.focus()
-    const onKey = (event) => event.key === 'Escape' && onClose()
-    window.addEventListener('keydown', onKey)
-    return () => {
-      unlockScroll()
-      window.removeEventListener('keydown', onKey)
-    }
-  }, [project, onClose, lockScroll, unlockScroll])
+    return unlockScroll
+  }, [project, lockScroll, unlockScroll])
 
   return createPortal(
     <AnimatePresence>
@@ -35,6 +32,7 @@ export function ProjectModal({ project, index, onClose, t, localize }) {
           exit={{ opacity: 0 }}
         >
           <motion.div
+            ref={dialogRef}
             className={styles.modal}
             role="dialog"
             aria-modal="true"

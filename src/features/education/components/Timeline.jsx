@@ -15,11 +15,11 @@ export function Timeline() {
     <Section id="education" index="04" eyebrow={t.eyebrow} title={t.title} subtitle={t.subtitle}>
       <ol className={styles.list}>
         {timeline.map((entry, index) => (
-          <li key={entry.id} className={styles.item}>
+          <li key={entry.id}>
             <Divider delay={index * 0.1} />
             <motion.div className={styles.row} variants={fadeUp} {...inView}>
               <span className={styles.period}>{localize(entry.period)}</span>
-              <div className={styles.body}>
+              <div>
                 <h3 className={styles.title}>{localize(entry.title)}</h3>
                 <p className={styles.place}>{localize(entry.place)}</p>
                 <p className={styles.description}>{localize(entry.description)}</p>

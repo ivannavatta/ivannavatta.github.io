@@ -1,5 +1,5 @@
 import { motion } from 'motion/react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { profile } from '@/shared/data/profile'
 import { useSmoothScroll } from '@/shared/hooks'
 import { useTranslation } from '@/shared/i18n'
@@ -19,18 +19,13 @@ export function Navbar() {
   const active = useActiveSection(SECTIONS)
   const { scrolled, hidden } = useScrollDirection()
   const [menuOpen, setMenuOpen] = useState(false)
+  const burgerRef = useRef(null)
+  const closeMenu = useCallback(() => setMenuOpen(false), [])
 
   useEffect(() => {
     if (menuOpen) lockScroll()
     else unlockScroll()
   }, [menuOpen, lockScroll, unlockScroll])
-
-  useEffect(() => {
-    if (!menuOpen) return undefined
-    const onKey = (event) => event.key === 'Escape' && setMenuOpen(false)
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [menuOpen])
 
   const navigate = (event, id) => {
     event.preventDefault()
@@ -57,7 +52,7 @@ export function Navbar() {
             <span className={styles.logoDot} aria-hidden="true" />
           </a>
 
-          <nav className={styles.links} aria-label="Principal">
+          <nav className={styles.links} aria-label={t.navLabel}>
             {SECTIONS.filter((id) => id !== 'home').map((id) => (
               <a
                 key={id}
@@ -75,8 +70,9 @@ export function Navbar() {
           <div className={styles.actions}>
             <LanguageToggle className={styles.desktopOnly} />
             <button
+              ref={burgerRef}
               type="button"
-              className={`${styles.burger} ${menuOpen ? styles.burgerOpen : ''}`}
+              className={styles.burger}
               onClick={() => setMenuOpen((open) => !open)}
               aria-label={menuOpen ? t.closeMenu : t.openMenu}
               aria-expanded={menuOpen}
@@ -88,7 +84,17 @@ export function Navbar() {
         </div>
       </motion.header>
 
-      <MobileMenu open={menuOpen} sections={SECTIONS} labels={t.links} active={active} onNavigate={navigate} />
+      <MobileMenu
+        open={menuOpen}
+        sections={SECTIONS}
+        labels={t.links}
+        label={t.menu}
+        navLabel={t.navLabel}
+        active={active}
+        onNavigate={navigate}
+        onClose={closeMenu}
+        toggleRef={burgerRef}
+      />
     </>
   )
 }

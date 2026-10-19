@@ -8,11 +8,8 @@ export const en = {
   formTitle: 'Or leave me a message',
   form: {
     name: 'Name',
-    namePlaceholder: 'Your name',
     email: 'Email',
-    emailPlaceholder: 'you@email.com',
     message: 'Message',
-    messagePlaceholder: 'Tell me about the offer or the project...',
     submit: 'Send message',
     sending: 'Sending...',
     success: "Thanks! Your message was sent. I'll get back to you soon.",
@@ -25,8 +22,6 @@ export const en = {
     messageShort: 'The message must be at least 10 characters long',
   },
   links: {
-    title: 'You can also find me on',
-    email: 'Email',
     linkedin: 'LinkedIn',
     github: 'GitHub',
     location: 'Location',
