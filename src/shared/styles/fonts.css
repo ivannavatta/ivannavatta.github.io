@@ -1,0 +1,11 @@
+/* General Sans (Indian Type Foundry · Fontshare), auto-hospedada.
+   La licencia ITF Free Font License permite el self-hosting para el sitio propio
+   (public/fonts/general-sans/LICENSE-FFL.txt). Archivo oficial sin modificar: la
+   licencia prohíbe subsetear o convertir. Una sola variable cubre los pesos 400–700. */
+@font-face {
+  font-family: 'General Sans';
+  src: url('/fonts/general-sans/GeneralSans-Variable.woff2') format('woff2');
+  font-weight: 200 700;
+  font-style: normal;
+  font-display: swap;
+}

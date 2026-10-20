@@ -1,0 +1,25 @@
+.mono {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  aspect-ratio: 6 / 5;
+  color: var(--ink);
+}
+
+.mono i {
+  grid-column: var(--c);
+  grid-row: var(--r);
+  background: currentColor;
+  transform: scale(0.9);
+}
+
+.mono i.accent {
+  background: var(--accent);
+}
+
+/* La escena 3D dibuja los bloques: con escena viva, todos los IN; con movimiento
+   reducido, solo el del inicio. Sin WebGL (html.no-gl) quedan estos bloques planos. */
+:global(html.gl.live) .mono i,
+:global(html.gl.reduced) .mono[data-stage-pose='hero'] i {
+  background: transparent;
+}

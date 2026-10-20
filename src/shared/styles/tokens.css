@@ -1,43 +1,80 @@
+/* =========================================================
+   Tokens · "Pieza por pieza"
+   Paleta escarcha + pizarra + verde azulado. Una sola familia: General Sans.
+   Los valores --light-* y --dark-* son la fuente única: la feature stage los lee
+   desde JS (getComputedStyle) para mezclar el tema y teñir los bloques 3D.
+   ========================================================= */
+
 :root {
-  /* Colores: base neutra cálida + un único acento */
-  --color-bg: #fafaf7;
-  --color-surface: #ffffff;
-  --color-surface-muted: #f3f2ee;
-  --color-text: #111111;
-  --color-text-muted: #5e5e5a;
-  --color-text-subtle: #6f6e68; /* 4.89:1 sobre --color-bg, 5.11:1 sobre blanco (WCAG AA) */
-  --color-border: #e7e5df;
-  --color-border-strong: #d4d2cb;
-  --color-border-control: #8a857a; /* bordes de inputs: 3.51:1 sobre --color-bg (WCAG 1.4.11) */
-  --color-accent: #2b44ff;
-  --color-accent-soft: rgba(43, 68, 255, 0.1);
-  --color-success: #16a34a;
-  --color-error: #dc2626;
+  /* Capítulo claro */
+  --light-bg: #f7f9fa;
+  --light-surface: #ecf0f2;
+  --light-surface-2: #e1e7ea;
+  --light-ink: #1f3038;
+  --light-soft: #5d6b72;
+  --light-accent: #0d7480;
+  --light-accent-ink: #ffffff;
+  --light-accent-hover: #0a5f69;
+  --light-error: #b4232c;
 
-  /* Tipografía */
-  --font-display: 'Inter Tight', 'Inter', system-ui, sans-serif;
-  --font-serif: 'Instrument Serif', Georgia, serif;
-  --font-body: 'Inter', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  /* Capítulo oscuro */
+  --dark-bg: #0e1a1f;
+  --dark-surface: #172a31;
+  --dark-surface-2: #22383f;
+  --dark-ink: #eef3f5;
+  --dark-soft: #9fb2b9;
+  --dark-accent: #4cc3cf;
+  --dark-accent-ink: #0e1a1f;
+  --dark-accent-hover: #7ad6df;
+  --dark-error: #ff9c93;
 
-  /* Layout */
-  --container: 1240px;
-  --gutter: clamp(1.25rem, 5vw, 3rem);
-  --section-padding: clamp(6rem, 14vw, 11rem);
-  --nav-height: 76px;
+  /* Bloques (escena 3D y sus equivalentes planos) */
+  --block-light: #dce5e8; /* IN sobre fondo oscuro */
+  --block-base: #2c4750; /* ladrillos bajo los proyectos, capa superior de figuras */
+  --tile: #1b2e36; /* teclas del stack */
+  --tile-active: #0b6670; /* tecla activa, almacenes de MyTube */
+  --graph-line: #6f8c96; /* aristas de figuras: 3.6:1 sobre --dark-surface */
+  --console-bg: #0a1418;
+  --field-border: #5b7782; /* borde de campos: 4.6:1 sobre claro, 3.3:1 sobre oscuro */
 
-  /* Radios */
-  --radius-sm: 6px;
-  --radius-md: 12px;
-  --radius-lg: 18px;
-  --radius-full: 999px;
+  /* Tokens vivos: los mueve la feature stage según el capítulo.
+     Sin escena viva (movimiento reducido o error) los fija cada sección con data-theme. */
+  --bg: var(--light-bg);
+  --surface: var(--light-surface);
+  --surface-2: var(--light-surface-2);
+  --ink: var(--light-ink);
+  --soft: var(--light-soft);
+  --accent: var(--light-accent);
+  --accent-ink: var(--light-accent-ink);
+  --accent-hover: var(--light-accent-hover);
+  --error: var(--light-error);
+
+  /* Tipo: cinco tamaños */
+  --step-small: 0.9375rem; /* 15 */
+  --step-body: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem); /* 17–19 */
+  --step-lead: clamp(1.25rem, 1rem + 1vw, 1.75rem); /* 20–28 */
+  --step-head: clamp(2.5rem, 1.4rem + 3.6vw, 4.5rem); /* 40–72 */
+  --step-display: clamp(4.5rem, 14vw, 15rem); /* nombre, filas del inicio */
+
+  --font: 'General Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: ui-monospace, 'Cascadia Code', 'SF Mono', Menlo, Consolas, monospace; /* solo dentro de <pre> */
+
+  /* Espacio */
+  --m: clamp(16px, 2.2vw, 32px); /* margen exterior, igual en los dos lados */
+  --gap: clamp(16px, 2vw, 28px);
+  --section: clamp(120px, 14vw, 220px);
+  --bar-h: 64px; /* barra fija mobile: 10 + 44 + 10 */
 
   /* Movimiento */
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-  --duration: 0.4s;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
 
-  /* Sombras suaves */
-  --shadow-sm: 0 1px 2px rgba(17, 17, 17, 0.04), 0 2px 8px rgba(17, 17, 17, 0.04);
-  --shadow-md: 0 2px 6px rgba(17, 17, 17, 0.04), 0 12px 32px rgba(17, 17, 17, 0.07);
+  /* Capas (la escena 3D queda entre el inicio y el resto de las secciones) */
+  --z-traces: 0;
+  --z-hero: 1;
+  --z-stage: 2;
+  --z-section: 3;
+  --z-nav: 60;
+  --z-skip: 200;
 }
+

@@ -1,14 +1,5 @@
-import { MotionConfig } from 'motion/react'
-import { SmoothScroll } from '@/shared/components'
-import { LanguageProvider } from '@/shared/i18n'
+import { ScrollProvider } from '@/shared/scroll'
 
 export function AppProviders({ children }) {
-  return (
-    <LanguageProvider>
-      {/* reducedMotion="user": respeta la preferencia del sistema operativo */}
-      <MotionConfig reducedMotion="user">
-        <SmoothScroll>{children}</SmoothScroll>
-      </MotionConfig>
-    </LanguageProvider>
-  )
+  return <ScrollProvider>{children}</ScrollProvider>
 }
