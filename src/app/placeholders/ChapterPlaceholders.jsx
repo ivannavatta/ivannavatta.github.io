@@ -26,27 +26,6 @@ const STEPS = [
 export function ChapterPlaceholders() {
   return (
     <>
-      <section {...chapterProps('perfil', 'light')} className={styles.perfil} aria-labelledby="perfil-title">
-        <div className={styles.grid}>
-          <div className={styles.perfilMain}>
-            <h2 className={styles.head} id="perfil-title">
-              Negocio, datos y código.
-            </h2>
-            <p className={styles.lead}>
-              Estudio cómo la tecnología resuelve problemas de negocio, y programo desde 2023 para poder construir esas
-              soluciones yo mismo.
-            </p>
-            <p className={styles.text}>
-              Combino programación, bases de datos, infraestructura tecnológica y gestión de proyectos. Me definen la
-              responsabilidad, el pensamiento analítico y las ganas de aprender.
-            </p>
-          </div>
-          <div className={styles.perfilAside}>
-            <Monogram pose={POSES.perfil} className={styles.perfilMono} />
-          </div>
-        </div>
-      </section>
-
       <section {...chapterProps('proyectos', 'dark')} className={styles.work} aria-labelledby="work-title">
         <div className={styles.workPin}>
           <div className={styles.workHead}>

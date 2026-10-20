@@ -26,25 +26,6 @@
   max-width: 60ch;
 }
 
-.perfil {
-  padding: var(--section) var(--m) calc(var(--section) * 0.6);
-}
-.perfilMain {
-  grid-column: 1 / span 7;
-  min-height: 90svh;
-}
-.perfilAside {
-  grid-column: 9 / -1;
-  position: relative;
-  align-self: stretch;
-}
-.perfilMono {
-  position: sticky;
-  top: calc(50svh - 150px);
-  height: 300px;
-  margin-left: auto;
-}
-
 .work {
   padding-top: calc(var(--section) * 0.5);
 }
@@ -179,13 +160,6 @@
 }
 
 @media (max-width: 1023px) {
-  .perfilMain {
-    grid-column: 1 / span 8;
-  }
-  .perfilMono {
-    height: 180px;
-    top: 30svh;
-  }
   .stackIntro,
   .stackLayers {
     grid-column: 1 / -1;
@@ -213,19 +187,6 @@
 @media (max-width: 767px) {
   .grid {
     grid-template-columns: 1fr;
-  }
-  .perfilMain,
-  .perfilAside {
-    grid-column: 1;
-  }
-  .perfilAside {
-    grid-row: 1;
-    margin-bottom: 32px;
-  }
-  .perfilMono {
-    position: relative;
-    top: auto;
-    height: 120px;
   }
   .layer {
     grid-template-columns: 1fr;

@@ -1,3 +1,4 @@
+import { About } from '@/features/about'
 import { Hero } from '@/features/hero'
 import { Navbar } from '@/features/navigation'
 import { Stage } from '@/features/stage'
@@ -5,7 +6,7 @@ import { ChapterPlaceholders } from './placeholders/ChapterPlaceholders'
 import { AppProviders } from './providers/AppProviders'
 
 // Las secciones que todavía son provisorias (./placeholders) se reemplazan por sus
-// features ronda por ronda: about, projects, skills, education y contact.
+// features ronda por ronda: projects, skills, education y contact.
 export function App() {
   return (
     <AppProviders>
@@ -15,6 +16,7 @@ export function App() {
       <Navbar />
       <main id="main">
         <Hero />
+        <About />
         <ChapterPlaceholders />
       </main>
       {/* Después de <main>: la escena mide las secciones ya montadas */}

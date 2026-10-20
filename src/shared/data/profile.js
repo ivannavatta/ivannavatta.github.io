@@ -25,11 +25,11 @@ export const profile = {
   university: 'UADE',
   universityUrl: 'https://www.uade.edu.ar',
 
-  // Año en que empezaste a programar: los "años de experiencia" se calculan solos.
+  // Año en que empezaste a programar (Perfil: "Programo desde").
   startYear: 2023,
 
   location: {
-    es: 'CABA, Argentina',
+    es: 'CABA, Buenos Aires',
     en: 'Buenos Aires, Argentina',
   },
 

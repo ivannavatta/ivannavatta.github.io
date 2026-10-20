@@ -1,0 +1,176 @@
+/* ---------- 2. Perfil ---------- */
+.perfil {
+  padding: var(--section) var(--m) calc(var(--section) * 0.6);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gap);
+}
+
+.main {
+  grid-column: 1 / span 7;
+}
+
+.aside {
+  grid-column: 9 / -1;
+  position: relative;
+}
+
+/* El IN acompaña la lectura: queda fijo a media pantalla (la escena 3D lo dibuja encima) */
+.mono {
+  position: sticky;
+  top: calc(50svh - 150px);
+  height: 300px;
+  margin-left: auto;
+}
+
+.title {
+  font-size: var(--step-head);
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+}
+
+.statement {
+  margin-top: 40px;
+  font-size: var(--step-lead);
+  line-height: 1.3;
+  font-weight: 500;
+  max-width: 40ch;
+}
+
+/* Revelado por palabra: solo color. Sin capa de movimiento (reducido) todo queda en tinta. */
+.word {
+  transition: color 120ms linear;
+}
+
+:global(html.live) .word {
+  color: var(--soft);
+}
+
+:global(html.live) .word.on {
+  color: var(--ink);
+}
+
+.about {
+  margin-top: 112px;
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: var(--gap);
+  align-items: start;
+}
+
+.facts div + div {
+  margin-top: 20px;
+}
+
+.facts dt {
+  font-size: var(--step-small);
+  color: var(--soft);
+}
+
+.facts dd {
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.text {
+  max-width: 60ch;
+}
+
+/* Tres principios en escalera */
+.principles {
+  margin-top: 112px;
+  display: grid;
+  gap: 56px;
+}
+
+.principles li {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: var(--gap);
+  align-items: baseline;
+}
+
+.principles li:nth-child(2) {
+  margin-left: 8%;
+}
+
+.principles li:nth-child(3) {
+  margin-left: 16%;
+}
+
+.principles h3 {
+  font-size: var(--step-lead);
+  line-height: 1.2;
+  font-weight: 600;
+}
+
+.principles p {
+  max-width: 46ch;
+}
+
+@media (max-width: 1023px) {
+  .main {
+    grid-column: 1 / span 8;
+  }
+
+  .aside {
+    grid-column: 9 / -1;
+  }
+
+  .mono {
+    height: 180px;
+    top: 30svh;
+  }
+}
+
+@media (max-width: 767px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .main,
+  .aside {
+    grid-column: 1;
+  }
+
+  .aside {
+    grid-row: 1;
+    margin-bottom: 32px;
+  }
+
+  .mono {
+    position: relative;
+    top: auto;
+    height: 120px;
+  }
+
+  .about {
+    grid-template-columns: 1fr;
+    margin-top: 64px;
+  }
+
+  .facts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .facts div + div {
+    margin-top: 0;
+  }
+
+  .principles {
+    margin-top: 72px;
+    gap: 40px;
+  }
+
+  .principles li {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-left: 0 !important;
+  }
+}

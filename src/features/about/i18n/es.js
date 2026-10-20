@@ -1,24 +1,26 @@
-export const es = {
-  eyebrow: 'Sobre mí',
-  title: 'Entender el negocio, *escribir el código*.',
-  paragraphs: [
-    'Soy {name}, desarrollador de software de CABA con más de {years} años programando. Empecé formándome en Coderhouse (Desarrollo Web, JavaScript, React y Programación Backend) y hoy estudio la Licenciatura en Gestión de la Tecnología de la Información en UADE, una carrera que combina el desarrollo de software con el análisis de sistemas.',
-    'Esa combinación me permite no solo escribir código, sino también entender el contexto de la empresa (sus procesos, sus usuarios y sus objetivos) para construir soluciones que realmente aporten valor.',
-    'Trabajo tanto en frontend como en backend, me desenvuelvo bien en equipos ágiles con Scrum y siempre estoy aprendiendo algo nuevo.',
-  ],
-  highlights: [
-    { title: 'Desarrollo Full Stack', text: 'Interfaces con React y servicios con Java y Python.' },
-    { title: 'Visión de negocio', text: 'Análisis de sistemas para entender procesos y necesidades reales.' },
-    { title: 'Trabajo en equipo', text: 'Metodologías ágiles, Scrum y control de versiones con Git.' },
-  ],
-  card: {
-    degree: 'Carrera',
-    location: 'Ubicación',
-    email: 'Email',
+export const about = {
+  title: 'Negocio, datos y código.',
+  statement: (year) =>
+    `Estudio cómo la tecnología resuelve problemas de negocio, y programo desde ${year} para poder construir esas soluciones yo mismo.`,
+  facts: {
+    base: 'Base',
+    education: 'Formación',
+    educationValue: (university) => `${university}, Lic. en Gestión de TI`,
+    since: 'Programo desde',
   },
-  stats: {
-    years: 'Años programando',
-    technologies: 'Tecnologías',
-    courses: 'Cursos certificados',
-  },
+  text: 'Combino programación, bases de datos, infraestructura tecnológica y gestión de proyectos. Me definen la responsabilidad, el pensamiento analítico y las ganas de aprender: en menos de un año pasé de mi primer curso de desarrollo web a programar un backend con Node.',
+  principles: [
+    {
+      title: 'Primero, el problema.',
+      text: 'Antes de escribir código modelo actores, datos y reglas. Lo practico con UML y análisis de sistemas en la facultad.',
+    },
+    {
+      title: 'Piezas con una sola tarea.',
+      text: 'Separo en capas y módulos: en MyTube, controladores, servicios y casos de uso; en Java, un TDA por estructura.',
+    },
+    {
+      title: 'Aprender y explicar.',
+      text: 'Aprendo rápido y en equipo, y explico las decisiones técnicas en términos que entiende cualquiera del negocio.',
+    },
+  ],
 }
