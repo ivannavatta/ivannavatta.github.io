@@ -4,6 +4,7 @@
   grid-template-rows: repeat(5, 1fr);
   aspect-ratio: 6 / 5;
   color: var(--ink);
+  pointer-events: none; /* decorativo (aria-hidden): nunca captura clics */
 }
 
 .mono i {

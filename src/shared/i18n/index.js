@@ -4,4 +4,3 @@ export { DEFAULT_LOCALE, currentLocale, pickCopy } from './locale'
 // Sin LanguageProvider, el contexto queda fijo en español.
 export { useLanguage } from './useLanguage'
 export { useTranslation } from './useTranslation'
-export { common } from './common'

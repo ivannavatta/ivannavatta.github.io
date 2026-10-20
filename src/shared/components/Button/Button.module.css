@@ -1,89 +1,55 @@
+/* Plano, un solo relleno, esquinas rectas. Respuesta al tocar: scale(0.97) en 160 ms. */
 .button {
-  position: relative;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.6rem;
-  border-radius: var(--radius-full);
-  font-family: var(--font-body);
-  font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  isolation: isolate;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 0;
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1;
+  text-decoration: none;
   transition:
-    color var(--duration) var(--ease-out),
-    border-color var(--duration) var(--ease-out),
-    background-color var(--duration) var(--ease-out);
+    transform 160ms var(--ease-out),
+    background-color 200ms ease,
+    color 200ms ease;
 }
 
-.md {
-  padding: 0.95rem 1.6rem;
-  font-size: 0.97rem;
+.button:active {
+  transform: scale(0.97);
 }
 
-.sm {
-  padding: 0.65rem 1.15rem;
-  font-size: 0.9rem;
+.solid {
+  background: var(--accent);
+  color: var(--accent-ink);
 }
 
-.label,
-.icon {
-  position: relative;
-  z-index: 1;
-  display: inline-flex;
+.quiet {
+  background: var(--surface-2);
+  color: var(--ink);
 }
 
-.icon {
-  transition: transform var(--duration) var(--ease-out);
+.note {
+  font-weight: 400;
+  color: var(--ink);
 }
 
-.button:hover .icon {
-  transform: translateX(3px);
+.solid .note {
+  color: var(--accent-ink);
 }
 
-/* Relleno que sube desde abajo al pasar el mouse */
-.button::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  border-radius: inherit;
-  transform: translateY(101%);
-  transition: transform 0.5s var(--ease-out);
+@media (hover: hover) and (pointer: fine) {
+  .solid:hover {
+    background: var(--accent-hover);
+  }
+
+  .quiet:hover {
+    background: var(--surface);
+  }
 }
 
-.button:hover::before {
-  transform: translateY(0);
-}
-
-.primary {
-  background: var(--color-text);
-  color: var(--color-bg);
-}
-
-.primary::before {
-  background: var(--color-accent);
-}
-
-.ghost {
-  border: 1px solid var(--color-border-strong);
-  color: var(--color-text);
-}
-
-.ghost::before {
-  background: var(--color-text);
-}
-
-.ghost:hover {
-  color: var(--color-bg);
-  border-color: var(--color-text);
-}
-
-.button:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-.button:disabled::before {
-  display: none;
+:global(html.reduced) .button:active {
+  transform: none;
 }

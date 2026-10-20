@@ -1,6 +1,7 @@
 /* Trazas pedidas por el usuario: decorativas, a 11 % de opacidad (no son reglas de layout) */
 .traces {
   color: var(--ink);
+  pointer-events: none; /* decorativas */
 }
 
 .net {

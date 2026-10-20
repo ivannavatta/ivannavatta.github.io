@@ -8,8 +8,8 @@ export function ArrowLink({ href, children, icon = <FiArrowUpRight />, className
     <a
       href={href}
       className={`${styles.link} ${className}`}
-      {...externalLinkProps(href)}
       {...props}
+      {...externalLinkProps(href)}
     >
       <span className="link-underline">{children}</span>
       {icon && <span className={styles.icon}>{icon}</span>}
