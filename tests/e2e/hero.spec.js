@@ -16,6 +16,7 @@ import {
   scrollY,
   expectNoHorizontalOverflow,
   expectNoA11yViolations,
+  expectReadableContrast,
   expectTargetSize,
   expectVisibleFocus,
   tabUntilFocused,
@@ -137,6 +138,7 @@ test('axe sin violaciones en #inicio y sin overflow arriba de todo', async ({ pa
   await waitForAnimationsToFinish(page, '#inicio')
   await expectNoHorizontalOverflow(page)
   await expectNoA11yViolations(page, { include: '#inicio' })
+  await expectReadableContrast(page, '#inicio') // axe no lo mide con el canvas detrás
 })
 
 /* ---------------- Con movimiento: pin + scrub ---------------- */
@@ -186,6 +188,7 @@ test.describe('con movimiento', () => {
     await wheelScroll(page, 400)
     await waitForAnimationsToFinish(page, '#inicio')
     await expectNoA11yViolations(page, { include: '#inicio' })
+    await expectReadableContrast(page, '#inicio')
   })
 
   test('la firma del IN (decorativa) no captura el puntero sobre el h1 ni sobre los CTAs', async ({ page }) => {

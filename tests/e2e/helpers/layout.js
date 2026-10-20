@@ -79,3 +79,38 @@ export async function expectTargetSize(locator, min = 24) {
   expect(box, 'El control no tiene caja (no está visible)').not.toBeNull()
   expect(Math.min(box.width, box.height), `Área táctil menor a ${min}px`).toBeGreaterThanOrEqual(min)
 }
+
+/**
+ * Busca bloques de texto de `rootSelector` que estén en pantalla pero tapados por otra cosa (el
+ * punto central de su caja no lo recibe el propio elemento). Ignora lo que queda debajo de la
+ * cabecera fija y lo que está fuera de pantalla. Devuelve la lista de tapados (vacía si está todo
+ * bien).
+ * @param {import('@playwright/test').Page} page
+ * @param {string} rootSelector ej. '#perfil'
+ * @param {{ selector?: string }} [opts] qué elementos revisar (por defecto, bloques de texto)
+ */
+export function findCoveredContent(page, rootSelector, { selector = 'h1, h2, h3, p, dt, dd, li > a, a, button' } = {}) {
+  return page.evaluate(
+    ({ rootSelector, selector }) => {
+      const root = document.querySelector(rootSelector)
+      if (!root) return [`no existe ${rootSelector}`]
+      const header = document.querySelector('header')
+      const headerBottom = header ? Math.max(0, header.getBoundingClientRect().bottom) : 0
+      const covered = []
+      for (const el of root.querySelectorAll(selector)) {
+        if (el.closest('[aria-hidden="true"]')) continue
+        const r = el.getBoundingClientRect()
+        if (r.width === 0 || r.height === 0) continue
+        const cx = r.left + r.width / 2
+        const cy = r.top + Math.min(r.height / 2, 12)
+        if (cy <= headerBottom + 2 || cy >= innerHeight - 2 || cx <= 0 || cx >= innerWidth) continue
+        const top = document.elementFromPoint(cx, cy)
+        if (!top || el.contains(top)) continue
+        const cls = typeof top.className === 'string' ? top.className.split(/\s+/).slice(0, 2).join('.') : ''
+        covered.push(`${el.tagName.toLowerCase()} "${el.textContent.trim().slice(0, 30)}" tapado por <${top.tagName.toLowerCase()} class="${cls}">`)
+      }
+      return covered
+    },
+    { rootSelector, selector },
+  )
+}

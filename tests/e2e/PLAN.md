@@ -39,7 +39,10 @@ Proyectos (Chromium): `desktop` 1440×900, `tablet` 768×1024, `mobile` 375×812
 - **Bugs conocidos**: el test que lo prueba queda con `test.fail(cond, 'BUG id: …')`; cuando se
   corrige, Playwright avisa "expected to fail but passed" y se saca la marca.
 - **Accesibilidad**: `expectNoA11yViolations(page, { include: '#seccion' })` (axe, WCAG 2.1 A/AA) en
-  cada sección, en `desktop` y en `mobile`, con el movimiento ya asentado. Antes de axe,
+  cada sección, en `desktop` y en `mobile`, con el movimiento ya asentado.
+- **Contraste**: con movimiento, el canvas y las trazas detrás del texto hacen que axe deje
+  `color-contrast` en "incomplete" (no lo mide; el helper lo anota). Por eso cada chequeo de axe va
+  acompañado de `expectReadableContrast(page, selector)` (contrast.js), que mide a mano. Antes de axe,
   `waitForAnimationsToFinish(page, selector)`: a mitad de un fade axe mide contraste con opacidad
   parcial y da falsos positivos.
 - **Listo**: `waitForAppReady` exige `<html data-motion>` en `ready`, `reduced` o `static` (`pending`
@@ -116,12 +119,19 @@ Cubre `Button`, `TextLink`, la nav y cualquier componente nuevo sin test propio:
 - [x] Internos `#id` con destino existente; sin `href` vacío ni `javascript:`.
 - [x] Descargas de mismo origen y sin `target`. Todo `<button>` con `type`.
 
-### 3. Perfil (`#perfil`)
-- `h2` "Negocio, datos y código."; lista de datos (Base, Formación, Programo desde) como `dl`.
-- Tres principios como `h3` dentro de una lista.
-- El texto que se revela por palabras queda completo y legible al terminar el scroll, y en reduced
-  está completo desde el inicio (el texto accesible es el mismo en ambos modos).
-- axe sobre `#perfil`, sin overflow en 375.
+### 3. Perfil — `about.spec.js` ✅ (ronda 3)
+- [x] Un h2; dl con 3 pares (Base, Formación, Programo desde) en orden; lista con 3 ítems y su h3;
+      snapshot de accesibilidad de la región (el IN no aparece).
+- [x] Declaración: texto completo en el DOM y renderizado sin palabras pegadas; una palabra por span
+      y ningún espacio adentro de los span.
+- [x] IN: `aria-hidden`, `pointer-events: none`, nada enfocable, y quieto mientras se lee si es sticky.
+- [x] Reveal con rueda real: nada en tinta antes del 85 %, avance monótono y progresivo (≥3 estados
+      intermedios), todo en tinta al pasar el 45 %, y reversible al subir.
+- [x] axe y contraste propio en `#perfil` con palabras grises y con todo en tinta (tema asentado).
+- [x] Reducido: todas las palabras en tinta desde el arranque; axe y contraste.
+- [x] Continuidad inicio → Perfil → Proyectos: nada tapado, sin superposición ni overflow.
+- [ ] (bug abierto `theme-mix-contrast`) Contraste AA del texto visible durante las mezclas de tema:
+      hoy `test.fail` en los proyectos con movimiento.
 
 ### 4. Proyectos (`#proyectos`, sección fijada)
 - `h2` "Proyectos"; cuatro `article` con nombre accesible MyTube, Sistema de transporte, uadeHUB y

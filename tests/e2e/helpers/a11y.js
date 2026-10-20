@@ -42,6 +42,20 @@ export async function expectNoA11yViolations(page, opts = {}) {
     // fuera de un test (uso ad hoc): no hay dónde adjuntar
   }
 
+  // Con canvas/SVG detrás del texto, axe no puede medir el contraste y lo deja en "incomplete".
+  // Lo anotamos para que no pase inadvertido: en esos casos usar expectReadableContrast (contrast.js).
+  const unmeasured = results.incomplete.find((v) => v.id === 'color-contrast')?.nodes.length ?? 0
+  if (unmeasured) {
+    try {
+      test.info().annotations.push({
+        type: 'axe sin medir contraste',
+        description: `${unmeasured} nodo(s) en ${[include ?? 'la página'].flat().join(', ')}: usar expectReadableContrast`,
+      })
+    } catch {
+      // fuera de un test
+    }
+  }
+
   const violations = results.violations.filter((v) => impacts.includes(v.impact ?? 'minor'))
   expect(violations.length, formatViolations(violations)).toBe(0)
   return results

@@ -17,6 +17,7 @@ import {
   waitForAnimationsToFinish,
   expectNoHorizontalOverflow,
   expectNoA11yViolations,
+  expectReadableContrast,
   expectTargetSize,
   expectVisibleFocus,
   NAV,
@@ -203,12 +204,14 @@ test.describe('nav · escritorio y tablet', () => {
   test('axe sin violaciones en la cabecera, sobre sección clara y oscura; sin overflow', async ({ page }) => {
     await expectNoHorizontalOverflow(page)
     await expectNoA11yViolations(page, { include: 'header' })
+    await expectReadableContrast(page, 'header')
     // Sobre una sección oscura (proyectos) la cabecera cambia de tema: el contraste también se mide
     await jumpTo(page, '#proyectos')
     await wheelScroll(page, -60)
     await expect(nav(page).header).toHaveAttribute('data-nav-state', 'visible')
     await waitForAnimationsToFinish(page, 'header') // transición de tema claro/oscuro
     await expectNoA11yViolations(page, { include: 'header' })
+    await expectReadableContrast(page, 'header')
   })
 })
 
@@ -343,12 +346,14 @@ test.describe('nav · mobile', () => {
     const n = nav(page)
     await expectNoHorizontalOverflow(page)
     await expectNoA11yViolations(page, { include: 'header' })
+    await expectReadableContrast(page, 'header')
     await n.toggle.click()
     await expect(n.link('Contacto')).toBeVisible()
     await waitForScrollSettled(page)
     await waitForAnimationsToFinish(page, 'header') // entrada escalonada de los links (opacidad)
     await expectNoHorizontalOverflow(page)
     await expectNoA11yViolations(page, { include: 'header' })
+    await expectReadableContrast(page, 'header')
   })
 })
 
