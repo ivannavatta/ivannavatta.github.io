@@ -23,6 +23,9 @@ const FONTS = [
   },
 ]
 
+const TIMEOUT_MS = 30_000
+const MAX_BYTES = 1024 * 1024
+
 const sha256 = (buffer) => createHash('sha256').update(buffer).digest('hex')
 
 async function ensure({ name, url, sha256: expected, dest }) {
@@ -31,10 +34,14 @@ async function ensure({ name, url, sha256: expected, dest }) {
   // Si ya está y coincide, no hace falta red (permite trabajar offline)
   if (existsSync(file) && sha256(await readFile(file)) === expected) return 'ok'
 
-  const response = await fetch(url)
+  const response = await fetch(url, { signal: AbortSignal.timeout(TIMEOUT_MS) })
   if (!response.ok) throw new Error(`${name}: la descarga respondió ${response.status}`)
+  if (Number(response.headers.get('content-length')) > MAX_BYTES) {
+    throw new Error(`${name}: el archivo supera ${MAX_BYTES} bytes`)
+  }
 
   const buffer = Buffer.from(await response.arrayBuffer())
+  if (buffer.length > MAX_BYTES) throw new Error(`${name}: el archivo supera ${MAX_BYTES} bytes`)
   const actual = sha256(buffer)
   if (actual !== expected) {
     throw new Error(`${name}: el SHA-256 no coincide (esperado ${expected}, recibido ${actual})`)

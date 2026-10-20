@@ -5,10 +5,8 @@
   "type": "module",
   "scripts": {
     "fonts": "node scripts/fetch-fonts.mjs",
-    "predev": "npm run fonts",
-    "dev": "vite",
-    "prebuild": "npm run fonts",
-    "build": "vite build",
+    "dev": "node scripts/fetch-fonts.mjs && vite",
+    "build": "node scripts/fetch-fonts.mjs && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
     "test:e2e": "playwright test",
