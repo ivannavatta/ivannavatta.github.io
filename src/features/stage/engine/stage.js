@@ -2,7 +2,16 @@
 // Port de initMotion()/initReduced() del mockup, con limpieza completa (compatible con
 // StrictMode, que monta, desmonta y vuelve a montar en desarrollo).
 import { ScrollTrigger, gsap } from '@/shared/scroll'
-import { HERO_PIN, POSES, ROOT_CLASS, STAGE_HOVER_EVENT, selectors } from '@/shared/stage'
+import {
+  HERO_PIN,
+  MOTION_ATTR,
+  MOTION_STATE,
+  POSES,
+  ROOT_CLASS,
+  STAGE_HOVER_EVENT,
+  selectors,
+  setMotionState,
+} from '@/shared/stage'
 import { clamp01 } from './math'
 import { buildPoses, buildReducedPoses } from './poses'
 import { clearSurface, createThemeMixer, syncSurfaceFromSections } from './theme'
@@ -105,6 +114,7 @@ export function startStage({ canvas, traces, mobile, reduced, classes }) {
       .then(({ createScene }) => {
         if (disposed) return
         scene = createScene(canvas, { mobile, reduced: true })
+        setMotionState(MOTION_STATE.reduced)
         setGl(!!scene)
         if (!scene) return
         cleanups.push(() => scene.dispose())
@@ -114,7 +124,9 @@ export function startStage({ canvas, traces, mobile, reduced, classes }) {
       })
       .catch((err) => {
         console.warn('[IN] Escena no disponible:', err?.message)
-        if (!disposed) setGl(false)
+        if (disposed) return
+        setGl(false)
+        setMotionState(MOTION_STATE.reduced)
       })
   }
 
@@ -190,7 +202,7 @@ export function startStage({ canvas, traces, mobile, reduced, classes }) {
     /* ---- Escena 3D (carga diferida) ---- */
     let scene = null
     let poses = null
-    loadScene()
+    const sceneLoaded = loadScene()
       .then(({ createScene }) => {
         if (disposed) return
         scene = createScene(canvas, { mobile, reduced: false })
@@ -208,6 +220,17 @@ export function startStage({ canvas, traces, mobile, reduced, classes }) {
         console.warn('[IN] three.js no disponible:', err?.message)
         if (!disposed) setGl(false)
       })
+    // Listo: escena resuelta (con o sin WebGL), fuentes cargadas y disparadores recalculados
+    Promise.all([sceneLoaded, fontsReady()]).then(() =>
+      requestAnimationFrame(() => {
+        if (disposed) return
+        refreshAll()
+        if (document.documentElement.getAttribute(MOTION_ATTR) === MOTION_STATE.pending) setMotionState(MOTION_STATE.ready)
+      }),
+    )
+    cleanups.push(() => {
+      if (document.documentElement.getAttribute(MOTION_ATTR) === MOTION_STATE.ready) setMotionState(MOTION_STATE.pending)
+    })
 
     // Inclinación del IN con el cursor (solo puntero fino)
     if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {

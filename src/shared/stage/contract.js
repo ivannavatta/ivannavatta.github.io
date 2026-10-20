@@ -53,6 +53,20 @@ export const ATTR = {
  */
 export const ROOT_CLASS = { live: 'live', reduced: 'reduced', gl: 'gl', noGl: 'no-gl' }
 
+/**
+ * Señal de estado del movimiento en <html data-motion> (para tests y depuración):
+ * - pending: la capa de movimiento está arrancando.
+ * - ready:   Lenis, ScrollTrigger y la escena terminaron de inicializar (con o sin WebGL).
+ * - reduced: movimiento reducido; la página quedó lista sin Lenis ni pins.
+ * - static:  la capa de movimiento falló; la página queda completa y estática.
+ */
+export const MOTION_ATTR = 'data-motion'
+export const MOTION_STATE = { pending: 'pending', ready: 'ready', reduced: 'reduced', static: 'static' }
+
+export function setMotionState(state) {
+  document.documentElement.setAttribute(MOTION_ATTR, state)
+}
+
 /** Tema discreto (sin mezcla) del capítulo que está bajo la cabecera. */
 export const SURFACE_ATTR = 'data-surface'
 

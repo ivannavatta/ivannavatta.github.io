@@ -3,6 +3,8 @@ export {
   CHAPTERS,
   HERO_PIN,
   MOBILE_QUERY,
+  MOTION_ATTR,
+  MOTION_STATE,
   POSES,
   ROOT_CLASS,
   STAGE_HOVER_EVENT,
@@ -13,4 +15,5 @@ export {
   chapterProps,
   poseProps,
   selectors,
+  setMotionState,
 } from './contract'

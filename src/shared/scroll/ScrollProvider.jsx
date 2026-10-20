@@ -1,7 +1,7 @@
 import Lenis from 'lenis'
 import 'lenis/dist/lenis.css'
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react'
-import { ROOT_CLASS } from '../stage/contract'
+import { MOTION_STATE, ROOT_CLASS, setMotionState } from '../stage/contract'
 import { ScrollTrigger, gsap } from './gsap'
 import { REDUCED_MOTION } from './motionPreference'
 import { ScrollContext } from './scrollContext'
@@ -36,7 +36,15 @@ export function ScrollProvider({ children }) {
   useLayoutEffect(() => {
     if (REDUCED_MOTION) return undefined
     const root = document.documentElement
-    const lenis = new Lenis({ lerp: 0.1, smoothWheel: true })
+    let lenis
+    try {
+      lenis = new Lenis({ lerp: 0.1, smoothWheel: true })
+    } catch (err) {
+      console.warn('[IN] Scroll suave no disponible:', err?.message)
+      setMotionState(MOTION_STATE.static)
+      return undefined
+    }
+    setMotionState(MOTION_STATE.pending) // stage pasa a ready cuando termina la escena
     lenisRef.current = lenis
     lenis.on('scroll', ScrollTrigger.update)
     const raf = (time) => lenis.raf(time * 1000)
