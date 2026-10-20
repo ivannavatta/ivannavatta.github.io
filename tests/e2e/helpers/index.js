@@ -1,0 +1,11 @@
+// Punto de entrada único de los helpers e2e.
+export { test, expect } from './fixtures.js'
+export { collectPageErrors, assertNoPageErrors } from './console.js'
+export { waitForAppReady, hasLenis, isReducedMode, nextFrames, freezeCssAnimations } from './motion.js'
+export { wheelScroll, wheelUntilInView, wheelToBottom, waitForScrollSettled, jumpTo, scrollY } from './scroll.js'
+export { expectNoHorizontalOverflow, expectWithinViewportX, expectTargetSize } from './layout.js'
+export { expectNoA11yViolations, formatViolations, WCAG21_AA } from './a11y.js'
+export { tabUntilFocused, tabOrder, expectVisibleFocus } from './keyboard.js'
+export { stubEmailJs, blockThirdParty } from './network.js'
+export { collectCspViolations, readCsp } from './csp.js'
+export { SECTIONS, NAV_LINKS, PROJECTS, EMAIL } from './site.js'
