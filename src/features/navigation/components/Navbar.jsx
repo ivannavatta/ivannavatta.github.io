@@ -47,8 +47,14 @@ export function Navbar() {
         transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       >
         <div className={`container ${styles.inner}`}>
-          <a href="#home" className={styles.logo} onClick={(event) => navigate(event, 'home')} aria-label={t.goHome}>
-            {profile.fullName}
+          <a
+            href="#home"
+            className={styles.logo}
+            onClick={(event) => navigate(event, 'home')}
+            aria-label={`${profile.initials} · ${profile.fullName}, ${t.goHome}`}
+            title={profile.fullName}
+          >
+            {profile.initials}
             <span className={styles.logoDot} aria-hidden="true" />
           </a>
 
