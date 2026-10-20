@@ -36,7 +36,13 @@ Proyectos (Chromium): `desktop` 1440×900, `tablet` 768×1024, `mobile` 375×812
 - **Scroll real**: `wheelScroll` / `wheelUntilInView` / `wheelToBottom` usan `mouse.wheel`, que es lo
   que escuchan Lenis y la lógica de dirección de la nav. `jumpTo` solo para preparar el estado.
 - **Accesibilidad**: `expectNoA11yViolations(page, { include: '#seccion' })` (axe, WCAG 2.1 A/AA) en
-  cada sección, en `desktop` y en `mobile`, con el movimiento ya asentado.
+  cada sección, en `desktop` y en `mobile`, con el movimiento ya asentado. Antes de axe,
+  `waitForAnimationsToFinish(page, selector)`: a mitad de un fade axe mide contraste con opacidad
+  parcial y da falsos positivos.
+- **Listo**: `waitForAppReady` exige `<html data-motion>` en `ready`, `reduced` o `static` (`pending`
+  no cuenta).
+- **Warnings vigilados**: el fixture `watchedWarnings` anota sin fallar los warnings intermitentes
+  (por ahora, "preloaded … but not used").
 - **Responsive**: `expectNoHorizontalOverflow(page)` en cada sección y en los tres tamaños.
 - Cada test es independiente y arranca con `page.goto('/')`.
 
@@ -56,23 +62,34 @@ Proyectos (Chromium): `desktop` 1440×900, `tablet` 768×1024, `mobile` 375×812
 - [x] `/cv.pdf` servido = `public/cv.pdf`, `Content-Type: application/pdf`.
 - [ ] Los links "Descargar CV" (hero, menú, contacto) tienen `download` y apuntan a `cv.pdf`.
 
-### 1. Nav (`banner`, `nav` "Secciones")
-- Logo "IN, volver al inicio" y los links Perfil, Proyectos, Stack, Recorrido y Contacto visibles en
-  desktop y tablet.
-- Clic en cada link: la sección llega arriba (`toBeInViewport`), el foco o el scroll terminan en la
-  sección y el link correcto queda con `aria-current="location"`.
-- **Ocultar/mostrar (desktop y tablet)**: arriba de todo (≤64 px) siempre visible; bajando ≥40 px con la
-  rueda, se oculta; subiendo ≥24 px, aparece. Con foco de teclado adentro no se oculta.
-- **Mobile (375)**: barra fija siempre visible. Botón "Abrir menú" (`aria-expanded="false"`,
-  `aria-controls="menu"`):
-  - al abrir: `aria-expanded="true"`, nombre "Cerrar menú", el panel muestra secciones y canales
-    (Email, LinkedIn, GitHub, CV), `main` queda `inert` y el scroll bloqueado;
-  - el foco queda atrapado (Tab y Shift+Tab ciclan entre logo, botón y links);
-  - Escape cierra y devuelve el foco al botón;
-  - un link de sección cierra el menú y lleva a la sección;
-  - pasar de 375 a 1440 con el menú abierto lo cierra sin dejar `inert`.
-- Contraste del tema de la nav sobre secciones claras y oscuras (axe sobre `banner` en dos posiciones).
-- Áreas táctiles ≥ 44 px en mobile (`expectTargetSize`).
+### 1. Nav — `navigation.spec.js` ✅ (ronda 1)
+Escritorio y tablet (≥768):
+- [x] IN ("IN, volver al inicio") y los cinco links en orden con su `href`; sin botón de menú ni canales.
+- [x] `aria-current="location"` sigue al capítulo (IN arriba de todo, un solo link marcado por vez).
+- [x] Arriba de todo (≤64 px) no se oculta aunque se baje más de 40 px.
+- [x] Rueda real: se oculta al acumular ≥40 px hacia abajo y aparece con ≥24 px hacia arriba; 30 px y
+      16 px no alcanzan; el cambio de sentido reinicia el acumulado. `data-nav-state` y panel `inert`.
+- [x] Oculta: Tab llega al IN, que revela la nav y libera el panel; con foco adentro no se oculta;
+      al salir con Tab vuelve a ocultarse al bajar.
+- [x] Clic en cada link: el h2 de destino recibe el foco, queda en pantalla y el link queda marcado.
+- [x] El IN vuelve al inicio, enfoca el h1 y marca `aria-current`.
+- [x] Foco visible en el IN y en cada link; objetivos ≥24 px.
+- [x] axe sobre `header` en sección clara y oscura (después de la transición de tema); sin overflow.
+
+Mobile (<768):
+- [x] Barra fija (no se oculta al bajar); "Abrir menú" con `aria-expanded="false"` y `aria-controls="menu"`.
+- [x] Abrir: `aria-expanded="true"`, nombre "Cerrar menú", foco en el botón, cinco secciones y cuatro
+      canales, `main` y el salto `inert`, `overflow: hidden` y la rueda no desplaza.
+- [x] Foco atrapado: Tab da la vuelta completa (secciones, canales, IN, botón); Shift+Tab al revés.
+- [x] Escape cierra, devuelve el foco al botón y libera la página (vuelve a desplazarse).
+- [x] Cada link cierra, enfoca el h2 de destino, libera la página, desplaza y marca el link.
+- [x] Pasar a 1440 con el menú abierto lo cierra sin dejar `inert` ni el scroll bloqueado.
+- [x] Objetivos táctiles ≥44 px (IN, botón, links y canales); foco visible.
+- [x] axe sobre `header` cerrado y abierto (después de la entrada escalonada); sin overflow.
+
+Movimiento reducido (*-reduced):
+- [x] `data-motion="reduced"`, sin Lenis ni `html.live`; los links saltan sin animación y enfocan el h2.
+- [x] Todos los tests de arriba corren también en `desktop-reduced` y `mobile-reduced`.
 
 ### 2. Hero (`#inicio`)
 - `h1` "Ivan Navatta"; bajada y meta (Desarrollador · UADE · Buenos Aires) visibles.

@@ -12,10 +12,14 @@
 //                 formulario tienen que llamar a stubEmailJs(page) (network.js), que registra una
 //                 ruta posterior y por eso tiene prioridad. Nunca se envían mails reales.
 //
+//   watchedWarnings (automático) anota en el reporte, SIN fallar, los console.warn que conviene
+//                 seguir aunque sean intermitentes (por defecto: preload sin usar).
+//
 // Opciones:
 //   allowedErrors  RegExp[] de errores a ignorar (por defecto, vacío).
 //   allowedCsp     RegExp[] de violaciones de CSP a ignorar (por defecto, vacío).
 //   failOnWarnings si true, también cuenta console.warn (por defecto false).
+//   watchWarnings  RegExp[] de warnings que se anotan sin fallar.
 import { test as base, expect } from '@playwright/test'
 import { collectPageErrors } from './console.js'
 import { collectCspViolations, CSP_CONSOLE_PATTERN } from './csp.js'
@@ -26,6 +30,21 @@ export const test = base.extend({
   allowedErrors: [[], { option: true }],
   allowedCsp: [[], { option: true }],
   failOnWarnings: [false, { option: true }],
+  watchWarnings: [[/preloaded using link preload but not used/i], { option: true }],
+
+  watchedWarnings: [
+    async ({ page, watchWarnings }, use, testInfo) => {
+      /** @type {string[]} */
+      const seen = []
+      page.on('console', (msg) => {
+        const text = msg.text()
+        if (watchWarnings.some((re) => re.test(text))) seen.push(`[console.${msg.type()}] ${text}`)
+      })
+      await use(seen)
+      for (const text of seen) testInfo.annotations.push({ type: 'warning vigilado', description: text })
+    },
+    { auto: true },
+  ],
 
   noRealEmail: [
     async ({ page }, use) => {
