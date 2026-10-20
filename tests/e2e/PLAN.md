@@ -35,6 +35,9 @@ Proyectos (Chromium): `desktop` 1440×900, `tablet` 768×1024, `mobile` 375×812
   `waitForTimeout`.
 - **Scroll real**: `wheelScroll` / `wheelUntilInView` / `wheelToBottom` usan `mouse.wheel`, que es lo
   que escuchan Lenis y la lógica de dirección de la nav. `jumpTo` solo para preparar el estado.
+  Los deltas son píxeles CSS: el helper compensa que Chromium divide `deltaY` por el DPR (mobile ×2).
+- **Bugs conocidos**: el test que lo prueba queda con `test.fail(cond, 'BUG id: …')`; cuando se
+  corrige, Playwright avisa "expected to fail but passed" y se saca la marca.
 - **Accesibilidad**: `expectNoA11yViolations(page, { include: '#seccion' })` (axe, WCAG 2.1 A/AA) en
   cada sección, en `desktop` y en `mobile`, con el movimiento ya asentado. Antes de axe,
   `waitForAnimationsToFinish(page, selector)`: a mitad de un fade axe mide contraste con opacidad
@@ -91,14 +94,27 @@ Movimiento reducido (*-reduced):
 - [x] `data-motion="reduced"`, sin Lenis ni `html.live`; los links saltan sin animación y enfocan el h2.
 - [x] Todos los tests de arriba corren también en `desktop-reduced` y `mobile-reduced`.
 
-### 2. Hero (`#inicio`)
-- `h1` "Ivan Navatta"; bajada y meta (Desarrollador · UADE · Buenos Aires) visibles.
-- CTA "Ver proyectos" → `#proyectos`; "Descargar CV" tiene `download`.
-- Canvas 3D y filas de texto decorativas con `aria-hidden` (fuera del árbol de accesibilidad).
-- Con el pin y el scrub: después de bajar con la rueda, el hero se libera y aparece `#perfil` (sin
-  saltos ni overflow).
-- Reduced: sin animación de ensamble, contenido estático visible desde el primer frame.
-- Sin WebGL (`no-gl`): el contenido sigue completo (opcional: deshabilitar WebGL por contexto).
+### 2. Hero — `hero.spec.js` ✅ (ronda 2)
+- [x] Un solo `h1` "Ivan Navatta"; snapshot de accesibilidad de `#inicio` (región, bajada, meta, dos
+      links y el h1): las filas, el IN, la firma y las trazas no aparecen.
+- [x] Filas, IN, firma, trazas y canvas con `aria-hidden`, sin nada enfocable adentro.
+- [x] "Ver proyectos" → foco en el h2 "Proyectos" y en pantalla.
+- [x] "Descargar CV" → `/cv.pdf` con `download`, sin `target`, y la descarga ocurre (`cv.pdf`).
+- [x] CTAs ≥44 px, alcanzables con Tab, foco visible y sin nada que capture el puntero encima.
+- [x] axe sobre `#inicio` arriba de todo y a mitad del pin; sin overflow.
+- [x] Pin: el bloque queda fijado arriba, el marco se encoge, se libera al bajar con la rueda, no se
+      superpone con Perfil ni lo tapa, y al volver arriba el scrub se deshace.
+- [x] Sin overflow horizontal en ningún punto del pin.
+- [x] Reducido: sin `pin-spacer`, filas ni firma, marco sin escala; el inicio se desplaza como una
+      sección más y el contenido está opaco desde el arranque.
+- [ ] (bug abierto `hero-firma`) La firma no captura el puntero: hoy `test.fail`.
+
+### 2b. Links y botones (toda la página) — `links.spec.js` ✅ (ronda 2)
+Cubre `Button`, `TextLink`, la nav y cualquier componente nuevo sin test propio:
+- [x] Externos: https, `target="_blank"`, `rel` con `noopener` y `noreferrer`, nombre con
+      "(se abre en otra pestaña)".
+- [x] Internos `#id` con destino existente; sin `href` vacío ni `javascript:`.
+- [x] Descargas de mismo origen y sin `target`. Todo `<button>` con `type`.
 
 ### 3. Perfil (`#perfil`)
 - `h2` "Negocio, datos y código."; lista de datos (Base, Formación, Programo desde) como `dl`.

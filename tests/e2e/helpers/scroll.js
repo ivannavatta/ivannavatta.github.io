@@ -38,18 +38,23 @@ async function pointerToCenter(page) {
 /**
  * Hace scroll con la rueda en pasos chicos (como una rueda real) y espera a que se asiente.
  * deltaY positivo baja, negativo sube.
+ *
+ * Los deltas son píxeles CSS en todos los proyectos: con deviceScaleFactor 2 (proyecto mobile),
+ * Chromium entrega a la página `WheelEvent.deltaY` dividido por el devicePixelRatio (400 → 200),
+ * así que acá se compensa multiplicando por el DPR.
  * @param {import('@playwright/test').Page} page
- * @param {number} deltaY total en píxeles
+ * @param {number} deltaY total en píxeles CSS
  * @param {{ step?: number, settle?: boolean }} [opts]
  * @returns {Promise<number>} scrollY final
  */
 export async function wheelScroll(page, deltaY, { step = 120, settle = true } = {}) {
   await pointerToCenter(page)
+  const dpr = await page.evaluate(() => window.devicePixelRatio || 1)
   const dir = Math.sign(deltaY)
   let left = Math.abs(deltaY)
   while (left > 0) {
     const d = Math.min(step, left)
-    await page.mouse.wheel(0, d * dir)
+    await page.mouse.wheel(0, d * dir * dpr)
     left -= d
   }
   return settle ? waitForScrollSettled(page) : page.evaluate(() => window.scrollY)
