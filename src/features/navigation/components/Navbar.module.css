@@ -1,0 +1,645 @@
+/* ---------- Cabecera: el IN es el chip, las secciones son pads sobre su traza ----------
+   Un solo sistema de capítulo y progreso: la traza que sale del IN se enciende con la
+   lectura. Se esconde al bajar y vuelve al subir. */
+.top {
+  --nav-h: 48px;
+  --wire: 28px;
+  /* Tema propio y discreto (data-nav, copia de html[data-surface]): el contraste es AA en
+     cada cuadro del cambio de capítulo, nunca a mitad de una mezcla */
+  --bg: var(--light-bg);
+  --ink: var(--light-ink);
+  --soft: var(--light-soft);
+  --accent: var(--light-accent);
+  --accent-ink: var(--light-accent-ink);
+  --chip-accent: var(--dark-accent);
+  --track: color-mix(in srgb, var(--ink) 26%, var(--bg));
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: var(--z-nav);
+  padding: var(--m);
+  pointer-events: none;
+  transition: transform 280ms var(--ease-out);
+}
+
+.top[data-nav='dark'] {
+  --bg: var(--dark-bg);
+  --ink: var(--dark-ink);
+  --soft: var(--dark-soft);
+  --accent: var(--dark-accent);
+  --accent-ink: var(--dark-accent-ink);
+  --chip-accent: var(--light-accent);
+}
+
+/* Salida más corta que la entrada; las dos con ease-out y solo transform */
+.top.isHidden {
+  transform: translate3d(0, calc(-100% - 8px), 0);
+  transition-duration: 200ms;
+}
+
+/* Chip anclado a la izquierda (logo) y bloque de pads centrado en la página.
+   Columnas: chip · traza de entrada · bloque · espacio espejo · columna espejo del chip.
+   Las dos columnas espejo hacen que el bloque quede centrado de verdad. */
+.board {
+  display: grid;
+  height: var(--nav-h);
+  grid-template-columns: var(--nav-h) minmax(var(--wire), 1fr) auto minmax(var(--wire), 1fr) var(--nav-h);
+  color: var(--ink);
+}
+
+/* La placa: el mismo fondo de la página, recortado justo al circuito (sin borde, sin sombra) */
+.logo,
+.lead,
+.nav {
+  pointer-events: auto;
+  background: var(--bg);
+}
+
+.logo {
+  grid-column: 1;
+  grid-row: 1;
+  display: grid;
+  place-items: center;
+  background: var(--ink);
+  color: var(--bg);
+  transition: transform 160ms var(--ease-out);
+}
+
+.logo svg {
+  width: 75%;
+  height: 75%;
+}
+
+.logoAccent {
+  fill: var(--chip-accent);
+}
+
+.logo:active {
+  transform: scale(0.96);
+}
+
+/* Traza de entrada: sale del chip y llega al primer pad del bloque */
+.lead {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+}
+
+.lead .wire {
+  flex: 1 1 auto;
+}
+
+.nav {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+.nav ul {
+  display: flex;
+  height: 100%;
+}
+
+.nav li {
+  display: flex;
+  align-items: center;
+}
+
+/* Tramo de traza que llega a cada pad; el relleno de acento es el avance */
+.wire {
+  position: relative;
+  flex: 0 0 var(--wire);
+  align-self: center;
+  height: 2px;
+  background: var(--track);
+  overflow: hidden;
+}
+
+.wire i {
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+}
+
+.nav a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+  padding: 0 14px 0 0;
+  color: var(--ink);
+  font-size: var(--step-small);
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    color 160ms ease,
+    transform 160ms var(--ease-out),
+    background-color 160ms ease;
+}
+
+/* Pad: el mismo módulo cuadrado que arma el IN */
+.nav a::before {
+  content: '';
+  flex: none;
+  width: 8px;
+  height: 8px;
+  background: var(--ink);
+  transition:
+    transform 200ms var(--ease-out),
+    background-color 160ms ease;
+}
+
+.nav li.isOn a::before {
+  background: var(--accent);
+}
+
+.nav a[aria-current] {
+  font-weight: 600;
+}
+
+.nav a[aria-current]::before {
+  transform: scale(1.5);
+}
+
+/* Reserva el ancho del peso 600 para que nada salte al cambiar de capítulo */
+.label {
+  display: inline-flex;
+  flex-direction: column;
+}
+
+.label::after {
+  content: attr(data-label);
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  font-weight: 600;
+}
+
+.nav a:active {
+  transform: scale(0.97);
+}
+
+/* Contacto: el otro bloque del circuito, el destino de la traza */
+.nav .cta {
+  padding: 0 18px;
+  background: var(--ink);
+  color: var(--bg);
+  font-weight: 600;
+}
+
+/* Su pad queda dentro del bloque, en el color del fondo: la traza entra al componente */
+.nav .cta::before,
+.nav li.isOn .cta::before {
+  background: var(--bg);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .nav a:not(.cta):hover {
+    color: var(--accent);
+  }
+
+  .nav a:not(.cta):hover::before {
+    transform: scale(1.5);
+  }
+
+  .nav .cta:hover {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .nav .cta:hover::before {
+    background: var(--accent-ink);
+  }
+}
+
+.board :focus-visible {
+  outline-offset: 2px;
+}
+
+.isFlip *,
+.isFlip *::before {
+  transition: none !important;
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .top {
+    --wire: 20px;
+  }
+}
+
+/* Escritorio y tablet: el botón y los canales no existen y el panel no genera caja */
+.toggle,
+.extra {
+  display: none;
+}
+
+.panel {
+  display: contents;
+}
+
+/* Mobile (< 768 px): barra fija con el chip, la traza de avance y el botón del menú.
+   El panel baja la traza del chip en vertical y cuelga de ella los mismos pads;
+   Contacto vuelve a ser el bloque donde termina la traza. */
+@media (max-width: 767px) {
+  .top {
+    --nav-h: 44px;
+    --wire: 12px;
+    --row: 60px;
+    --lead-in: 24px;
+    --gap-end: 20px;
+    padding: calc((var(--bar-h) - var(--nav-h)) / 2) var(--m);
+    background: var(--bg);
+    pointer-events: auto;
+  }
+
+  .top.isHidden {
+    transform: none; /* fija: en mobile no se esconde al bajar */
+  }
+
+  .board {
+    grid-template-columns: var(--nav-h) minmax(var(--wire), 1fr) auto;
+  }
+
+  /* Con el menú abierto la traza sale por abajo del chip y entra al panel */
+  .logo {
+    position: relative;
+  }
+
+  .logo::after {
+    content: '';
+    position: absolute;
+    left: calc(50% - 1px);
+    top: 100%;
+    width: 2px;
+    height: calc((var(--bar-h) - var(--nav-h)) / 2);
+    background: var(--track);
+    opacity: 0;
+    transition: opacity 120ms ease;
+  }
+
+  .isLit .logo::after {
+    background: var(--accent);
+  }
+
+  .isOpen .logo::after {
+    opacity: 1;
+    transition-duration: 160ms;
+  }
+
+  /* Botón: el otro bloque del circuito (como Contacto en escritorio) */
+  .toggle {
+    grid-column: 3;
+    grid-row: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    height: var(--nav-h);
+    padding: 0 16px 0 14px;
+    border: 0;
+    border-radius: 0;
+    background: var(--ink);
+    color: var(--bg);
+    font-size: var(--step-small);
+    font-weight: 600;
+    line-height: 1;
+    transition: transform 160ms var(--ease-out);
+  }
+
+  .toggle:active {
+    transform: scale(0.97);
+  }
+
+  /* Las dos palabras ocupan la misma celda: el bloque no cambia de ancho */
+  .toggleLabel {
+    display: grid;
+  }
+
+  .toggleLabel > span {
+    grid-area: 1 / 1;
+    transition: opacity 120ms ease;
+  }
+
+  .toggleLabel > span + span,
+  .isOpen .toggleLabel > span:first-child {
+    opacity: 0;
+  }
+
+  .isOpen .toggleLabel > span + span {
+    opacity: 1;
+  }
+
+  /* Tres trazas de 2 px con su pad de 4 px. Abierto: las trazas de afuera se cruzan en X y
+     los tres pads se juntan en el cruce, en el acento del chip (el bloque turquesa del IN). */
+  .burger {
+    position: relative;
+    flex: none;
+    width: 20px;
+    height: 16px;
+  }
+
+  .burger b,
+  .burger i {
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: currentColor;
+    transition:
+      transform 180ms var(--ease-in-out),
+      opacity 120ms ease,
+      background-color 120ms ease;
+  }
+
+  .burger b {
+    z-index: 1; /* el pad queda sobre el cruce */
+    width: 4px;
+    height: 4px;
+  }
+
+  .burger i {
+    left: 7px;
+    width: 13px;
+    height: 2px;
+  }
+
+  .burger b:nth-of-type(2) {
+    top: 6px;
+  }
+
+  .burger b:nth-of-type(3) {
+    top: 12px;
+  }
+
+  .burger i:nth-of-type(1) {
+    top: 1px;
+  }
+
+  .burger i:nth-of-type(2) {
+    top: 7px;
+  }
+
+  .burger i:nth-of-type(3) {
+    top: 13px;
+  }
+
+  .isOpen .burger b,
+  .isOpen .burger i {
+    transition-duration: 240ms, 160ms, 160ms;
+  }
+
+  .isOpen .burger b {
+    background: var(--chip-accent);
+  }
+
+  .isOpen .burger b:nth-of-type(1) {
+    transform: translate3d(8px, 6px, 0);
+  }
+
+  .isOpen .burger b:nth-of-type(2) {
+    transform: translate3d(8px, 0, 0);
+  }
+
+  .isOpen .burger b:nth-of-type(3) {
+    transform: translate3d(8px, -6px, 0);
+  }
+
+  .isOpen .burger i:nth-of-type(1) {
+    transform: translate3d(-3.5px, 6px, 0) rotate(45deg) scaleX(1.3);
+  }
+
+  .isOpen .burger i:nth-of-type(2) {
+    transform: translate3d(-3.5px, 0, 0) scaleX(0.2);
+    opacity: 0;
+  }
+
+  .isOpen .burger i:nth-of-type(3) {
+    transform: translate3d(-3.5px, -6px, 0) rotate(-45deg) scaleX(1.3);
+  }
+
+  /* Panel: debajo de la barra hasta el pie de la pantalla, en el mismo tema discreto que la barra.
+     Cae 12 px desde la barra; la salida es más corta que la entrada. */
+  .panel {
+    position: fixed;
+    z-index: -1;
+    left: 0;
+    right: 0;
+    top: var(--bar-h);
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 40px;
+    padding: 0 var(--m) calc(var(--m) + env(safe-area-inset-bottom, 0px));
+    background: var(--bg);
+    color: var(--ink);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    visibility: hidden;
+    opacity: 0;
+    transform: translate3d(0, -12px, 0);
+    transition:
+      opacity 160ms var(--ease-out),
+      transform 160ms var(--ease-out),
+      visibility 0s linear 160ms;
+  }
+
+  .isOpen .panel {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+    transition-duration: 240ms, 240ms, 0s;
+    transition-delay: 0s;
+  }
+
+  /* La traza vertical: cada pad recibe el tramo que viene del anterior; el primero, el que baja del chip */
+  .nav ul {
+    display: block;
+    height: auto;
+    padding-top: var(--lead-in);
+  }
+
+  .nav li {
+    position: relative;
+    height: var(--row);
+  }
+
+  .nav li:nth-child(2) {
+    --i: 1;
+  }
+
+  .nav li:nth-child(3) {
+    --i: 2;
+  }
+
+  .nav li:nth-child(4) {
+    --i: 3;
+  }
+
+  .nav li:nth-child(5) {
+    --i: 4;
+  }
+
+  .nav .wire {
+    position: absolute;
+    left: 21px;
+    top: calc(var(--row) / -2);
+    width: 2px;
+    height: var(--row);
+    flex: none;
+  }
+
+  .nav li:first-child .wire {
+    top: calc(var(--lead-in) * -1);
+    height: calc(var(--lead-in) + var(--row) / 2);
+  }
+
+  .nav .end {
+    margin-top: var(--gap-end);
+  }
+
+  .nav .end .wire {
+    top: calc((var(--gap-end) + var(--row) / 2) * -1);
+    height: calc(var(--gap-end) + var(--row) / 2);
+  }
+
+  .nav .wire i {
+    transform-origin: 50% 0;
+    transform: scaleY(0);
+  }
+
+  .nav a {
+    position: relative;
+    z-index: 1; /* el pad se pinta encima de la traza */
+    flex: 1 1 auto;
+    gap: 18px;
+    padding: 0 0 0 18px;
+    font-size: 2.25rem;
+    letter-spacing: -0.03em;
+  }
+
+  .nav .cta {
+    flex: 0 0 auto;
+    padding: 0 24px 0 18px;
+  }
+
+  /* Canales: los pines de Contacto, alineados a la misma columna de pads */
+  .extra {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: var(--gap);
+    --i: 5;
+  }
+
+  .extra li:nth-child(n + 3) {
+    --i: 6;
+  }
+
+  .extra a {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    min-height: 48px;
+    padding-left: 18px;
+    color: var(--ink);
+    font-size: var(--step-body);
+    font-weight: 500;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 6px;
+    text-decoration-color: var(--soft);
+  }
+
+  .extra a::before {
+    content: '';
+    flex: none;
+    width: 8px;
+    height: 8px;
+    background: var(--ink);
+  }
+
+  .extraNote {
+    font-weight: 400;
+    color: var(--soft);
+  }
+
+  /* Entrada: la traza se dibuja de pad en pad y cada link sale de ella (30 ms entre uno y otro).
+     Solo al abrir; al cerrar se va todo junto con el panel. */
+  .isOpen .nav .wire {
+    animation: top-draw 200ms var(--ease-out) backwards;
+    animation-delay: calc(var(--i, 0) * 30ms);
+  }
+
+  .isOpen .nav a,
+  .isOpen .extra li {
+    animation: top-in 220ms var(--ease-out) backwards;
+    animation-delay: calc(var(--i, 0) * 30ms + 40ms);
+  }
+}
+
+@keyframes top-draw {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes top-in {
+  from {
+    opacity: 0;
+    transform: translate3d(-8px, 0, 0);
+  }
+}
+
+/* ---------- Movimiento reducido: sin desplazamientos, solo opacidad y color ---------- */
+:global(html.reduced) .top {
+  transition: opacity 160ms ease;
+}
+
+:global(html.reduced) .top.isHidden {
+  transform: none;
+  opacity: 0;
+  transition-duration: 120ms;
+}
+
+:global(html.reduced) .top.isHidden .board > * {
+  pointer-events: none;
+}
+
+:global(html.reduced) .nav a::before {
+  transition: background-color 160ms ease;
+}
+
+:global(html.reduced) .nav a:active,
+:global(html.reduced) .logo:active {
+  transform: none;
+}
+
+/* Menú mobile en movimiento reducido: el panel y los links solo cambian de opacidad;
+   el ícono pasa a la X sin desplazarse */
+@media (max-width: 767px) {
+  :global(html.reduced) .top.isHidden {
+    opacity: 1;
+  }
+
+  :global(html.reduced) .panel {
+    transform: none;
+  }
+
+  :global(html.reduced) .isOpen .nav .wire,
+  :global(html.reduced) .isOpen .nav a,
+  :global(html.reduced) .isOpen .extra li {
+    animation: none;
+  }
+
+  :global(html.reduced) .burger b,
+  :global(html.reduced) .burger i {
+    transition:
+      opacity 120ms ease,
+      background-color 120ms ease;
+  }
+
+  :global(html.reduced) .toggle:active {
+    transform: none;
+  }
+}

@@ -1,17 +1,18 @@
+import { Navbar } from '@/features/navigation'
 import { Stage } from '@/features/stage'
 import { ChapterPlaceholders } from './placeholders/ChapterPlaceholders'
 import { HeroPlaceholder } from './placeholders/HeroPlaceholder'
 import { AppProviders } from './providers/AppProviders'
 
-// Ronda 0: base visual, scroll y escena. Las secciones son provisorias (./placeholders)
-// y se reemplazan por sus features ronda por ronda: navigation, hero, about, projects,
-// skills, education y contact.
+// Las secciones que todavía son provisorias (./placeholders) se reemplazan por sus
+// features ronda por ronda: hero, about, projects, skills, education y contact.
 export function App() {
   return (
     <AppProviders>
       <a className="skip" href="#perfil">
         Saltar al contenido
       </a>
+      <Navbar />
       <main id="main">
         <HeroPlaceholder />
         <ChapterPlaceholders />

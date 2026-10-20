@@ -18,10 +18,12 @@ const EMPTY = []
  * - Escape llama a `onEscape`,
  * - al desactivarse devuelve el foco al elemento que lo tenía antes de abrir.
  * `includeRefs`: elementos de afuera que forman parte del ciclo (ej. el botón que cierra el menú).
+ * `restoreFocus`: false si el que usa la trampa decide adónde va el foco al cerrar (p. ej. un menú
+ *   cuyos links lo mandan al título de la sección de destino).
  *
  * Devuelve el ref que hay que asignar al contenedor del diálogo.
  */
-export function useFocusTrap(active, { initialFocusRef, onEscape, includeRefs = EMPTY } = {}) {
+export function useFocusTrap(active, { initialFocusRef, onEscape, includeRefs = EMPTY, restoreFocus = true } = {}) {
   const containerRef = useRef(null)
   const onEscapeRef = useRef(onEscape)
 
@@ -76,11 +78,12 @@ export function useFocusTrap(active, { initialFocusRef, onEscape, includeRefs = 
     return () => {
       cancelAnimationFrame(frame)
       document.removeEventListener('keydown', onKeyDown)
+      if (!restoreFocus) return
       if (previouslyFocused instanceof HTMLElement && previouslyFocused.isConnected) {
         previouslyFocused.focus({ preventScroll: true })
       }
     }
-  }, [active, initialFocusRef, includeRefs])
+  }, [active, initialFocusRef, includeRefs, restoreFocus])
 
   return containerRef
 }
