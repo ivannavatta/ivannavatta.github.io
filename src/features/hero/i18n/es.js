@@ -1,12 +1,12 @@
-export const es = {
-  available: 'Disponible para nuevas oportunidades',
-  role: 'Desarrollador de software con *visión de negocio*.',
-  descriptionStart: 'Estudiante de la',
-  descriptionEnd:
-    'Combino desarrollo de software y análisis de sistemas para construir soluciones que entienden el negocio.',
+export const hero = {
+  firstName: 'Ivan',
+  lastName: 'Navatta',
+  lead: 'Desarrollo software de punta a punta, de la base de datos a la interfaz, empezando por lo que necesita el negocio.',
+  meta: 'Desarrollador · Estudiante de la Lic. en Gestión de la Tecnología de la Información (UADE) · Buenos Aires',
   ctaProjects: 'Ver proyectos',
   ctaCv: 'Descargar CV',
-  scroll: 'Scroll',
-  yearsCoding: 'años programando',
-  codeLabel: 'Bloque de código con mis datos como objeto JavaScript',
+  cvNote: 'PDF',
+  // Filas decorativas que cruzan detrás del marco (aria-hidden)
+  rowA: 'Negocio · Datos · Código · Negocio · Datos · Código · Negocio · Datos · Código ·',
+  rowB: 'Pieza por pieza · Pieza por pieza · Pieza por pieza · Pieza por pieza ·',
 }

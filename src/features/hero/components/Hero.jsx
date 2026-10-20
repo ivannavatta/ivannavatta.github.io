@@ -1,93 +1,72 @@
-import { motion } from 'motion/react'
-import { FiArrowDown, FiArrowRight, FiDownload } from 'react-icons/fi'
-import { EASE_OUT } from '@/shared/animations/variants'
-import { Button, RevealText } from '@/shared/components'
+import { useRef } from 'react'
+import { Button } from '@/shared/components/Button/Button'
+import { CircuitTraces } from '@/shared/components/CircuitTraces/CircuitTraces'
+import { Monogram } from '@/shared/components/Monogram/Monogram'
 import { profile } from '@/shared/data/profile'
-import { useSmoothScroll, useYearsCoding } from '@/shared/hooks'
-import { useTranslation } from '@/shared/i18n'
-import { toSegments } from '@/shared/utils/segments'
-import { en } from '../i18n/en'
-import { es } from '../i18n/es'
-import { CodeBlock } from './CodeBlock'
-import styles from '../Hero.module.css'
+import { POSES, chapterProps } from '@/shared/stage'
+import { useFitLine } from '../hooks/useFitLine'
+import { useHeroPin } from '../hooks/useHeroPin'
+import { copy } from '../i18n'
+import styles from './Hero.module.css'
 
-const fade = (delay) => ({
-  initial: { opacity: 0, y: 14 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 1, ease: EASE_OUT, delay },
-})
+const NAME_MAX_PX = 420
 
+/**
+ * Inicio: nombre a todo el ancho, propuesta de valor, dos acciones y el IN de bloques
+ * (la escena 3D lo dibuja encima de la grilla de Monogram y lo inclina con el cursor).
+ * Al bajar, el inicio se encoge a un marco, detrás pasa el fondo oscuro con dos filas
+ * cruzadas y el IN explota y se rearma como firma en el centro (pose "firma").
+ */
 export function Hero() {
-  const { t, localize } = useTranslation({ es, en })
-  const { scrollTo } = useSmoothScroll()
-  const years = useYearsCoding()
+  const sectionRef = useRef(null)
+  const pinRef = useRef(null)
+  const frameRef = useRef(null)
+  const rowARef = useRef(null)
+  const rowBRef = useRef(null)
+  const nameRef = useRef(null)
+  const t = copy.hero
 
-  const goToProjects = (event) => {
-    event.preventDefault()
-    scrollTo('#projects')
-  }
+  useFitLine(nameRef, NAME_MAX_PX)
+  useHeroPin({ sectionRef, pinRef, frameRef, rowARef, rowBRef })
 
   return (
-    <section id="home" className={styles.hero}>
-      <div className={`container ${styles.inner}`}>
-        <motion.div className={styles.topLine} {...fade(0.1)}>
-          {profile.availableForWork && (
-            <span className={styles.available}>
-              <span className={styles.pulse} aria-hidden="true" />
-              {t.available}
-            </span>
-          )}
-          <span className={styles.location}>{localize(profile.location)}</span>
-        </motion.div>
-
-        <RevealText as="h1" className={styles.name} text={profile.fullName} animate delay={0.2} stagger={0.12} />
-
-        <div className={styles.grid}>
-          <div>
-            <RevealText as="p" className={styles.role} text={toSegments(t.role)} animate delay={0.55} stagger={0.04} />
-
-            <motion.p className={styles.description} {...fade(0.9)}>
-              {t.descriptionStart} {localize(profile.degree)} ({profile.university}). {t.descriptionEnd}
-            </motion.p>
-
-            <motion.div className={styles.ctas} {...fade(1.05)}>
-              <Button href="#projects" onClick={goToProjects} icon={<FiArrowRight />}>
-                {t.ctaProjects}
-              </Button>
-              {profile.cvUrl && (
-                <Button
-                  href={profile.cvUrl}
-                  download={`${profile.fullName.replace(' ', '-')}-CV.pdf`}
-                  variant="ghost"
-                  icon={<FiDownload />}
-                >
-                  {t.ctaCv}
-                </Button>
-              )}
-            </motion.div>
-
-            <motion.p className={styles.meta} {...fade(1.2)}>
-              <strong>{years}+</strong> {t.yearsCoding}
-            </motion.p>
-          </div>
-
-          <motion.div className={styles.codeWrapper} {...fade(0.8)}>
-            <CodeBlock label={t.codeLabel} />
-          </motion.div>
+    <section
+      ref={sectionRef}
+      {...chapterProps('inicio', 'light', { backdrop: 'dark' })}
+      className={styles.hero}
+      aria-labelledby="hero-title"
+    >
+      <div className={styles.pin} ref={pinRef}>
+        <div className={styles.rows} aria-hidden="true">
+          <p className={styles.row}>
+            <span ref={rowARef}>{t.rowA}</span>
+          </p>
+          <p className={`${styles.row} ${styles.rowAccent}`}>
+            <span ref={rowBRef}>{t.rowB}</span>
+          </p>
         </div>
 
-        <motion.a
-          href="#about"
-          className={styles.scrollHint}
-          onClick={(event) => {
-            event.preventDefault()
-            scrollTo('#about')
-          }}
-          {...fade(1.4)}
-        >
-          <span className={styles.scrollLine} aria-hidden="true" />
-          {t.scroll} <FiArrowDown aria-hidden="true" />
-        </motion.a>
+        <div className={styles.frame} ref={frameRef}>
+          <CircuitTraces seed={3} className={styles.traces} />
+          <div className={styles.inner}>
+            <div className={styles.copy}>
+              <p className={styles.lead}>{t.lead}</p>
+              <p className={styles.meta}>{t.meta}</p>
+              <div className={styles.actions}>
+                <Button href="#proyectos">{t.ctaProjects}</Button>
+                <Button href={profile.cvUrl} variant="quiet" note={t.cvNote} download>
+                  {t.ctaCv}
+                </Button>
+              </div>
+            </div>
+            <Monogram pose={POSES.hero} className={styles.mono} />
+            <h1 className={styles.name} id="hero-title" ref={nameRef}>
+              <span>{t.firstName}</span> <span>{t.lastName}</span>
+            </h1>
+          </div>
+        </div>
+
+        <Monogram pose={POSES.firma} className={styles.firma} />
       </div>
     </section>
   )
