@@ -15,7 +15,10 @@ function focusTargetOf(element) {
 
 function resolveTarget(target) {
   if (typeof target === 'number') return target
-  if (typeof target === 'string') return target.length > 1 ? document.querySelector(target) : null
+  // getElementById y no querySelector: un id que no es un selector válido no tira SyntaxError
+  if (typeof target === 'string') {
+    return target.startsWith('#') && target.length > 1 ? document.getElementById(target.slice(1)) : null
+  }
   return target instanceof Element ? target : null
 }
 
@@ -113,7 +116,7 @@ export function ScrollProvider({ children }) {
       const link = event.target instanceof Element ? event.target.closest('a[href^="#"]') : null
       if (!link) return
       const hash = link.getAttribute('href')
-      if (hash.length < 2 || !document.querySelector(hash)) return
+      if (hash.length < 2 || !document.getElementById(hash.slice(1))) return
       event.preventDefault()
       scrollTo(hash)
     }

@@ -47,7 +47,7 @@ export const ATTR = {
 /**
  * Clases en <html>:
  * - live:    capa de movimiento activa (Lenis + ScrollTrigger). Fondo y texto globales.
- * - reduced: prefers-reduced-motion o ?reduced. Sin Lenis, sin pins, IN estático en el inicio.
+ * - reduced: prefers-reduced-motion. Sin Lenis, sin pins, IN estático en el inicio.
  * - gl:      la escena 3D dibuja los bloques; los equivalentes CSS se vuelven transparentes.
  * - no-gl:   sin WebGL; quedan los bloques CSS (fallback plano).
  */
