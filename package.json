@@ -4,7 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "fonts": "node scripts/fetch-fonts.mjs",
+    "predev": "npm run fonts",
     "dev": "vite",
+    "prebuild": "npm run fonts",
     "build": "vite build",
     "lint": "oxlint",
     "preview": "vite preview",

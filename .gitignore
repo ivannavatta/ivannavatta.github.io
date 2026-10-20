@@ -29,6 +29,9 @@ dist-ssr
 /blob-report/
 /playwright/.cache/
 
+# Fuentes con licencia que no permite publicarlas en un repo (las baja scripts/fetch-fonts.mjs)
+/public/fonts/**/*.woff2
+
 # Variables de entorno (cualquier modo de Vite; solo se versiona el ejemplo)
 .env*
 !.env.example
