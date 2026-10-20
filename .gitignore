@@ -29,6 +29,6 @@ dist-ssr
 /blob-report/
 /playwright/.cache/
 
-# Variables de entorno
-.env
-.env.local
+# Variables de entorno (cualquier modo de Vite; solo se versiona el ejemplo)
+.env*
+!.env.example
