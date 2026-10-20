@@ -1,26 +1,23 @@
-import { About } from '@/features/about'
-import { Contact } from '@/features/contact'
-import { Timeline } from '@/features/education'
-import { Hero } from '@/features/hero'
-import { Navbar } from '@/features/navigation'
-import { Projects } from '@/features/projects'
-import { Skills } from '@/features/skills'
-import { Footer } from '@/shared/components'
+import { Stage } from '@/features/stage'
+import { ChapterPlaceholders } from './placeholders/ChapterPlaceholders'
+import { HeroPlaceholder } from './placeholders/HeroPlaceholder'
 import { AppProviders } from './providers/AppProviders'
 
+// Ronda 0: base visual, scroll y escena. Las secciones son provisorias (./placeholders)
+// y se reemplazan por sus features ronda por ronda: navigation, hero, about, projects,
+// skills, education y contact.
 export function App() {
   return (
     <AppProviders>
-      <Navbar />
-      <main>
-        <Hero />
-        <About />
-        <Skills />
-        <Projects />
-        <Timeline />
-        <Contact />
+      <a className="skip" href="#perfil">
+        Saltar al contenido
+      </a>
+      <main id="main">
+        <HeroPlaceholder />
+        <ChapterPlaceholders />
       </main>
-      <Footer />
+      {/* Después de <main>: la escena mide las secciones ya montadas */}
+      <Stage />
     </AppProviders>
   )
 }
