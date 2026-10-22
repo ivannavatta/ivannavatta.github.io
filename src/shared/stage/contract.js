@@ -5,8 +5,11 @@
  * con estos atributos y stage los MIDE. Así cada feature se reemplaza sin tocar a la otra.
  *
  * - Capítulo:  <section {...chapterProps('perfil', 'light')}>  → id, data-chapter, data-theme
+ *              Cada sección pinta su fondo y sus colores según data-theme (globals.css); no hay
+ *              mezcla global. Entre capítulos de distinto tema stage dibuja una costura de bloques.
  *              El inicio puede sumar data-backdrop="dark": el fondo que aparece detrás del
- *              marco cuando el inicio se encoge.
+ *              marco cuando el inicio se encoge. Una región interna con su propio data-theme
+ *              (el marco del inicio) cuenta para el tema de la cabecera.
  * - Pose:      un contenedor con {...poseProps(POSES.stack)} y, adentro, cada bloque con
  *              {...blockProps()} (o {...blockProps({ accent: true })} para el bloque de acento).
  *              Los bloques se leen en orden de documento.
@@ -46,7 +49,7 @@ export const ATTR = {
 
 /**
  * Clases en <html>:
- * - live:    capa de movimiento activa (Lenis + ScrollTrigger). Fondo y texto globales.
+ * - live:    capa de movimiento activa (Lenis + ScrollTrigger, pins y costuras entre capítulos).
  * - reduced: prefers-reduced-motion. Sin Lenis, sin pins, IN estático en el inicio.
  * - gl:      la escena 3D dibuja los bloques; los equivalentes CSS se vuelven transparentes.
  * - no-gl:   sin WebGL; quedan los bloques CSS (fallback plano).

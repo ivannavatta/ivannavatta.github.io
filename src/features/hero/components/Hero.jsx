@@ -46,7 +46,8 @@ export function Hero() {
           </p>
         </div>
 
-        <div className={styles.frame} ref={frameRef}>
+        {/* El marco es una región clara propia (data-theme): la cabecera la detecta al encogerse */}
+        <div className={styles.frame} ref={frameRef} data-theme="light">
           <CircuitTraces seed={3} className={styles.traces} />
           <div className={styles.inner}>
             <div className={styles.copy}>

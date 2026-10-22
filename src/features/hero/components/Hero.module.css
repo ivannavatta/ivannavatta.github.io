@@ -6,8 +6,11 @@
   overflow: hidden;
 }
 
-/* Filas que cruzan detrás del marco: solo con la capa de movimiento */
+/* Filas que cruzan detrás del marco: solo con la capa de movimiento. Viven sobre el fondo
+   oscuro del inicio (data-backdrop), así que usan los colores del tema oscuro. */
 .rows {
+  --ink: var(--dark-ink);
+  --accent: var(--dark-accent);
   position: absolute;
   inset: 0;
   z-index: 0;

@@ -104,9 +104,14 @@ p {
 
 /* ---------- Capítulos ----------
    Contrato con la feature stage (ver src/shared/stage/contract.js):
-   cada sección es <section data-chapter="…" data-theme="light|dark">.
-   Con escena viva (html.live) el fondo y el texto son globales y los mezcla stage.
-   Sin escena viva, cada sección fija su propio tema. */
+   cada sección es <section data-chapter="…" data-theme="light|dark"> y pinta SU fondo y SUS
+   colores. No hay mezcla global: ningún texto queda nunca sobre un gris intermedio. La
+   continuidad entre capítulos la dan las costuras de bloques que dibuja stage en el borde.
+
+   Capas (de abajo hacia arriba): fondo de cada sección · costuras y trazas (z 0) · contenido
+   del inicio (z 1) · escena 3D (z 2) · contenido del resto de las secciones (z 3).
+   Por eso las secciones NO crean contexto de apilamiento: su fondo queda debajo de la escena
+   y de las trazas, y sus hijos directos suben de capa. */
 main {
   position: relative;
   overflow-x: clip;
@@ -114,14 +119,32 @@ main {
 
 main > section {
   position: relative;
+}
+
+main > section > * {
+  position: relative;
   z-index: var(--z-section);
 }
 
-main > section[data-chapter='inicio'] {
+main > section[data-chapter='inicio'] > * {
   z-index: var(--z-hero);
 }
 
-html:not(.live) [data-theme='dark'] {
+[data-theme='light'] {
+  --bg: var(--light-bg);
+  --surface: var(--light-surface);
+  --surface-2: var(--light-surface-2);
+  --ink: var(--light-ink);
+  --soft: var(--light-soft);
+  --accent: var(--light-accent);
+  --accent-ink: var(--light-accent-ink);
+  --accent-hover: var(--light-accent-hover);
+  --error: var(--light-error);
+  background: var(--bg);
+  color: var(--ink);
+}
+
+[data-theme='dark'] {
   --bg: var(--dark-bg);
   --surface: var(--dark-surface);
   --surface-2: var(--dark-surface-2);
@@ -135,9 +158,15 @@ html:not(.live) [data-theme='dark'] {
   color: var(--ink);
 }
 
-html:not(.live) [data-theme='light'] {
-  background: var(--bg);
-  color: var(--ink);
+/* Con escena viva, el inicio deja ver detrás del marco el fondo que declara (data-backdrop) */
+html.live [data-backdrop='dark'] {
+  background: var(--dark-bg);
+}
+
+/* El fondo del documento sigue al capítulo bajo la cabecera: solo se ve al estirar el scroll */
+html[data-surface='dark'] {
+  background: var(--dark-bg);
+  scrollbar-color: var(--dark-soft) var(--dark-bg);
 }
 
 /* ---------- Saltar al contenido ---------- */

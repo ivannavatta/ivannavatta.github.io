@@ -28,10 +28,20 @@
   height: 0;
   z-index: var(--z-traces);
   pointer-events: none;
-  color: var(--ink);
   overflow: hidden;
   /* Sin efecto visual: expone --m resuelto en px para que la ruta siga el margen exterior */
   scroll-margin-left: var(--m);
+}
+
+/* Colores por capítulo: cada franja de la red y de la ruta toma los de SU tema */
+.onLight {
+  color: var(--light-ink);
+  --accent: var(--light-accent);
+}
+
+.onDark {
+  color: var(--dark-ink);
+  --accent: var(--dark-accent);
 }
 
 /* Pedidas por el usuario como hilo conductor: decorativas, a 11 % de opacidad */
@@ -56,4 +66,38 @@
 
 .node {
   fill: var(--accent);
+}
+
+/* ---------- Costuras entre capítulos (ver engine/seams.js) ---------- */
+.seams {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 0;
+  z-index: var(--z-traces);
+  pointer-events: none;
+}
+
+.seam {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+.seam i {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  transform: translate3d(0, 100%, 0);
+  will-change: transform;
+}
+
+.blockLight {
+  background: var(--light-bg);
+}
+
+.blockDark {
+  background: var(--dark-bg);
 }

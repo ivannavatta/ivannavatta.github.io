@@ -5,12 +5,20 @@ import { MOBILE_QUERY } from '@/shared/stage'
 import { startStage } from '../engine/stage'
 import styles from './Stage.module.css'
 
-const TRACE_CLASSES = { net: styles.net, pad: styles.pad, route: styles.route, node: styles.node }
+const TRACE_CLASSES = {
+  net: styles.net,
+  pad: styles.pad,
+  route: styles.route,
+  node: styles.node,
+  onLight: styles.onLight,
+  onDark: styles.onDark,
+}
+const SEAM_CLASSES = { seam: styles.seam, blockLight: styles.blockLight, blockDark: styles.blockDark }
 
 /**
  * La escena que acompaña toda la página: el IN 3D (canvas), las trazas de circuito de
- * fondo con la ruta del margen y la mezcla de tema por capítulo. Es decorativa: el canvas
- * y las trazas quedan fuera del árbol de accesibilidad.
+ * fondo con la ruta del margen y las costuras de bloques entre capítulos de distinto tema.
+ * Es decorativa: el canvas, las costuras y las trazas quedan fuera del árbol de accesibilidad.
  *
  * Se monta después de <main>: lee las secciones a través del contrato de src/shared/stage.
  * Al cruzar el corte mobile se rearma (en mobile cada slot es un bloque; en escritorio, cuatro).
@@ -18,23 +26,28 @@ const TRACE_CLASSES = { net: styles.net, pad: styles.pad, route: styles.route, n
 export function Stage() {
   const canvasRef = useRef(null)
   const tracesRef = useRef(null)
+  const seamsRef = useRef(null)
   const { reduced } = useScroll()
   const mobile = useMediaQuery(MOBILE_QUERY)
 
   useEffect(() => {
-    if (!canvasRef.current || !tracesRef.current) return undefined
+    if (!canvasRef.current || !tracesRef.current || !seamsRef.current) return undefined
     return startStage({
       canvas: canvasRef.current,
       traces: tracesRef.current,
+      seams: seamsRef.current,
       mobile,
       reduced,
       classes: TRACE_CLASSES,
+      seamClasses: SEAM_CLASSES,
     })
   }, [mobile, reduced])
 
   return (
     <>
       <canvas ref={canvasRef} className={styles.canvas} aria-hidden="true" />
+      {/* Costuras entre capítulos (debajo de las trazas: las trazas cruzan el borde) */}
+      <div ref={seamsRef} className={styles.seams} aria-hidden="true" />
       <svg ref={tracesRef} className={styles.traces} aria-hidden="true" focusable="false" />
     </>
   )

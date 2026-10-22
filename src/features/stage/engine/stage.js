@@ -1,4 +1,5 @@
-// Orquestación de la escena: segmentos de scroll → poses del IN, mezcla de temas y trazas.
+// Orquestación de la escena: segmentos de scroll → poses del IN, costuras entre capítulos,
+// tema discreto de la cabecera y trazas.
 // Port de initMotion()/initReduced() del mockup, con limpieza completa (compatible con
 // StrictMode, que monta, desmonta y vuelve a montar en desarrollo).
 import { ScrollTrigger, gsap } from '@/shared/scroll'
@@ -14,13 +15,13 @@ import {
 } from '@/shared/stage'
 import { clamp01 } from './math'
 import { buildPoses, buildReducedPoses } from './poses'
-import { clearSurface, createThemeMixer, syncSurfaceFromSections } from './theme'
+import { createSeamLayer } from './seams'
+import { createSurfaceTracker } from './theme'
 import { createTraceLayer } from './traces'
 
 // three.js va en su propio chunk: la página se pinta antes de que cargue la escena
 const loadScene = () => import('./scene')
 
-const HERO_BACKDROP_AT = 0.2 // el fondo aparece al 20 % del pin del inicio
 const LAYOUT_DEBOUNCE = 200
 
 const chapter = (id) => document.querySelector(selectors.chapter(id))
@@ -53,12 +54,14 @@ function observeMainHeight(onChange) {
   }
 }
 
-export function startStage({ canvas, traces, mobile, reduced, classes }) {
+export function startStage({ canvas, traces, seams, mobile, reduced, classes, seamClasses }) {
   const root = document.documentElement
   const cleanups = []
   let disposed = false
   const traceLayer = createTraceLayer(traces, { live: !reduced, classes })
   cleanups.push(() => traceLayer.dispose())
+  const surface = createSurfaceTracker()
+  cleanups.push(() => surface.dispose())
 
   const setGl = (ok) => root.classList.add(ok ? ROOT_CLASS.gl : ROOT_CLASS.noGl)
   cleanups.push(() => root.classList.remove(ROOT_CLASS.gl, ROOT_CLASS.noGl))
@@ -81,17 +84,15 @@ export function startStage({ canvas, traces, mobile, reduced, classes }) {
     }
     const relayout = () => {
       traceLayer.draw()
+      surface.sync()
       render()
     }
 
     traceLayer.draw()
-    syncSurfaceFromSections()
-    const onScroll = () => syncSurfaceFromSections()
+    surface.sync()
+    const onScroll = () => surface.sync()
     window.addEventListener('scroll', onScroll, { passive: true })
-    cleanups.push(() => {
-      window.removeEventListener('scroll', onScroll)
-      clearSurface()
-    })
+    cleanups.push(() => window.removeEventListener('scroll', onScroll))
 
     let resizeTimer = 0
     const onResize = () => {
@@ -147,13 +148,9 @@ export function startStage({ canvas, traces, mobile, reduced, classes }) {
       : null
     const heroP = () => (heroST ? heroST.progress : 0)
 
-    const theme = createThemeMixer({
-      getHeroBackdrop: () =>
-        heroST && hero.dataset.backdrop
-          ? { y: heroST.start + (heroST.end - heroST.start) * HERO_BACKDROP_AT, theme: hero.dataset.backdrop }
-          : null,
-    })
-    cleanups.push(() => theme.dispose())
+    // Costuras de bloques entre capítulos de distinto tema (solo con movimiento)
+    const seamLayer = createSeamLayer(seams, { classes: seamClasses })
+    cleanups.push(() => seamLayer.dispose())
 
     /* ---- Segmentos: qué pose y cuánto de transición ---- */
     const seg = (id, start, end) => {
@@ -259,9 +256,9 @@ export function startStage({ canvas, traces, mobile, reduced, classes }) {
     })
     const onRefresh = () => {
       heightWatch.sync()
-      theme.buildStops()
       traceLayer.draw()
-      theme.apply(window.scrollY)
+      seamLayer.build()
+      surface.sync()
       if (scene) {
         scene.resize()
         scene.invalidate()
@@ -279,7 +276,10 @@ export function startStage({ canvas, traces, mobile, reduced, classes }) {
       const y = window.scrollY
       const moved = y !== lastY
       lastY = y
-      theme.apply(y)
+      if (moved) {
+        surface.sync()
+        seamLayer.update(y)
+      }
       const max = root.scrollHeight - window.innerHeight
       traceLayer.setProgress(max > 0 ? y / max : 0)
       if (scene) {

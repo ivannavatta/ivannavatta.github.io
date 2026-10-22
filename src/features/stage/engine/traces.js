@@ -1,13 +1,18 @@
 // Hilo conductor: trazas de circuito de fondo y la ruta de acento que baja por el margen
 // y se conecta con el título de cada capítulo. Con escena viva, la ruta se dibuja con la lectura.
+// La red y la ruta se dibujan una vez (en <defs>) y se muestran por capítulo con <use>,
+// recortadas a la franja de cada sección y en los colores de SU tema: las trazas cruzan el
+// borde entre capítulos sin depender de una mezcla global de colores.
 // Se construye con createElementNS (sin innerHTML: lo exige la política de seguridad).
-import { MOBILE_QUERY, selectors } from '@/shared/stage'
+import { MOBILE_QUERY, THEMES, selectors } from '@/shared/stage'
 import { traceNet } from '@/shared/utils/traceNet'
+import { effectiveTheme } from './theme'
 
 const SVG_NS = 'http://www.w3.org/2000/svg'
 const NET_SEED = 7
+let instance = 0 // ids únicos (StrictMode monta dos veces)
 
-function svgEl(tag, attrs) {
+function svgEl(tag, attrs = {}) {
   const el = document.createElementNS(SVG_NS, tag)
   for (const [name, value] of Object.entries(attrs)) el.setAttribute(name, String(value))
   return el
@@ -16,6 +21,7 @@ function svgEl(tag, attrs) {
 const pad = (x, y, className) => svgEl('rect', { class: className, x: x - 3, y: y - 3, width: 6, height: 6 })
 
 export function createTraceLayer(svg, { live, classes }) {
+  const uid = `stage-${++instance}`
   let route = null
   let routeLen = 0
   let lastOffset = ''
@@ -34,26 +40,46 @@ export function createTraceLayer(svg, { live, classes }) {
     const x0 = m * 0.35
     const jog = m * 0.3
     const mainTop = main.getBoundingClientRect().top
+    const sections = Array.from(document.querySelectorAll(selectors.chapters))
+
+    // Ruta de acento: baja por el margen y hace un quiebre en el título de cada capítulo
     let d = `M${x0} ${window.innerHeight}`
     const nodes = []
-    Array.from(document.querySelectorAll(selectors.chapters))
-      .slice(1)
-      .forEach((section) => {
-        const head = section.querySelector('h2')
-        const top = section.getBoundingClientRect().top - mainTop
-        const hy = head ? head.getBoundingClientRect().top - mainTop + 8 : top + 160
-        d += `L${x0} ${hy - 40}L${x0 + jog} ${hy - 40 + jog}L${x0 + jog} ${hy + 40}L${x0} ${hy + 40 + jog}`
-        nodes.push(svgEl('rect', { class: classes.node, x: (x0 + jog - 3).toFixed(1), y: hy + 8, width: 6, height: 6 }))
-      })
+    sections.slice(1).forEach((section) => {
+      const head = section.querySelector('h2')
+      const top = section.getBoundingClientRect().top - mainTop
+      const hy = head ? head.getBoundingClientRect().top - mainTop + 8 : top + 160
+      d += `L${x0} ${hy - 40}L${x0 + jog} ${hy - 40 + jog}L${x0 + jog} ${hy + 40}L${x0} ${hy + 40 + jog}`
+      nodes.push(pad(x0 + jog, hy + 11, classes.node))
+    })
     d += `L${x0} ${h - 40}`
 
+    const defs = svgEl('defs')
+    const netGroup = svgEl('g', { id: `${uid}-net` })
     const net = traceNet(w, h, NET_SEED, mobile ? 34 : 26)
-    const fragment = document.createDocumentFragment()
-    fragment.append(svgEl('path', { class: classes.net, d: net.d }))
-    for (const [x, y] of net.pads) fragment.append(pad(x, y, classes.pad))
+    netGroup.append(svgEl('path', { class: classes.net, d: net.d }))
+    for (const [x, y] of net.pads) netGroup.append(pad(x, y, classes.pad))
+    const routeGroup = svgEl('g', { id: `${uid}-route` })
     route = svgEl('path', { class: classes.route, d })
-    fragment.append(route, ...nodes)
-    svg.replaceChildren(fragment)
+    routeGroup.append(route, ...nodes)
+    defs.append(netGroup, routeGroup)
+
+    // Una franja por capítulo, con los colores de su tema
+    const layers = []
+    sections.forEach((section, i) => {
+      const r = section.getBoundingClientRect()
+      const clip = svgEl('clipPath', { id: `${uid}-clip-${i}` })
+      clip.append(svgEl('rect', { x: 0, y: r.top - mainTop, width: w, height: r.height }))
+      defs.append(clip)
+      const theme = effectiveTheme(section)
+      const layer = svgEl('g', {
+        'clip-path': `url(#${uid}-clip-${i})`,
+        class: theme === THEMES.dark ? classes.onDark : classes.onLight,
+      })
+      layer.append(svgEl('use', { href: `#${uid}-net` }), svgEl('use', { href: `#${uid}-route` }))
+      layers.push(layer)
+    })
+    svg.replaceChildren(defs, ...layers)
 
     routeLen = route.getTotalLength()
     lastOffset = ''
