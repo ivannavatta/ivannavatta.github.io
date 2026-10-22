@@ -1,0 +1,256 @@
+/* ---------- 5. Recorrido ---------- */
+.path {
+  padding: var(--section) var(--m) calc(var(--section) * 0.7);
+}
+
+.head {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gap);
+  align-items: end;
+}
+
+.title {
+  grid-column: 1 / span 5;
+  font-size: var(--step-head);
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+}
+
+.lead {
+  grid-column: 7 / -1;
+  max-width: 52ch;
+}
+
+.list {
+  margin-top: 72px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) minmax(0, 1.25fr);
+  gap: var(--gap);
+  align-items: end;
+}
+
+.step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Columna de bloques: uno cada ~10 h de cursada. Con escena viva la dibuja el IN 3D. */
+.bars {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 6px;
+  margin-bottom: 18px;
+  color: var(--ink);
+}
+
+.bars i {
+  display: block;
+  width: 36px;
+  height: 36px;
+  background: currentColor;
+}
+
+.bars i.barAccent {
+  background: var(--accent);
+}
+
+:global(html.gl.live) .bars i {
+  background: transparent;
+}
+
+.when {
+  font-size: var(--step-small);
+  color: var(--soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.what {
+  font-size: var(--step-lead);
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.where {
+  font-size: var(--step-small);
+}
+
+.now .when {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.certButton {
+  align-self: flex-start;
+  margin-top: 8px;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 0;
+  background: var(--surface-2);
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  transition:
+    transform 160ms var(--ease-out),
+    background-color 200ms ease;
+}
+
+.certButton:active {
+  transform: scale(0.97);
+}
+
+.certButton[aria-expanded='true'] {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* Certificado: flota sobre el paso (la sombra es la de algo que de verdad flota).
+   Entra en 180 ms y sale en 120 ms, desde el botón (origen abajo); display discreto: oculto
+   no ocupa caja ni se lee. */
+.cert {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 12px);
+  z-index: 5;
+  width: min(340px, 80vw);
+  margin: 0;
+  background: #ffffff;
+  padding: 8px;
+  box-shadow:
+    0 18px 40px -12px rgb(14 26 31 / 0.35),
+    0 4px 10px rgb(14 26 31 / 0.12);
+  transform-origin: 0 100%;
+  transition:
+    opacity 180ms var(--ease-out),
+    transform 180ms var(--ease-out),
+    display 180ms allow-discrete;
+}
+
+@starting-style {
+  .cert:not([hidden]) {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+}
+
+.cert[hidden] {
+  display: none;
+  opacity: 0;
+  transform: translateY(8px) scale(0.97);
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease,
+    display 120ms allow-discrete;
+}
+
+.cert img {
+  width: 100%;
+  height: auto;
+  background: var(--light-surface);
+}
+
+.cert figcaption {
+  padding: 8px 4px 2px;
+  font-size: 0.875rem;
+  color: var(--light-soft);
+}
+
+.step:nth-child(n + 4) .cert {
+  left: auto;
+  right: 0;
+  transform-origin: 100% 100%;
+}
+
+/* Escritorio: fechas, títulos y lugares en la misma línea en las cinco columnas (subgrid).
+   La carrera arranca en la fila de las fechas; los bloques siguen apoyados sobre la misma base.
+   Sin subgrid queda el layout de columnas alineadas abajo. */
+@media (min-width: 1024px) {
+  @supports (grid-template-rows: subgrid) {
+    .list {
+      grid-template-rows: repeat(5, auto);
+      row-gap: 0;
+    }
+
+    .step {
+      display: grid;
+      grid-row: span 5;
+      grid-template-rows: subgrid;
+      row-gap: 6px;
+    }
+
+    .bars {
+      align-self: end;
+    }
+
+    .certButton {
+      align-self: start;
+    }
+
+    .now > :first-child {
+      grid-row-start: 2;
+    }
+  }
+}
+
+/* Tablet y mobile: la línea en vertical, los bloques en fila */
+@media (max-width: 1023px) {
+  .head {
+    grid-template-columns: 1fr;
+    row-gap: 16px;
+  }
+
+  .title,
+  .lead {
+    grid-column: 1;
+  }
+
+  .list {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    margin-top: 64px;
+  }
+
+  .bars {
+    flex-direction: row;
+    margin-bottom: 10px;
+  }
+
+  .bars i {
+    width: 28px;
+    height: 28px;
+  }
+
+  .cert {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    margin-top: 12px;
+    width: min(420px, 100%);
+    box-shadow: none;
+  }
+
+  .step:nth-child(n + 4) .cert {
+    left: auto;
+    right: auto;
+  }
+}
+
+:global(html.reduced) .certButton:active {
+  transform: none;
+}
+
+:global(html.reduced) .cert,
+:global(html.reduced) .cert[hidden] {
+  transform: none;
+}
+
+@starting-style {
+  :global(html.reduced) .cert:not([hidden]) {
+    transform: none;
+  }
+}

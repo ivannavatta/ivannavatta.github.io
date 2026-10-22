@@ -1,1 +1,1 @@
-export { Timeline } from './components/Timeline'
+export { Education } from './components/Education'
