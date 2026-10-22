@@ -14,7 +14,6 @@ import {
   expectNoHorizontalOverflow,
   expectNoA11yViolations,
   expectReadableContrast,
-  measureTextContrast,
   findCoveredContent,
 } from './helpers/index.js'
 
@@ -29,13 +28,10 @@ const PRINCIPLES = ['Primero, el problema.', 'Piezas con una sola tarea.', 'Apre
 
 const isReducedProject = () => test.info().project.use.reducedMotion === 'reduce'
 
-// BUG theme-mix-contrast (abierto): con movimiento, src/features/stage/engine/theme.js:84-99
-// interpola en RGB --bg, --ink y --soft durante MIX_WINDOW (28 % de la pantalla) en cada cambio de
-// tema; a mitad de la mezcla texto y fondo convergen (peor medido: 1.18:1 en 1440, scrollY ≈ 1760).
-// La cabecera ya lo evita con un tema discreto; el contenido no.
-const THEME_MIX_BUG = 'BUG theme-mix-contrast: theme.js:84 mezcla texto y fondo en RGB y el contraste cae a ~1.2:1'
-
-/** true cuando la mezcla de tema terminó (las variables vivas de <html> ya son las del tema claro). */
+/**
+ * true si <html> no tiene una mezcla de tema en curso (variables --bg vivas distintas del claro).
+ * Desde el fix de las costuras no hay mezcla global y devuelve true; queda como guarda por si vuelve.
+ */
 const themeSettledLight = (page) =>
   page.evaluate(() => {
     const live = document.documentElement.style.getPropertyValue('--bg').trim()
@@ -262,35 +258,7 @@ test.describe('movimiento reducido', () => {
   })
 })
 
-test('contraste AA del texto visible en las mezclas de tema inicio → Perfil → Proyectos', async ({ page }) => {
-  test.setTimeout(90_000)
-  test.fail(!isReducedProject(), THEME_MIX_BUG)
-  // theme.js: cada capítulo toma su tema cuando su borde cruza el 55 % de la pantalla, con una
-  // mezcla del 28 % de la pantalla centrada ahí. Barremos esa banda en pasos de 20 px.
-  const bands = await page.evaluate(() =>
-    ['perfil', 'proyectos'].map((id) => {
-      const top = document.getElementById(id).getBoundingClientRect().top + scrollY
-      const stop = top - innerHeight * 0.55
-      return { id, from: Math.round(stop - innerHeight * 0.16), to: Math.round(stop + innerHeight * 0.16) }
-    }),
-  )
-  const failures = []
-  for (const band of bands) {
-    for (let y = band.from; y <= band.to; y += 20) {
-      await jumpTo(page, y)
-      await waitForAnimationsToFinish(page)
-      for (const root of ['#inicio', '#perfil', '#proyectos']) {
-        for (const x of await measureTextContrast(page, root)) if (x.ratio < x.required) failures.push({ y, band: band.id, ...x })
-      }
-    }
-  }
-  const worst = [...failures].sort((a, b) => a.ratio - b.ratio).slice(0, 5)
-  expect(
-    failures.length,
-    `texto bajo AA en ${new Set(failures.map((f) => f.y)).size} posición(es); peores:\n` +
-      worst.map((f) => `  scrollY ${f.y} (→ ${f.band}): ${f.ratio}:1 "${f.text}" ${f.fg} sobre ${f.bg}`).join('\n'),
-  ).toBe(0)
-})
+// El contraste en los bordes entre capítulos (costuras) lo barre seams.spec.js.
 
 test('continuidad inicio → Perfil → Proyectos: nada tapado, sin superposición ni overflow', async ({ page }) => {
   const s = perfil(page)

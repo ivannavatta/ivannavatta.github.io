@@ -61,3 +61,17 @@ export async function expectVisibleFocus(locator) {
     `Sin indicador de foco visible (outline ${style.outlineStyle} ${style.outlineWidth}px, box-shadow ${style.boxShadow}, :focus-visible ${style.focusVisible})`,
   ).toBe(true)
 }
+
+/**
+ * Da foco a `locator` en modalidad teclado (para que matchee :focus-visible): primero un Tab real
+ * (el navegador pasa a modalidad teclado) y después el foco programático, que la conserva.
+ * Útil cuando el componente reacciona solo a foco de teclado (p. ej. el salto de los casos apilados).
+ * @param {import('@playwright/test').Page} page
+ * @param {import('@playwright/test').Locator} locator
+ */
+export async function keyboardFocus(page, locator) {
+  await page.keyboard.press('Tab')
+  await locator.focus()
+  await expect(locator).toBeFocused()
+  return locator.evaluate((el) => el.matches(':focus-visible'))
+}

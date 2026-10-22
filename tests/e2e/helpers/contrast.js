@@ -10,13 +10,19 @@
 // (≥24 px, o ≥18.66 px en negrita).
 import { expect } from '@playwright/test'
 
+// Capas que pueden quedar DETRÁS del texto sin ser ancestros suyos: los bloques de las costuras
+// entre capítulos (src/features/stage/engine/seams.js, clase de CSS module "_seam_…").
+export const SEAM_BLOCKS = '[class*="_seam_"] > i'
+
 /**
  * @param {import('@playwright/test').Page} page
  * @param {string} rootSelector
+ * @param {{ overlays?: string }} [opts] selector de capas que, si se cruzan con el texto, también
+ *   cuentan como fondo posible (se toma el peor caso). Por defecto, los bloques de las costuras.
  * @returns {Promise<Array<{ text: string, ratio: number, required: number, fg: string, bg: string }>>}
  */
-export function measureTextContrast(page, rootSelector) {
-  return page.evaluate((rootSelector) => {
+export function measureTextContrast(page, rootSelector, { overlays = SEAM_BLOCKS } = {}) {
+  return page.evaluate(({ rootSelector, overlays }) => {
     const root = document.querySelector(rootSelector)
     if (!root) return []
     const parse = (c) => {
@@ -56,6 +62,12 @@ export function measureTextContrast(page, rootSelector) {
       for (let n = el; n; n = n.parentElement) o *= Number(getComputedStyle(n).opacity)
       return o
     }
+    const overlayBoxes = overlays
+      ? [...document.querySelectorAll(overlays)]
+          .map((el) => ({ r: el.getBoundingClientRect(), bg: parse(getComputedStyle(el).backgroundColor) }))
+          .filter((o) => o.bg.a > 0 && o.r.width > 0 && o.r.height > 0)
+      : []
+    const intersects = (a, b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top
     const header = document.querySelector('header')
     const headerBottom = header ? Math.max(0, header.getBoundingClientRect().bottom) : 0
     const out = []
@@ -67,18 +79,32 @@ export function measureTextContrast(page, rootSelector) {
       if (cs.visibility === 'hidden' || cs.display === 'none') continue
       const r = el.getBoundingClientRect()
       if (r.width === 0 || r.bottom <= headerBottom || r.top >= innerHeight) continue
-      const bg = backgroundOf(el)
       const fgRaw = parse(cs.color)
-      const fg = over({ ...fgRaw, a: fgRaw.a * opacityOf(el) }, bg)
+      const opacity = opacityOf(el)
+      // Invisible a propósito (p. ej. un caso que todavía no entró en el apilado): no se lee
+      if (opacity <= 0.01) continue
       const size = parseFloat(cs.fontSize)
       const large = size >= 24 || (size >= 18.66 && Number(cs.fontWeight) >= 700)
       const required = large ? 3 : 4.5
-      const value = ratio(fg, bg)
       const hex = (c) => `rgb(${Math.round(c.r)},${Math.round(c.g)},${Math.round(c.b)})`
-      out.push({ text: el.textContent.trim().slice(0, 30), ratio: Math.round(value * 100) / 100, required, fg: hex(fg), bg: hex(bg) })
+      // Fondo propio y, si una capa (costura) se cruza con la caja del texto, también esa capa
+      const candidates = [backgroundOf(el), ...overlayBoxes.filter((o) => intersects(o.r, r)).map((o) => over(o.bg, backgroundOf(el)))]
+      let worst = null
+      for (const bg of candidates) {
+        const fg = over({ ...fgRaw, a: fgRaw.a * opacity }, bg)
+        const value = ratio(fg, bg)
+        if (!worst || value < worst.value) worst = { value, fg, bg }
+      }
+      out.push({
+        text: el.textContent.trim().slice(0, 30),
+        ratio: Math.round(worst.value * 100) / 100,
+        required,
+        fg: hex(worst.fg),
+        bg: hex(worst.bg),
+      })
     }
     return out
-  }, rootSelector)
+  }, { rootSelector, overlays })
 }
 
 /**

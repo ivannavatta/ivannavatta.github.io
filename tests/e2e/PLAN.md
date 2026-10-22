@@ -133,17 +133,30 @@ Cubre `Button`, `TextLink`, la nav y cualquier componente nuevo sin test propio:
 - [ ] (bug abierto `theme-mix-contrast`) Contraste AA del texto visible durante las mezclas de tema:
       hoy `test.fail` en los proyectos con movimiento.
 
-### 4. Proyectos (`#proyectos`, sección fijada)
-- `h2` "Proyectos"; cuatro `article` con nombre accesible MyTube, Sistema de transporte, uadeHUB y
-  box9.
-- Con la rueda (desktop): el pin recorre los cuatro casos en orden y libera al final; cada caso queda
-  a la vista en algún momento (`wheelUntilInView`).
-- "Ver arquitectura" (botón, `aria-expanded`/`aria-controls`): abre el panel, que recibe foco o queda
-  anunciado; volver a hacer clic lo cierra. Con teclado (Enter/Espacio).
-- Links de repositorio: `target="_blank"` con `rel="noopener"` y aviso de pestaña nueva en el nombre.
-- Figuras: el grafo (`role="img"` con `title`) y la matriz 9-box (`role="img"` con `aria-label`)
-  tienen texto alternativo.
-- Mobile: sin pin horizontal roto, casos apilados legibles y sin overflow.
+### 4. Proyectos — `projects.spec.js` ✅ (ronda 4)
+- [x] h2, bajada y cuatro `article` (MyTube, Sistema de transporte, uadeHUB, box9) con
+      `aria-labelledby`, h3, ficha Problema/Rol/Stack y "Ver arquitectura" (`aria-expanded`,
+      `aria-controls`); base de ladrillos `aria-hidden`.
+- [x] Links: repositorios con "(se abre en otra pestaña)", `target="_blank"` y `rel` seguro;
+      Transporte sin links (repo privado); ningún link al TPO ni al deploy de MyTube.
+- [x] Figuras con epígrafe; grafo `role="img"` con `<title>` y letras ocultas; consola en
+      `pre > code` con `<mark>`; matriz `role="img"` con `aria-label`.
+- [x] "Ver arquitectura" ↔ "Ver resumen" con Enter y Espacio; el foco no se pierde; vuelve la figura.
+- [x] Tab y Shift+Tab por los cuatro casos: cada foco visible (opacidad 1), en pantalla y sin nada
+      encima (el salto del apilado funciona en los dos sentidos); foco visible.
+- [x] Pin con rueda real en 1440×900 y 1024×900 (apila en orden, el último queda adelante, los que
+      esperan no capturan el puntero) y lista en 1440×700; la bajada nunca queda tapada; sin overflow.
+- [x] Con el panel abierto en el apilado, el caso entra entero y nada lo tapa.
+- [x] Inclinación 3D solo con puntero fino.
+- [x] axe y contraste propio, también con un panel abierto. Reducido: lista, sin pin ni transform.
+
+### 4b. Costuras y cabecera — `seams.spec.js` ✅ (ronda 4)
+- [x] Con movimiento, una costura por cada borde claro/oscuro; en reducido, ninguna.
+- [x] Cada borde entre capítulos, barrido en pasos de 20 px mientras la costura se arma y de 40 px
+      después: contraste AA de las dos secciones (contando los bloques detrás del texto) y ningún
+      texto con un bloque encima.
+- [ ] (bug abierto `seam-surface-lag`) `data-surface` y `theme-color` = color real bajo la cabecera
+      en cada borde: hoy `test.fail` con movimiento (desfase de 48 px).
 
 ### 5. Stack (`#stack`)
 - `h2` "Stack, por capas"; cinco capas (`h3`: Interfaz, Backend, Datos, Herramientas, Método).
