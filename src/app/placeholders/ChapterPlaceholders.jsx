@@ -26,19 +26,6 @@ const STEPS = [
 export function ChapterPlaceholders() {
   return (
     <>
-      <section {...chapterProps('proyectos', 'dark')} className={styles.work} aria-labelledby="work-title">
-        <div className={styles.workPin}>
-          <div className={styles.workHead}>
-            <h2 className={styles.head} id="work-title">
-              Proyectos
-            </h2>
-            <p className={styles.text}>MyTube · Sistema de transporte · uadeHUB · box9</p>
-          </div>
-          <div className={styles.workStage} />
-          <div className={styles.workBase} {...poseProps(POSES.visor, { layout: 'bricks' })} aria-hidden="true" />
-        </div>
-      </section>
-
       <section {...chapterProps('stack', 'dark')} className={styles.stack} aria-labelledby="stack-title">
         <div className={styles.grid}>
           <div className={styles.stackIntro}>

@@ -1,0 +1,267 @@
+/* ---------- 3. Proyectos ---------- */
+.work {
+  padding-top: calc(var(--section) * 0.5);
+}
+
+.pin {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 28px;
+  padding: calc(var(--m) + 72px) var(--m) var(--m);
+}
+
+.head {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gap);
+  align-items: end;
+}
+
+.title {
+  grid-column: 1 / span 5;
+  font-size: var(--step-head);
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+}
+
+.intro {
+  grid-column: 7 / -1;
+  max-width: 56ch;
+}
+
+.stage {
+  position: relative;
+  display: grid;
+  gap: 24px;
+}
+
+/* Base de ladrillos del IN (la dibuja la escena 3D) */
+.base {
+  height: 56px;
+  pointer-events: none;
+}
+
+/* ---------- Caso ---------- */
+.case {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: clamp(24px, 4vw, 64px);
+  padding: clamp(24px, 3vw, 44px);
+  background: var(--surface);
+  color: var(--ink);
+  transform-origin: 50% 0;
+}
+
+.caseTitle {
+  font-size: var(--step-head);
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+}
+
+.meta {
+  margin-top: 12px;
+  color: var(--soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.facts {
+  margin-top: 28px;
+  display: grid;
+  gap: 16px;
+}
+
+.facts dt {
+  font-size: var(--step-small);
+  color: var(--soft);
+}
+
+.facts dd {
+  margin-top: 2px;
+  max-width: 56ch;
+}
+
+.links {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 24px;
+}
+
+.more {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  background: var(--surface-2);
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 1rem;
+  transition:
+    transform 160ms var(--ease-out),
+    background-color 200ms ease;
+}
+
+.more:active {
+  transform: scale(0.97);
+}
+
+.more[aria-expanded='true'] {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* Figura y panel comparten lugar: el panel la reemplaza sin mover el resto del caso */
+.side {
+  position: relative;
+  min-height: 0;
+  display: grid;
+}
+
+.side[data-open] > figure {
+  visibility: hidden;
+}
+
+/* Entra en 220 ms y sale en 160 ms (la salida, más corta), solo opacidad y transform.
+   display se anima de forma discreta: oculto no ocupa caja ni se lee, y la salida igual se ve. */
+.panel {
+  position: absolute;
+  inset: 0;
+  overflow: auto;
+  padding: 4px 4px 4px 0;
+  background: var(--surface);
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 220ms var(--ease-out),
+    transform 220ms var(--ease-out),
+    display 220ms allow-discrete;
+}
+
+@starting-style {
+  .panel:not([hidden]) {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+.panel[hidden] {
+  display: none;
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease,
+    display 160ms allow-discrete;
+}
+
+.panel h4 {
+  font-size: var(--step-lead);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.panel h4 + * {
+  margin-top: 10px;
+}
+
+.panel * + h4 {
+  margin-top: 28px;
+}
+
+.panel ul {
+  display: grid;
+  gap: 10px;
+}
+
+.panel li {
+  padding-left: 22px;
+  position: relative;
+}
+
+.panel li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.6em;
+  width: 8px;
+  height: 8px;
+  background: var(--accent);
+}
+
+/* ---------- Escritorio con altura: los casos se apilan (useCaseStack) ---------- */
+.isPinned .pin {
+  height: 100svh;
+}
+
+.isPinned .stage {
+  display: block;
+}
+
+/* Al menos el alto del escenario y, si el contenido pide más, crece (useCaseStack solo apila
+   cuando el caso más alto entra en la pantalla) */
+.isPinned .case {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  min-height: 100%;
+  will-change: transform;
+}
+
+/* ---------- Tablet y mobile: uno debajo del otro, la base arriba ---------- */
+@media (max-width: 1023px) {
+  .case {
+    grid-template-columns: 1fr;
+  }
+
+  .panel {
+    position: relative;
+    inset: auto;
+  }
+
+  /* El panel ocupa el lugar de la figura (sin dejar el hueco de la figura oculta) */
+  .side[data-open] > figure {
+    display: none;
+  }
+
+  .head {
+    grid-template-columns: 1fr;
+    row-gap: 16px;
+  }
+
+  .pin {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .base {
+    order: 1;
+    height: 48px;
+  }
+
+  .stage {
+    order: 2;
+  }
+
+  .title,
+  .intro {
+    grid-column: 1;
+  }
+}
+
+:global(html.reduced) .more:active {
+  transform: none;
+}
+
+:global(html.reduced) .panel,
+:global(html.reduced) .panel[hidden] {
+  transform: none;
+}
+
+@starting-style {
+  :global(html.reduced) .panel:not([hidden]) {
+    transform: none;
+  }
+}

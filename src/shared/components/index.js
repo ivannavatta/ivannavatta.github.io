@@ -1,6 +1,4 @@
-export { ArrowLink } from './ArrowLink/ArrowLink'
 export { Button } from './Button/Button'
 export { Divider } from './Divider/Divider'
 export { RevealText } from './RevealText/RevealText'
 export { Section } from './Section/Section'
-export { SmoothScroll } from './SmoothScroll/SmoothScroll'

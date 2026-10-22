@@ -1,0 +1,178 @@
+/* Figuras de cada caso: fragmentos del propio sistema, dibujados en el tema oscuro */
+.fig {
+  align-self: center;
+  display: grid;
+  gap: 14px;
+}
+
+.fig figcaption {
+  font-size: var(--step-small);
+  color: var(--soft);
+}
+
+/* ---------- MyTube: capas ---------- */
+.layers {
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: stretch;
+  column-gap: 12px;
+}
+
+.layers figcaption {
+  grid-column: 1 / -1;
+}
+
+.layersHead {
+  font-size: var(--step-small);
+  color: var(--soft);
+  margin-bottom: 10px;
+}
+
+.stack {
+  display: grid;
+  gap: 6px;
+}
+
+.stack li {
+  background: var(--surface-2);
+  padding: 12px 14px;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.stack li:first-child {
+  background: var(--block-base);
+}
+
+.stores {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.stores li {
+  background: var(--tile-active);
+  color: var(--dark-ink);
+  padding: 12px 14px;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.layersLink {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  align-self: center;
+  font-size: var(--step-small);
+  color: var(--soft);
+}
+
+/* ---------- Sistema de transporte: grafo ---------- */
+.graph svg {
+  width: 100%;
+  height: auto;
+  max-height: 300px;
+}
+
+.edges path {
+  stroke: var(--graph-line);
+  stroke-width: 2;
+  fill: none;
+}
+
+.route {
+  stroke: var(--accent);
+  stroke-width: 4;
+  fill: none;
+  stroke-linejoin: round;
+}
+
+.nodes rect {
+  fill: var(--ink);
+}
+
+.nodes rect.nodeEnd {
+  fill: var(--accent);
+}
+
+.nodes rect.nodeOff {
+  fill: var(--graph-line);
+}
+
+.labels text {
+  fill: var(--soft);
+  font: 500 15px var(--font);
+  text-anchor: middle;
+}
+
+.labels text.labelStart {
+  text-anchor: start;
+}
+
+/* ---------- uadeHUB: consola (código real: acá sí va la monoespaciada) ---------- */
+.console pre {
+  margin: 0;
+  padding: 20px 22px;
+  background: var(--console-bg);
+  color: var(--dark-ink);
+  font-family: var(--mono);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.console mark {
+  background: none;
+  color: var(--dark-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+/* ---------- box9: matriz 3 × 3 ---------- */
+.matrixWrap {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: 1fr auto;
+  gap: 10px;
+  max-width: 360px;
+}
+
+.axisY {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  text-align: center;
+  font-size: var(--step-small);
+  color: var(--soft);
+}
+
+.axisX {
+  grid-column: 2;
+  text-align: center;
+  font-size: var(--step-small);
+  color: var(--soft);
+}
+
+.matrixGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  aspect-ratio: 1;
+}
+
+.matrixGrid span {
+  background: var(--surface-2);
+  display: grid;
+  place-items: center;
+  font-weight: 600;
+  font-size: 1.125rem;
+}
+
+.matrixGrid span:nth-child(-n + 3) {
+  background: var(--block-base);
+}
+
+.matrixGrid span.mark {
+  background: var(--accent);
+  color: var(--accent-ink);
+}

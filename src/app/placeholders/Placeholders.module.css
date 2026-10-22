@@ -21,27 +21,6 @@
   font-weight: 500;
   max-width: 40ch;
 }
-.text {
-  margin-top: 24px;
-  max-width: 60ch;
-}
-
-.work {
-  padding-top: calc(var(--section) * 0.5);
-}
-.workPin {
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  gap: 28px;
-  height: 100svh;
-  padding: calc(var(--m) + 72px) var(--m) var(--m);
-}
-.workStage {
-  background: var(--dark-surface);
-}
-.workBase {
-  height: 56px;
-}
 
 .stack {
   padding: var(--section) var(--m) calc(var(--section) * 0.6);
@@ -178,10 +157,6 @@
   .bars i {
     width: 28px;
     height: 28px;
-  }
-  .workPin {
-    height: auto;
-    min-height: 100svh;
   }
 }
 @media (max-width: 767px) {
