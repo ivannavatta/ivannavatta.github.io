@@ -150,6 +150,7 @@ export function startStage({ canvas, traces, seams, mobile, reduced, classes, se
 
     // Costuras de bloques entre capítulos de distinto tema (solo con movimiento)
     const seamLayer = createSeamLayer(seams, { classes: seamClasses })
+    surface.setSeamEdge(seamLayer.edgeOf) // la cabecera cambia de tema donde se ve el borde
     cleanups.push(() => seamLayer.dispose())
 
     /* ---- Segmentos: qué pose y cuánto de transición ---- */

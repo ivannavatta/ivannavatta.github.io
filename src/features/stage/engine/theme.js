@@ -3,19 +3,16 @@
 // globals.css). Acá solo se decide qué tema hay debajo de la cabecera, para que la nav
 // (<html data-surface>) y la barra del navegador (meta theme-color) cambien de golpe, nunca
 // a mitad de un gris.
-import { ROOT_CLASS, SURFACE_ATTR, THEMES } from '@/shared/stage'
+import { SURFACE_ATTR, THEMES } from '@/shared/stage'
+import { effectiveTheme } from './chapters'
 import { cssColor } from './tokens'
 
 const NAV_PROBE = 40 // px desde arriba: lo que está bajo la cabecera
-
-/**
- * Tema efectivo de una región: con escena viva, una sección con data-backdrop muestra ese
- * fondo detrás de su contenido (el inicio, oscuro detrás del marco que se encoge).
- */
-export function effectiveTheme(el) {
-  const live = document.documentElement.classList.contains(ROOT_CLASS.live)
-  return (live && el.dataset.backdrop) || el.dataset.theme || THEMES.light
-}
+// Redondear como el navegador evita que un borde que "cae justo" en el punto de prueba quede de
+// un lado en la pantalla y del otro en la cuenta: las cajas comunes van en unidades de 1/64 px;
+// los bloques de la costura son capas compuestas (will-change) y quedan alineados al px entero
+// (medido también con DPR 2).
+const snap = (v) => Math.round(v * 64) / 64
 
 export function createSurfaceTracker() {
   const root = document.documentElement
@@ -23,14 +20,20 @@ export function createSurfaceTracker() {
   const initialMeta = meta?.content
   const hex = { [THEMES.light]: cssColor('--light-bg'), [THEMES.dark]: cssColor('--dark-bg') }
   let last = ''
+  let seamEdge = () => null
 
-  /** La región con tema más interna que contiene el punto de prueba (p. ej. el marco del inicio). */
+  /**
+   * La región con tema más interna que contiene el punto de prueba (p. ej. el marco del inicio).
+   * Una sección con costura empieza donde empieza su costura (un módulo antes): ahí ya se ve su color.
+   */
   function themeUnderHeader() {
     const x = window.innerWidth / 2
     let theme = THEMES.light
     for (const el of document.querySelectorAll('main [data-theme]')) {
       const r = el.getBoundingClientRect()
-      if (r.top <= NAV_PROBE && r.bottom > NAV_PROBE && r.left <= x && r.right >= x) theme = effectiveTheme(el)
+      const edge = seamEdge(el)
+      const top = edge === null ? snap(r.top) : Math.round(edge)
+      if (top <= NAV_PROBE && snap(r.bottom) > NAV_PROBE && r.left <= x && r.right >= x) theme = effectiveTheme(el)
     }
     return theme
   }
@@ -48,5 +51,10 @@ export function createSurfaceTracker() {
     if (meta && initialMeta) meta.content = initialMeta
   }
 
-  return { sync, dispose }
+  /** fn(section) → tope visible de su costura en px, o null (lo da la capa de costuras). */
+  function setSeamEdge(fn) {
+    seamEdge = fn
+  }
+
+  return { sync, setSeamEdge, dispose }
 }

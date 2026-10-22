@@ -6,7 +6,7 @@
 // Se construye con createElementNS (sin innerHTML: lo exige la política de seguridad).
 import { MOBILE_QUERY, THEMES, selectors } from '@/shared/stage'
 import { traceNet } from '@/shared/utils/traceNet'
-import { effectiveTheme } from './theme'
+import { effectiveTheme } from './chapters'
 
 const SVG_NS = 'http://www.w3.org/2000/svg'
 const NET_SEED = 7

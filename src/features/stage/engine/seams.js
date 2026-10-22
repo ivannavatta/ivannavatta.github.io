@@ -13,9 +13,8 @@
 import { THEMES, selectors } from '@/shared/stage'
 import { mulberry32 } from '@/shared/utils/traceNet'
 import { clamp01, easeInOut } from './math'
-import { effectiveTheme } from './theme'
+import { SEAM_MODULE as MODULE, effectiveTheme } from './chapters'
 
-export const MODULE = 48 // mismo paso que la grilla de las trazas: los bloques caen sobre ella
 const RANGE = 0.5 // fracción de pantalla que recorre el borde mientras se arma la costura
 const SPREAD = 0.55 // cuánto se escalonan los bloques dentro del rango
 const BLOCK_SPAN = 1 - SPREAD // parte del rango que tarda cada bloque en subir
@@ -55,7 +54,7 @@ export function createSeamLayer(container, { classes }) {
         strip.append(block)
       }
       container.append(strip)
-      seams.push({ y, blocks })
+      seams.push({ y, blocks, strip, section: sections[i] })
       n++
     }
     update(window.scrollY)
@@ -76,10 +75,16 @@ export function createSeamLayer(container, { classes }) {
     }
   }
 
+  /** Borde visible (px desde el tope de la pantalla) de la sección, si tiene costura: el tope real de la costura. */
+  function edgeOf(section) {
+    const seam = seams.find((s) => s.section === section)
+    return seam ? seam.strip.getBoundingClientRect().top : null
+  }
+
   function dispose() {
     container.replaceChildren()
     seams = []
   }
 
-  return { build, update, dispose }
+  return { build, update, edgeOf, dispose }
 }
