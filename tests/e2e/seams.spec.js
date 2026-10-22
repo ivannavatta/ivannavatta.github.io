@@ -47,11 +47,6 @@ test('con movimiento hay una costura por cada borde claro/oscuro; con reducido, 
   }
 })
 
-// BUG seam-surface-lag (abierto, baja): theme.js decide el tema de la cabecera por el rect de la
-// sección (punto a 40 px), pero la costura deja el borde visual un módulo (48 px) más arriba. Mientras
-// el borde está entre 40 y 88 px del tope, la cabecera y theme-color muestran el tema anterior.
-const SURFACE_LAG_BUG = 'BUG seam-surface-lag: theme.js themeUnderHeader no cuenta el módulo de 48 px de la costura'
-
 for (const [prev, next] of BORDERS) {
   test(`borde ${prev} → ${next}: contraste AA y nada tapado por la costura (pasos de 20 px)`, async ({ page }) => {
     test.setTimeout(180_000)
@@ -80,16 +75,6 @@ for (const [prev, next] of BORDERS) {
   })
 
   test(`borde ${prev} → ${next}: la cabecera y theme-color toman el tema real que tienen debajo`, async ({ page }) => {
-    // El desfase solo existe donde hay costura: con movimiento y con cambio de tema en el borde
-    const themeChange = await page.evaluate(
-      ([a, b]) => {
-        const live = document.documentElement.classList.contains('live')
-        const themeOf = (el) => (live && el.dataset.backdrop) || el.dataset.theme
-        return themeOf(document.getElementById(a)) !== themeOf(document.getElementById(b))
-      },
-      [prev, next],
-    )
-    test.fail(!isReducedProject() && themeChange, SURFACE_LAG_BUG)
     const mismatches = []
     // Solo la zona donde el borde pasa por debajo de la cabecera (de 160 px a -20 px del tope)
     const top = await page.evaluate((id) => document.getElementById(id).getBoundingClientRect().top + scrollY, next)

@@ -139,8 +139,16 @@ test('links: repositorios con aviso de pestaña nueva; sin el repo privado de Ja
       await expect(link).toHaveAttribute('rel', /noreferrer/)
     }
   }
-  // En toda la página: ni el repo privado del TPO ni el deploy de MyTube
-  await expect(page.locator('a[href*="repo-privado"]')).toHaveCount(0)
+  // Transporte no enlaza nada (su repositorio es privado)
+  await expect(w.article('Sistema de transporte').locator('a')).toHaveCount(0)
+  // En toda la página, los únicos repositorios enlazados son los permitidos (lista cerrada: no se
+  // nombra ningún repo privado en los tests). El perfil de GitHub, sin ruta, no cuenta.
+  const ALLOWED_REPOS = ['mytube', 'mytube-backend', 'uadeHUB', 'box9'].map((r) => `${GITHUB}/${r}`)
+  const repoLinks = await page
+    .locator(`a[href^="${GITHUB}/"]`)
+    .evaluateAll((as) => [...new Set(as.map((a) => a.getAttribute('href').replace(/\/+$/, '')))].sort())
+  expect(repoLinks).toEqual([...ALLOWED_REPOS].sort())
+  // Ni el deploy de MyTube
   await expect(page.locator('a[href*="vercel.app"]')).toHaveCount(0)
 })
 
