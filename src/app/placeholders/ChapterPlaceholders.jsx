@@ -1,20 +1,10 @@
 import { Monogram } from '@/shared/components/Monogram/Monogram'
-import { POSES, announceStageHover, blockProps, chapterProps, poseProps } from '@/shared/stage'
+import { POSES, blockProps, chapterProps, poseProps } from '@/shared/stage'
 import styles from './Placeholders.module.css'
 
 // TEMPORAL (ronda 0): secciones mínimas con los id, data-chapter, data-theme y los
 // bloques del contrato de stage, para probar la escena 3D de punta a punta.
 // Cada una se reemplaza por su feature en la ronda que le toca.
-
-const TILE_LAYERS = [
-  ['Interfaz', ['HTML', 'CSS', 'JavaScript', 'React', 'TypeScript']],
-  ['Backend', ['Java', 'Python', 'Node.js y Express']],
-  ['Datos', ['SQL', 'MongoDB']],
-  ['Herramientas', ['Git', 'GitHub', 'VS Code', 'Figma', 'UML']],
-  ['Método', ['Scrum', 'Análisis de sistemas']],
-]
-// Índice global de cada tecla (orden de documento), para el hover de la escena
-const TILE_START = TILE_LAYERS.map((_, i) => TILE_LAYERS.slice(0, i).reduce((n, [, t]) => n + t.length, 0))
 
 const STEPS = [
   { when: 'Jun. 2023 · 38 h', what: 'Desarrollo Web', where: 'Coderhouse', bars: 4 },
@@ -26,45 +16,6 @@ const STEPS = [
 export function ChapterPlaceholders() {
   return (
     <>
-      <section {...chapterProps('stack', 'dark')} className={styles.stack} aria-labelledby="stack-title">
-        <div className={styles.grid}>
-          <div className={styles.stackIntro}>
-            <h2 className={styles.head} id="stack-title">
-              Stack, por capas
-            </h2>
-          </div>
-          <div
-            className={styles.stackLayers}
-            {...poseProps(POSES.stack)}
-            onPointerLeave={() => announceStageHover(POSES.stack, -1)}
-          >
-            {TILE_LAYERS.map(([name, tiles], layer) => (
-              <div className={styles.layer} key={name}>
-                <h3 className={styles.layerName}>{name}</h3>
-                <ul className={styles.tiles}>
-                  {tiles.map((tile, i) => {
-                    const index = TILE_START[layer] + i
-                    return (
-                      <li key={tile}>
-                        <button
-                          type="button"
-                          className={styles.tile}
-                          {...blockProps()}
-                          onFocus={() => announceStageHover(POSES.stack, index)}
-                          onPointerEnter={() => announceStageHover(POSES.stack, index)}
-                        >
-                          {tile}
-                        </button>
-                      </li>
-                    )
-                  })}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <section {...chapterProps('recorrido', 'light')} className={styles.path} aria-labelledby="path-title">
         <h2 className={styles.head} id="path-title">
           Recorrido

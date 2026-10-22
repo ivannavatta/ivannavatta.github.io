@@ -2,12 +2,6 @@
    escena 3D tenga dónde posarse. Cada bloque se borra en la ronda de su sección. */
 
 /* ---------- Secciones de prueba (solo geometría) ---------- */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  column-gap: var(--gap);
-  align-items: start;
-}
 .head {
   font-size: var(--step-head);
   line-height: 1;
@@ -20,48 +14,6 @@
   line-height: 1.3;
   font-weight: 500;
   max-width: 40ch;
-}
-
-.stack {
-  padding: var(--section) var(--m) calc(var(--section) * 0.6);
-}
-.stackIntro {
-  grid-column: 1 / span 4;
-}
-.stackLayers {
-  grid-column: 6 / -1;
-  display: grid;
-  gap: 20px;
-}
-.layer {
-  display: grid;
-  grid-template-columns: 150px minmax(0, 1fr);
-  gap: var(--gap);
-  align-items: center;
-}
-.layerName {
-  font-size: var(--step-body);
-  font-weight: 600;
-  letter-spacing: 0;
-}
-.tiles {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-.tile {
-  min-height: 76px;
-  min-width: 112px;
-  padding: 0 24px;
-  border: 0;
-  background: var(--tile);
-  color: var(--dark-ink);
-  font-size: var(--step-lead);
-  font-weight: 500;
-  letter-spacing: -0.01em;
-}
-:global(html.gl.live) .tile {
-  background: transparent;
 }
 
 .path {
@@ -139,13 +91,6 @@
 }
 
 @media (max-width: 1023px) {
-  .stackIntro,
-  .stackLayers {
-    grid-column: 1 / -1;
-  }
-  .stackIntro {
-    margin-bottom: 48px;
-  }
   .pathList {
     grid-template-columns: 1fr;
     gap: 40px;
@@ -160,19 +105,6 @@
   }
 }
 @media (max-width: 767px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
-  .layer {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-  .tile {
-    min-height: 60px;
-    min-width: 0;
-    padding: 0 18px;
-    font-size: 1.125rem;
-  }
   .contact {
     padding-top: calc(var(--bar-h) + 24px);
   }

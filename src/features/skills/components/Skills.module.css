@@ -1,0 +1,141 @@
+/* ---------- 4. Stack ---------- */
+.stack {
+  padding: var(--section) var(--m) calc(var(--section) * 0.6);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gap);
+  align-items: start;
+}
+
+/* Título, bajada y el panel "Dónde la usé" quedan fijos mientras se recorren las capas */
+.intro {
+  grid-column: 1 / span 4;
+  position: sticky;
+  top: 120px;
+}
+
+.title {
+  font-size: var(--step-head);
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+}
+
+.lead {
+  margin-top: 24px;
+  max-width: 36ch;
+}
+
+.detail {
+  margin-top: 48px;
+  min-height: 160px;
+}
+
+.detailName {
+  font-size: var(--step-lead);
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.detailUse {
+  margin-top: 8px;
+  max-width: 36ch;
+}
+
+.layers {
+  grid-column: 6 / -1;
+  display: grid;
+  gap: 20px;
+}
+
+.layer {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: var(--gap);
+  align-items: center;
+}
+
+.layerName {
+  font-size: var(--step-body);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* Tecla: con escena viva la dibuja el bloque 3D de atrás (transparente acá);
+   sin WebGL o con movimiento reducido es una teja plana */
+.tile {
+  min-height: 76px;
+  min-width: 112px;
+  padding: 0 24px;
+  border: 0;
+  background: var(--tile);
+  color: var(--dark-ink);
+  font-size: var(--step-lead);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  transition:
+    transform 160ms var(--ease-out),
+    background-color 200ms ease;
+}
+
+.tile:active {
+  transform: scale(0.97);
+}
+
+.tile.active {
+  background: var(--tile-active);
+}
+
+:global(html.gl.live) .tile,
+:global(html.gl.live) .tile.active {
+  background: transparent;
+}
+
+:global(html.reduced) .tile:active {
+  transform: none;
+}
+
+@media (max-width: 1023px) {
+  .intro {
+    grid-column: 1 / -1;
+    position: relative;
+    top: auto;
+    margin-bottom: 48px;
+  }
+
+  .detail {
+    min-height: 0;
+    margin-top: 24px;
+  }
+
+  .layers {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 767px) {
+  .layer {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .tiles {
+    gap: 8px;
+  }
+
+  .tile {
+    min-height: 60px;
+    min-width: 0;
+    padding: 0 18px;
+    font-size: 1.125rem;
+  }
+}
