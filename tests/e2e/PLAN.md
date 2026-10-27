@@ -158,12 +158,34 @@ Cubre `Button`, `TextLink`, la nav y cualquier componente nuevo sin test propio:
 - [ ] (bug abierto `seam-surface-lag`) `data-surface` y `theme-color` = color real bajo la cabecera
       en cada borde: hoy `test.fail` con movimiento (desfase de 48 px).
 
-### 5. Stack (`#stack`)
-- `h2` "Stack, por capas"; cinco capas (`h3`: Interfaz, Backend, Datos, Herramientas, Método).
-- Cada tile es un `button` con su uso en el nombre accesible (texto `sr-only`).
-- Hover y foco con Tab actualizan el panel de detalle (que es `aria-hidden`: la info llega por el
-  nombre del botón); foco visible en cada tile (`expectVisibleFocus`).
-- Recorrer todos los tiles con Tab sin trampas de foco.
+### 5. Stack — `skills.spec.js` ✅ (ronda 5)
+- [x] Un `h2` "Stack, por capas" (`aria-labelledby`), bajada y cinco capas en orden (`h3`: Interfaz,
+      Backend, Datos, Herramientas, Método), cada una con su lista; snapshot de accesibilidad de la región
+      (el panel y los bloques del IN no aparecen).
+- [x] 17 tecnologías, cada una un `button type="button"` con nombre "<tecnología>: <uso>"; lo visible es
+      solo el nombre y el uso va en un `sr-only` (1×1).
+- [x] Panel "Dónde la usé": `aria-hidden`, sin nada enfocable ni live regions; estado inicial con la pista.
+- [x] Tab recorre las 17 en orden: foco visible, panel con su uso, tecla activa, al menos media tecla en
+      pantalla y sin nada encima; la escena recibe `stage:hover` 0…16 y -1 al salir; el foco sale de
+      `#stack` (sin trampa) y el panel conserva la última. Shift+Tab al revés y vuelve a entrar.
+      Las teclas cortadas por el borde (el navegador no desplaza si ya se ven en parte) quedan anotadas.
+- [x] Enter y Espacio sobre una tecla la muestran en el panel.
+- [x] Puntero fino: hover sobre cada tecla actualiza el panel y la marca; al salir, baja y el panel
+      conserva la última. Puntero grueso: pasar por encima no cambia nada, el toque sí.
+- [x] IN desarmado: un `data-stage-block` por botón (y nada más); canvas, costuras y trazas con
+      `aria-hidden`, `pointer-events: none` y nada enfocable; con la pose asentada, el centro de cada
+      tecla lo recibe su botón.
+- [x] Píxeles reales (helper `pixels.js`): con escena viva el botón es transparente y detrás de cada tecla
+      se ve un bloque (no el fondo de la sección); texto AA sobre el color real del bloque. En reducido,
+      teja plana `--tile`.
+- [ ] (bug abierto `stack-active-contrast`) La tecla activa con escena viva (bloque iluminado ≈
+      rgb(65,128,138)) deja el texto en ≈3,9–4,4:1: pasa como texto grande en escritorio (28 px) pero no en
+      tablet (23,7 px) ni mobile (18 px). Hoy `test.fail` en `tablet` y `mobile`.
+- [x] Teclas ≥44 px, dentro del ancho; sin overflow recorriendo la sección con la rueda (3 tamaños).
+- [x] axe y contraste propio en `#stack` con la pose asentada y con una tecla activa (desktop, mobile y
+      *-reduced).
+- [x] Reducido: `data-motion="reduced"`, sin `live`; el canvas queda arriba (no fijo); teja `--tile` →
+      `--tile-active` al activarse, `:active` sin transform; el panel funciona igual.
 
 ### 6. Recorrido (`#recorrido`)
 - `h2` "Recorrido"; lista ordenada (`ol`) con cinco pasos (`h3`): Desarrollo Web, JavaScript,
