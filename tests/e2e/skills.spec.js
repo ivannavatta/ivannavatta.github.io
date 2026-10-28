@@ -30,7 +30,11 @@ import {
 } from './helpers/index.js'
 
 const TITLE = 'Stack, por capas'
-const LEAD = 'Cada bloque es una tecnología. Pasá el cursor o recorrelos con Tab para ver dónde la usé.'
+// La bajada depende del puntero: con cursor invita al hover y al Tab; en táctil, a tocar
+const LEAD_FINE = 'Cada bloque es una tecnología. Pasá el cursor o recorrelos con Tab para ver dónde la usé.'
+const LEAD_TOUCH = 'Cada bloque es una tecnología. Tocá uno para ver dónde la usé.'
+const leadFor = (page) =>
+  page.evaluate(() => matchMedia('(hover: hover) and (pointer: fine)').matches).then((fine) => (fine ? LEAD_FINE : LEAD_TOUCH))
 const DETAIL = { title: 'Dónde la usé', hint: 'Elegí un bloque para ver en qué proyecto o curso usé esa tecnología.' }
 
 // Contrato de contenido (src/features/skills/i18n/es.js): `use` va al panel y `sr` al nombre
@@ -216,6 +220,7 @@ test('estructura: un h2, la bajada, cinco capas con h3 y lista, y 17 tecnología
   await expect(s.section).toHaveAttribute('aria-labelledby', 'stack-title')
   await expect(s.section.getByRole('heading', { level: 2 })).toHaveCount(1)
   await expect(s.h2).toHaveId('stack-title')
+  const LEAD = await leadFor(page)
   await expect(s.section.getByRole('paragraph').filter({ hasText: /^Cada bloque/ })).toHaveText(LEAD)
 
   // Cinco capas, en orden, cada una con su h3 y una lista con sus tecnologías

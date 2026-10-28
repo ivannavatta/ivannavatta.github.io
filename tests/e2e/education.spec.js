@@ -43,6 +43,8 @@ const STEPS = [
   { id: 'uade', what: 'Lic. en Gestión de TI', when: 'Mar. 2025 – hoy', where: 'UADE · Licenciatura en Gestión de la Tecnología de la Información', blocks: 0 },
 ]
 const COURSES = STEPS.filter((s) => s.blocks > 0)
+// La columna más alta (Backend) abre su certificado al costado en escritorio (clase certBeside)
+const BESIDE = 'backend'
 const certAlt = (what) => `Certificado de Coderhouse del curso ${what}, a nombre de Ivan Navatta`
 
 const isReducedProject = () => test.info().project.use.reducedMotion === 'reduce'
@@ -443,6 +445,26 @@ test.describe('vista previa con el cursor', () => {
     await expect(s.cert(c.id)).toBeHidden()
   })
 
+  test('Backend: el certificado se abre al costado y el puente lateral lo mantiene abierto', async ({ page }) => {
+    const s = path(page)
+    const backend = COURSES.find((c) => c.id === BESIDE)
+    const bars = await s.step(backend.what).locator('[aria-hidden="true"]').boundingBox()
+    // Cursor sobre la columna de Backend (adentro del paso) y quedarse: abre
+    await page.mouse.move(bars.x + bars.width / 2, bars.y + 10, { steps: 3 })
+    await expect(s.cert(backend.id)).toBeVisible()
+    const fig = await s.cert(backend.id).boundingBox()
+    expect(fig.x + fig.width, 'al costado izquierdo de la columna').toBeLessThanOrEqual(bars.x + 1)
+    // Cruzar el hueco hacia la izquierda (el puente) hasta el centro del certificado
+    const y = Math.min(fig.y + fig.height / 2, bars.y + 10)
+    await page.mouse.move(bars.x - 4, y, { steps: 4 })
+    await page.mouse.move(fig.x + fig.width / 2, y, { steps: 6 })
+    await pageDelay(page, 250)
+    await expect(s.cert(backend.id)).toBeVisible()
+    // Salir del certificado hacia afuera del paso: cierra
+    await pointerAway(page)
+    await expect(s.cert(backend.id)).toBeHidden()
+  })
+
   test('pasar a otro paso reemplaza el certificado (nunca dos a la vez)', async ({ page }) => {
     const s = path(page)
     for (const c of COURSES) {
@@ -486,44 +508,6 @@ test.describe('vista previa con el cursor', () => {
     await page.mouse.move(p.x + 10, p.y, { steps: 3 })
     await pageDelay(page, 450)
     await expect(s.cert(c.id)).toBeHidden()
-    await pointerAway(page)
-    await page.mouse.move(p.x, p.y, { steps: 3 })
-    await expect(s.cert(c.id)).toBeVisible()
-  })
-})
-
-// Pedido del brief: "un clic sobre la vista previa la cierra y no vuelve a abrirse hasta salir del
-// paso". Hoy la vista previa se cierra con el botón o con Escape (ver el test anterior), pero un clic
-// sobre el certificado mismo no hace nada: queda abierto.
-const PREVIEW_CLICK_BUG = 'BUG path-preview-click: un clic sobre la vista previa (el certificado) no la cierra; solo el botón o Escape'
-
-test.describe('vista previa con el cursor: clic sobre el certificado', () => {
-  test.beforeEach(async ({ page }) => {
-    test.skip(test.info().project.name !== 'desktop' && test.info().project.name !== 'desktop-reduced', 'Puntero fino de escritorio')
-    await page.goto('/')
-    await waitForAppReady(page)
-    await showListBottom(page)
-  })
-
-  test('un clic sobre la vista previa la cierra y no vuelve hasta salir del paso', async ({ page }) => {
-    test.fail(true, PREVIEW_CLICK_BUG)
-    const s = path(page)
-    const c = COURSES[1]
-    const p = await stepPoint(s, c.what)
-    await page.mouse.move(p.x, p.y, { steps: 3 })
-    await expect(s.cert(c.id)).toBeVisible()
-    // Subir al certificado por el puente (sin salir del paso) y hacer clic en la imagen
-    const fig = await s.cert(c.id).boundingBox()
-    await page.mouse.move(fig.x + fig.width / 2, fig.y + fig.height + 4, { steps: 4 })
-    await page.mouse.move(fig.x + fig.width / 2, fig.y + fig.height / 2, { steps: 4 })
-    await expect(s.cert(c.id)).toBeVisible()
-    await page.mouse.click(fig.x + fig.width / 2, fig.y + fig.height / 2)
-    await expect(s.cert(c.id)).toBeHidden({ timeout: 2_000 })
-    // Sigue cerrada mientras el cursor queda en el paso
-    await page.mouse.move(p.x, p.y, { steps: 3 })
-    await pageDelay(page, 450)
-    await expect(s.cert(c.id)).toBeHidden()
-    // Al salir y volver, se reabre
     await pointerAway(page)
     await page.mouse.move(p.x, p.y, { steps: 3 })
     await expect(s.cert(c.id)).toBeVisible()
@@ -617,7 +601,7 @@ for (const width of [1440, 1024]) {
       await expectNoHorizontalOverflow(page)
     })
 
-    test('el certificado flota sobre su columna, entero en el ancho y sin correr el layout', async ({ page }) => {
+    test('cada certificado flota en su lugar (Backend al costado), entero, sin pisar texto ni bloques y sin correr el layout', async ({ page }) => {
       await page.goto('/')
       await waitForAppReady(page)
       const s = path(page)
@@ -628,23 +612,75 @@ for (const width of [1440, 1024]) {
         await page.keyboard.press('Enter')
         await expect(s.cert(c.id)).toBeVisible()
         await waitForAnimationsToFinish(page, '#recorrido')
-        const r = await s.cert(c.id).evaluate((f) => {
-          const cs = getComputedStyle(f)
-          const b = f.getBoundingClientRect()
-          const bars = f.closest('li').querySelector('[aria-hidden="true"]').getBoundingClientRect()
-          return { position: cs.position, left: b.left, right: b.right, bottom: b.bottom, barsTop: bars.top, vw: document.documentElement.clientWidth }
-        })
+        const r = await certPlacement(page, c.id)
         expect(r.position, `${c.what}: flota`).toBe('absolute')
-        expect(r.left).toBeGreaterThanOrEqual(0)
-        expect(r.right).toBeLessThanOrEqual(r.vw)
-        expect(r.bottom, `${c.what}: queda encima de su columna`).toBeLessThanOrEqual(r.barsTop + 1)
+        expect(r.cert.left, `${c.what}: entra por la izquierda`).toBeGreaterThanOrEqual(0)
+        expect(r.cert.right, `${c.what}: entra por la derecha`).toBeLessThanOrEqual(r.vw)
+        // Texto: ninguno lo pisa. Bloques de otros pasos: solo se exige a Backend (el certificado de
+        // React, de 340 px, pasa por encima de la columna de Backend: es un popover y está aceptado)
+        expect(r.overlaps.filter((o) => !o.startsWith('bloque')), `${c.what}: pisa texto`).toEqual([])
+        if (c.id === BESIDE) expect(r.overlaps, 'Backend: pisa la bajada o los bloques de React').toEqual([])
+        if (c.id === BESIDE) {
+          // La columna más alta: a la izquierda, con el borde de arriba a la altura de su primer bloque
+          expect(r.cert.right, 'Backend: a la izquierda de su columna').toBeLessThanOrEqual(r.bars.left + 1)
+          expect(Math.abs(r.cert.top - r.bars.top), 'Backend: arriba a la altura del primer bloque').toBeLessThanOrEqual(2)
+          expect(r.cert.width, 'Backend: min(280px, 26vw)').toBeLessThanOrEqual(Math.min(280, 0.26 * width) + 1)
+        } else {
+          expect(r.cert.bottom, `${c.what}: queda encima de su columna`).toBeLessThanOrEqual(r.bars.top + 1)
+        }
         expect(await stepBoxes(page), 'abrir no mueve nada').toEqual(before)
         await expectNoHorizontalOverflow(page)
         await page.keyboard.press('Escape')
       }
     })
+
+    test('Backend al costado: no queda bajo la cabecera, aunque la cabecera aparezca', async ({ page }) => {
+      await page.goto('/')
+      await waitForAppReady(page)
+      const s = path(page)
+      const backend = COURSES.find((c) => c.id === BESIDE)
+      // Botón de Backend a la vista y la cabecera visible (aparece al subir con la rueda)
+      await showListBottom(page)
+      await wheelScroll(page, -60)
+      await expect(page.locator('header')).not.toHaveAttribute('data-nav-state', 'hidden')
+      await keyboardFocus(page, s.button(backend.what))
+      await page.keyboard.press('Enter')
+      await expect(s.cert(backend.id)).toBeVisible()
+      await waitForAnimationsToFinish(page, '#recorrido')
+      const r = await certPlacement(page, backend.id)
+      expect(r.cert.top, `el certificado (top ${Math.round(r.cert.top)}) queda bajo la cabecera (bottom ${Math.round(r.header)})`).toBeGreaterThanOrEqual(r.header)
+    })
   })
 }
+
+/** Caja del certificado abierto y de su columna, y lo que pisa: texto de #recorrido y bloques de otros pasos. */
+const certPlacement = (page, id) =>
+  page.evaluate((id) => {
+    const f = document.getElementById(`cert-${id}`)
+    const li = f.closest('li')
+    const box = (el) => {
+      const b = el.getBoundingClientRect()
+      return { left: b.left, right: b.right, top: b.top, bottom: b.bottom, width: b.width }
+    }
+    const cert = box(f)
+    const hit = (b) => b.left < cert.right - 1 && b.right > cert.left + 1 && b.top < cert.bottom - 1 && b.bottom > cert.top + 1
+    const overlaps = []
+    for (const el of document.querySelectorAll('#recorrido h2, #recorrido h2 + p, #recorrido h3, #recorrido li > p, #recorrido li button')) {
+      if (hit(box(el))) overlaps.push(`${el.tagName.toLowerCase()} "${el.textContent.trim().slice(0, 25)}"`)
+    }
+    for (const b of document.querySelectorAll('#recorrido [data-stage-block]')) {
+      if (!li.contains(b) && hit(box(b))) overlaps.push(`bloque de "${b.closest('li').querySelector('h3').textContent}"`)
+    }
+    const header = document.querySelector('header')
+    return {
+      position: getComputedStyle(f).position,
+      cert,
+      bars: box(li.querySelector('[aria-hidden="true"]')),
+      overlaps: [...new Set(overlaps)],
+      header: header ? Math.max(0, header.getBoundingClientRect().bottom) : 0,
+      vw: document.documentElement.clientWidth,
+    }
+  }, id)
 
 test.describe('una columna por debajo de 1024', () => {
   test.beforeEach(() => {
@@ -769,9 +805,6 @@ async function redrawAfterLayout(page, id, action) {
 
 // "Uno o dos cuadros", con margen: el rAF que detecta el cambio de layout puede llegar un cuadro tarde
 const FRAMES_2 = 60
-const CLOSE_BUG =
-  'BUG path-close-lag: al cerrar un certificado en tablet/mobile, la escena tarda ~200 ms en redibujar: los bloques 3D quedan en la posición vieja (el aviso stage:layout llega antes de que el certificado salga del layout)'
-
 test.describe('tablet y mobile: los bloques 3D siguen a los del DOM', () => {
   test.beforeEach(async ({ page }) => {
     test.skip(!['mobile', 'tablet'].includes(test.info().project.name), 'Certificado en el flujo con escena viva')
@@ -801,13 +834,10 @@ test.describe('tablet y mobile: los bloques 3D siguen a los del DOM', () => {
     expect(post.bad, 'después de abrir: bloques del DOM sin bloque 3D detrás').toEqual([])
   })
 
-  // Al cerrar, `hidden` saca el certificado del layout recién al terminar la transición de salida
-  // (display 120 ms allow-discrete), pero announceStageLayout() se dispara al cambiar el estado,
-  // antes: la escena dibuja con el layout viejo. Lo corrige recién el ResizeObserver de <main>
-  // (200 ms de debounce). Medido con píxeles: los bloques que suben quedan sin su bloque 3D
-  // ≈ 150–250 ms después de que el certificado sale del layout.
+  // Bug path-close-lag (corregido): al cerrar, `hidden` saca el certificado del layout recién al
+  // terminar la transición de salida y el aviso a la escena llegaba antes. Ahora un ResizeObserver
+  // sobre la lista avisa sin debounce cuando cambia de tamaño de verdad.
   test('al cerrar el certificado, la escena redibuja los bloques en uno o dos cuadros y quedan alineados', async ({ page }) => {
-    test.fail(true, CLOSE_BUG)
     const s = path(page)
     const probe = await alignmentProbe(page)
     await s.button(COURSES[0].what).tap()

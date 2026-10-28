@@ -7,15 +7,16 @@
 //   - E2E_SERVER=dev: `vite` en modo dev, más rápido para iterar, pero SIN CSP.
 //       PowerShell: $env:E2E_SERVER='dev'; npm run test:e2e
 //   - E2E_REUSE=1 reutiliza un servidor que ya esté escuchando en el puerto.
+//   - Un segundo servidor (puerto 5180, E2E_MAIL_PORT) con claves de EmailJS DE MENTIRA, para los
+//     tests de envío del formulario (contact.spec.js), que mockean api.emailjs.com. Otro outDir
+//     (node_modules/.cache): no pisa dist. Ver tests/e2e/helpers/servers.js.
 //
 // Proyectos (todos en Chromium):
 //   desktop 1440x900 · tablet 768x1024 · mobile 375x812 (touch)
 //   desktop-reduced y mobile-reduced: igual, con prefers-reduced-motion: reduce
 import { defineConfig, devices } from '@playwright/test'
+import { BASE_URL, FAKE_EMAILJS, HOST, MAIL_OUT_DIR, MAIL_PORT, MAIL_URL, PORT } from './tests/e2e/helpers/servers.js'
 
-const PORT = Number(process.env.E2E_PORT || 5179)
-const HOST = '127.0.0.1'
-const BASE_URL = `http://${HOST}:${PORT}`
 const usePreview = process.env.E2E_SERVER !== 'dev'
 const reuse = process.env.E2E_REUSE === '1' || (!usePreview && !process.env.CI)
 const isCI = !!process.env.CI
@@ -79,14 +80,29 @@ export default defineConfig({
     { name: 'mobile-reduced', use: { ...mobile, reducedMotion: 'reduce' } },
   ],
 
-  webServer: {
-    command: usePreview
-      ? `npm run build && npm run preview -- --host ${HOST} --port ${PORT} --strictPort`
-      : `npx vite --host ${HOST} --port ${PORT} --strictPort`,
-    url: BASE_URL,
-    reuseExistingServer: reuse,
-    timeout: usePreview ? 180_000 : 60_000,
-    stdout: 'ignore',
-    stderr: 'pipe',
-  },
+  // Los servidores arrancan en orden: el segundo build empieza cuando el primero ya responde
+  // (dos builds a la vez agotaban la memoria en Windows).
+  webServer: [
+    {
+      command: usePreview
+        ? `npm run build && npm run preview -- --host ${HOST} --port ${PORT} --strictPort`
+        : `npx vite --host ${HOST} --port ${PORT} --strictPort`,
+      url: BASE_URL,
+      reuseExistingServer: reuse,
+      timeout: usePreview ? 180_000 : 60_000,
+      stdout: 'ignore',
+      stderr: 'pipe',
+    },
+    {
+      command: usePreview
+        ? `npm run build -- --outDir ${MAIL_OUT_DIR} --emptyOutDir && npm run preview -- --outDir ${MAIL_OUT_DIR} --host ${HOST} --port ${MAIL_PORT} --strictPort`
+        : `npx vite --host ${HOST} --port ${MAIL_PORT} --strictPort`,
+      url: MAIL_URL,
+      env: { ...FAKE_EMAILJS },
+      reuseExistingServer: reuse,
+      timeout: usePreview ? 180_000 : 60_000,
+      stdout: 'ignore',
+      stderr: 'pipe',
+    },
+  ],
 })

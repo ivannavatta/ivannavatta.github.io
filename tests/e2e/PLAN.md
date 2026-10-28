@@ -202,39 +202,59 @@ Cubre `Button`, `TextLink`, la nav y cualquier componente nuevo sin test propio:
 - [x] Hover (≥1024 con puntero fino): una pasada de <150 ms no abre ni pide la imagen; quedarse abre entre
       190 y 600 ms después de entrar; se puede pasar al certificado por el puente sin cerrarlo; salir cierra;
       pasar a otro paso lo reemplaza. Cerrar con el botón o con Escape lo silencia hasta salir del paso.
-- [ ] (bug abierto `path-preview-click`) Un clic sobre la vista previa (el certificado) la cierra: hoy no
-      hace nada. `test.fail` en `desktop` y `desktop-reduced`.
+      (Decisión: la vista previa se cierra con el botón o con Escape; un clic sobre el certificado no la
+      cierra, y está bien así).
 - [x] Sin hover con 1023 px ni con puntero grueso (tocar abre).
 - [x] Subgrid en 1440 y 1024: cinco columnas; fechas, títulos y lugares en la misma línea y con el mismo
-      alto; botones alineados; columnas sobre la misma base; UADE arranca en la fila de las fechas. El
-      certificado flota (absoluto) sobre su columna, entero en el ancho y sin mover nada.
+      alto; botones alineados; columnas sobre la misma base; UADE arranca en la fila de las fechas. Los
+      certificados flotan (absolutos) sobre su columna, enteros en el ancho, sin pisar texto y sin mover nada.
+- [x] Backend (la columna más alta, `certBeside`): el certificado se abre a la izquierda de su columna, con
+      el borde de arriba a la altura del primer bloque y ancho ≤ min(280px, 26vw); no pisa la bajada ni los
+      bloques de React; no queda bajo la cabecera aunque aparezca; el puente lateral lo mantiene abierto.
 - [x] <1024 (tablet y mobile): una columna; el certificado se abre en el flujo, debajo del botón, sin tapar
       texto ni causar overflow.
 - [x] Tablet y mobile con escena viva: al abrir un certificado, la escena redibuja con el layout nuevo en el
       mismo cuadro y los bloques 3D quedan detrás de los del DOM (píxeles).
-- [ ] (bug abierto `path-close-lag`) Al cerrar, la escena tarda ~220–280 ms en redibujar (los bloques 3D
-      quedan en la posición vieja): `test.fail` en `tablet` y `mobile`. Se mide con un observador de las
-      llamadas de dibujo de WebGL, no con píxeles (más rápido y determinista).
+- [x] Al cerrar, la escena redibuja como mucho 60 ms después de que el certificado sale del layout (bug
+      `path-close-lag` corregido: ResizeObserver sobre la lista, sin debounce). Se mide con un observador de
+      las llamadas de dibujo de WebGL, no con píxeles (más rápido y determinista).
 - [x] axe y contraste propio en `#recorrido` cerrado y con dos certificados abiertos (desktop, mobile y
       *-reduced); sin overflow con cada certificado abierto, en los tres tamaños.
 - [x] Reducido: `data-motion="reduced"`, bloques planos (`--ink` y un `--accent`), el canvas no llega a la
       sección y el certificado se abre por teclado sin transform.
 
-### 7. Contacto (`#contacto`) — siempre con `stubEmailJs(page)`
-- `h2` "Contacto"; canales: Email (mailto), LinkedIn, GitHub, CV (descarga).
-- "Copiar email": con permiso `clipboard-write`/`clipboard-read`, el portapapeles tiene
-  `ivannavatta@gmail.com`, el botón dice "Copiado" y el `status` anuncia "Email copiado…"; vuelve
-  al texto original.
-- Mobile: "Escribir un mensaje" (`aria-expanded`) muestra el formulario y lleva el scroll hasta él.
-- Formulario (labels Nombre, Email, Mensaje):
-  - envío vacío → tres errores asociados por `aria-describedby`, `aria-invalid="true"` y foco en el
-    primer campo inválido; no hay request a EmailJS;
-  - email inválido → mensaje específico;
-  - los errores se actualizan mientras se escribe, después del primer intento;
-  - envío válido con stub 200 → estado "Enviando…" con `aria-busy` y botón deshabilitado, después el
-    mensaje de éxito en el `status`, formulario limpio; se verifica el payload interceptado;
-  - stub 500 → mensaje de error visible y anunciado, sin perder lo escrito.
-- Pie: "Volver al inicio" lleva a `#inicio`.
+### 7. Contacto — `contact.spec.js` ✅ (ronda 7)
+Dos builds: el normal (sin claves de EmailJS) y uno con claves **de mentira** en el puerto 5180
+(`helpers/servers.js`, segundo `webServer` con `env`, outDir en `node_modules/.cache`; nunca un `.env`).
+En el de envío, api.emailjs.com siempre mockeado (`stubEmailJs`) y `navigator.webdriver = false` (si no,
+`blockHeadless` de EmailJS rechaza con 451). Cada test arranca con `localStorage` vacío (contexto nuevo).
+- [x] `h2` "Contacto", pedido y texto; lista "Canales": Email (mailto), LinkedIn y GitHub (pestaña nueva,
+      `rel` seguro, aviso en el nombre), CV (`/cv.pdf` con `download`); nombre accesible = texto visible, sin
+      `aria-label`. "Copiar email" `type="button"`. Pie con el año y "Volver al inicio" (`#inicio`). IN decorativo.
+- [x] Formulario "O dejame un mensaje" (`novalidate`): Nombre, Email (`type=email`) y Mensaje (`textarea`),
+      con `required`, `autocomplete` y `maxlength` 80, 254 y 2000 (no se puede escribir más).
+- [x] Honeypot: fuera de pantalla, `aria-hidden`, `tabindex=-1`; Tab va Nombre → Email → Mensaje → Enviar.
+- [x] Validación: vacío → tres errores con `aria-describedby`, `aria-invalid`, foco en Nombre y sin llamadas;
+      email inválido → mensaje específico y foco en Email; sin errores antes del primer intento y después se
+      actualizan mientras se escribe.
+- [x] Sin claves (build normal): aviso desde el principio; al enviar, "Abrir el mensaje en tu correo" con
+      `mailto` (asunto "Contacto desde el portfolio: <nombre>" y cuerpo = mensaje); lo escrito se conserva;
+      ni el SDK ni llamadas a EmailJS.
+- [x] Envío (stub 200): "Enviando…" con `aria-disabled` y `aria-busy` (no `disabled`) y el foco en el botón;
+      doble clic y Enter durante el envío → un solo POST; payload con `service_id`, `template_id`, `user_id` y
+      `template_params` {`from_name`, `from_email`, `reply_to`, `message`} recortados; éxito anunciado en el
+      `status` y formulario limpio. El SDK se carga recién al enviar, desde el sitio, sin violaciones de CSP.
+- [x] Stub 500: error visible y anunciado, conserva lo escrito; el reintento inmediato da "Esperá unos
+      segundos" (limitRate guarda la hora antes de enviar) y no llama a la red.
+- [x] Honeypot completo: finge el éxito y no envía nada.
+- [x] Copiar email: portapapeles = el email, "Copiado", `status` "Email copiado al portapapeles." y vuelve a
+      "Copiar email" (el aviso se vacía). Si falla: "No se pudo copiar" y el `status` dice el email.
+- [x] Mobile: "Escribir un mensaje" ↔ "Ocultar el formulario" (`aria-expanded`, `aria-controls`), foco en
+      Nombre, el scroll deja el formulario debajo de la barra; al cerrar, el foco queda en el botón. ≥768 sin botón.
+- [x] Una pantalla con el formulario cerrado: 1440×900, 1366×768, 1280×720, 1024×768, 768×1024 y 375×812.
+- [x] "Volver al inicio": `scrollY` 0 y foco en el h1 (también en reducido).
+- [x] axe y contraste propio (limpio y con errores); `label-content-name-mismatch` (experimental, pedida
+      aparte) sin violaciones en `#contacto` y en la cabecera con el menú mobile abierto. Sin overflow.
 
 ## Transversal por tamaño y modo
 
