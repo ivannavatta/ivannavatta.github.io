@@ -10,7 +10,7 @@ import styles from './Education.module.css'
  * en tablet y mobile se abre debajo del botón. La imagen se pide recién cuando hace falta
  * (al abrir, enfocar el botón o pasar el cursor), no con la página.
  */
-export function Step({ step, open, onToggle, onEnter, onLeave }) {
+export function Step({ step, open, certBeside = false, onToggle, onEnter, onLeave }) {
   const t = copy.education
   const c = copy.steps[step.id]
   const [requested, setRequested] = useState(false)
@@ -24,7 +24,7 @@ export function Step({ step, open, onToggle, onEnter, onLeave }) {
 
   return (
     <li
-      className={isCourse ? styles.step : `${styles.step} ${styles.now}`}
+      className={[styles.step, !isCourse && styles.now, certBeside && styles.certBeside].filter(Boolean).join(' ')}
       style={isCourse ? { '--blocks': step.blocks } : undefined}
       // Solo el mouse: en equipos híbridos un toque también dispara pointerenter
       onPointerEnter={hasCert && onEnter ? (e) => e.pointerType === 'mouse' && onEnter() : undefined}

@@ -227,6 +227,26 @@
       );
     }
   }
+
+  /* La columna más alta (Backend, 9 bloques) define la fila: encima de ella el certificado
+     taparía la bajada de la sección y quedaría bajo la cabecera. Va al costado, sobre el aire
+     que dejan las columnas más bajas, con el borde de arriba a la altura de su primer bloque.
+     Más angosto (≤ 280 px) para no llegar a los bloques del curso de al lado. */
+  .step.certBeside .cert {
+    top: 0;
+    bottom: auto;
+    left: auto;
+    right: calc(100% + var(--cert-gap));
+    width: min(280px, 26vw);
+    transform-origin: 100% 0;
+  }
+
+  /* El puente cruza el hueco del costado, entre el certificado y su columna */
+  .step.certBeside .cert::after {
+    inset: 0 auto 0 100%;
+    width: var(--cert-gap);
+    height: auto;
+  }
 }
 
 /* Tablet y mobile: la línea en vertical, los bloques en fila, el certificado en el flujo */

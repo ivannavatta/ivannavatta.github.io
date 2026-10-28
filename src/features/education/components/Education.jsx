@@ -75,10 +75,20 @@ export function Education() {
   }, [visible])
 
   // En tablet y mobile el certificado se abre en el flujo y corre los bloques de los pasos
-  // siguientes: la escena 3D los vuelve a medir en el próximo cuadro.
+  // siguientes. Se avisa cuando la lista cambia de tamaño de verdad (ResizeObserver, sin espera):
+  // al abrir es enseguida, y al cerrar recién cuando termina la salida (display allow-discrete).
+  // Así la escena 3D vuelve a medir en el cuadro siguiente, con o sin movimiento reducido.
+  const listRef = useRef(null)
   useEffect(() => {
-    announceStageLayout()
-  }, [visible])
+    const list = listRef.current
+    if (!list || typeof ResizeObserver === 'undefined') return undefined
+    const observer = new ResizeObserver(() => announceStageLayout())
+    observer.observe(list)
+    return () => observer.disconnect()
+  }, [])
+
+  // La columna más alta define la fila de bloques: su certificado no entra arriba y va al costado
+  const tallest = Math.max(...STEPS.map((step) => step.blocks ?? 0))
 
   return (
     <section {...chapterProps('recorrido', 'light')} className={styles.path} aria-labelledby="path-title">
@@ -88,11 +98,12 @@ export function Education() {
         </h2>
         <p className={styles.lead}>{t.lead}</p>
       </div>
-      <ol className={styles.list} {...poseProps(POSES.path)}>
+      <ol ref={listRef} className={styles.list} {...poseProps(POSES.path)}>
         {STEPS.map((step) => (
           <Step
             key={step.id}
             step={step}
+            certBeside={step.blocks === tallest}
             open={visible === step.id}
             onToggle={() => dispatch({ type: 'toggle', id: step.id })}
             onEnter={preview ? () => enter(step.id) : undefined}
