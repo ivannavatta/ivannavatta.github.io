@@ -16,6 +16,8 @@
  *              Una pose con data-stage-layout="bricks" no tiene bloques: stage arma dos
  *              hileras de ladrillos dentro del rectángulo del contenedor.
  * - Hover:     announceStageHover(POSES.stack, índice | -1) eleva un bloque de la pose.
+ * - Layout:    announceStageLayout() cuando una sección mueve sus bloques sin scroll (un panel que
+ *              se abre en el flujo): la escena vuelve a medir en el próximo cuadro.
  *
  * Clases que stage y scroll ponen en <html> (para CSS): ver ROOT_CLASS.
  * Tema discreto para la cabecera: <html data-surface="light|dark"> (ver SURFACE_ATTR).
@@ -80,6 +82,8 @@ export const MOBILE_QUERY = '(max-width: 767px)'
 
 export const STAGE_HOVER_EVENT = 'stage:hover'
 
+export const STAGE_LAYOUT_EVENT = 'stage:layout'
+
 export const selectors = {
   chapters: 'main > section[data-chapter]',
   chapter: (id) => `section[data-chapter="${id}"]`,
@@ -106,4 +110,8 @@ export function blockProps({ accent = false } = {}) {
 
 export function announceStageHover(pose, index) {
   window.dispatchEvent(new CustomEvent(STAGE_HOVER_EVENT, { detail: { pose, index } }))
+}
+
+export function announceStageLayout() {
+  window.dispatchEvent(new CustomEvent(STAGE_LAYOUT_EVENT))
 }

@@ -1,35 +1,34 @@
 import { useState } from 'react'
-import { useMediaQuery } from '@/shared/hooks/useMediaQuery'
+import { Button } from '@/shared/components/Button/Button'
 import { blockProps } from '@/shared/stage'
 import { copy } from '../i18n'
 import styles from './Education.module.css'
 
-const FINE_POINTER = '(hover: hover) and (pointer: fine)'
-
 /**
  * Un paso del recorrido. Los cursos llevan su columna de bloques (decorativa: la escena 3D la
- * dibuja) y "Ver certificado", que despliega la miniatura encima del paso. La imagen se pide
- * recién la primera vez que se abre.
+ * dibuja) y "Ver certificado", que despliega la miniatura: en escritorio flota sobre la columna,
+ * en tablet y mobile se abre debajo del botón. La imagen se pide recién cuando hace falta
+ * (al abrir, enfocar el botón o pasar el cursor), no con la página.
  */
-export function Step({ step }) {
+export function Step({ step, open, onToggle, onEnter, onLeave }) {
   const t = copy.education
   const c = copy.steps[step.id]
-  const fine = useMediaQuery(FINE_POINTER)
-  const [open, setOpen] = useState(false)
   const [requested, setRequested] = useState(false)
   const isCourse = step.kind === 'course'
+  const hasCert = isCourse && Boolean(step.image)
   const certId = `cert-${step.id}`
 
-  const show = (on) => {
-    if (on) setRequested(true)
-    setOpen(on)
-  }
+  // Estado derivado durante el render (patrón de React): una vez pedida, la imagen queda
+  if (open && !requested) setRequested(true)
+  const request = () => setRequested(true)
 
   return (
     <li
       className={isCourse ? styles.step : `${styles.step} ${styles.now}`}
-      onPointerEnter={isCourse && fine ? () => show(true) : undefined}
-      onPointerLeave={isCourse && fine ? () => show(false) : undefined}
+      style={isCourse ? { '--blocks': step.blocks } : undefined}
+      // Solo el mouse: en equipos híbridos un toque también dispara pointerenter
+      onPointerEnter={hasCert && onEnter ? (e) => e.pointerType === 'mouse' && onEnter() : undefined}
+      onPointerLeave={hasCert && onLeave ? (e) => e.pointerType === 'mouse' && onLeave() : undefined}
     >
       {isCourse && (
         <div className={styles.bars} aria-hidden="true">
@@ -42,24 +41,21 @@ export function Step({ step }) {
       <p className={styles.when}>{isCourse ? `${c.when} · ${t.hours(step.hours)}` : c.when}</p>
       <h3 className={styles.what}>{c.what}</h3>
       <p className={styles.where}>{c.where}</p>
-      {isCourse && step.image && (
+      {hasCert && (
         <>
-          <button
+          <Button
+            variant="quiet"
             className={styles.certButton}
-            type="button"
             aria-expanded={open}
             aria-controls={certId}
-            onClick={() => show(!open)}
-            onKeyDown={(e) => {
-              if (e.key === 'Escape' && open) show(false)
-            }}
+            onClick={onToggle}
+            onFocus={request}
           >
             {t.showCert}
-          </button>
+            <span className="sr-only">: {c.what}</span>
+          </Button>
           <figure className={styles.cert} id={certId} hidden={!open}>
-            {requested && (
-              <img src={step.image} alt={t.certAlt(c.what)} width="480" height="339" decoding="async" />
-            )}
+            {requested && <img src={step.image} alt={t.certAlt(c.what)} width="480" height="311" decoding="async" />}
             <figcaption>{t.certCaption(c.what)}</figcaption>
           </figure>
         </>

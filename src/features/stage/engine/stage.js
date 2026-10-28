@@ -10,6 +10,7 @@ import {
   POSES,
   ROOT_CLASS,
   STAGE_HOVER_EVENT,
+  STAGE_LAYOUT_EVENT,
   selectors,
   setMotionState,
 } from '@/shared/stage'
@@ -23,6 +24,7 @@ import { createTraceLayer } from './traces'
 const loadScene = () => import('./scene')
 
 const LAYOUT_DEBOUNCE = 200
+const COMPACT_QUERY = '(max-width: 1023px)' // una columna: tablet y mobile
 
 const chapter = (id) => document.querySelector(selectors.chapter(id))
 const fontsReady = () => (document.fonts ? document.fonts.ready : Promise.resolve())
@@ -159,6 +161,7 @@ export function startStage({ canvas, traces, seams, mobile, reduced, classes, se
       return el ? create({ trigger: el, start, end }) : null
     }
     const ampK = mobile ? 0.5 : 1
+    const compact = window.matchMedia(COMPACT_QUERY)
     const vh = () => window.innerHeight
     const segments = [
       {
@@ -178,7 +181,16 @@ export function startStage({ canvas, traces, seams, mobile, reduced, classes, se
         spin: 1.2,
       },
       { from: POSES.visor, to: POSES.stack, st: seg('stack', 'top 85%', 'top 15%'), amp: () => vh() * 0.2 * ampK, spin: 1.4 },
-      { from: POSES.stack, to: POSES.path, st: seg('recorrido', 'top 85%', 'top 10%'), amp: () => vh() * 0.18 * ampK, spin: 1.2 },
+      {
+        from: POSES.stack,
+        to: POSES.path,
+        // En una columna (tablet y mobile) las últimas capas del stack se siguen leyendo cuando el
+        // Recorrido asoma: el morph espera a que lleguen al tercio de arriba. Función: se
+        // reevalúa en cada refresh (al cambiar el ancho).
+        st: seg('recorrido', () => (compact.matches ? 'top 40%' : 'top 85%'), 'top 10%'),
+        amp: () => vh() * 0.18 * ampK,
+        spin: 1.2,
+      },
       { from: POSES.path, to: POSES.contact, st: seg('contacto', 'top 85%', 'top 5%'), amp: () => vh() * 0.24 * ampK, spin: 1.6 },
     ].filter((s) => s.t || s.st)
 
@@ -249,6 +261,13 @@ export function startStage({ canvas, traces, seams, mobile, reduced, classes, se
     }
     window.addEventListener(STAGE_HOVER_EVENT, onHover)
     cleanups.push(() => window.removeEventListener(STAGE_HOVER_EVENT, onHover))
+
+    // Una sección movió sus bloques sin scroll (p. ej. un certificado que se abre en el flujo):
+    // los slots se leen del DOM en cada cuadro sucio, así que alcanza con pedir uno nuevo.
+    // El alto de <main> cambia también y observeMainHeight recalcula el resto después.
+    const onLayout = () => scene?.invalidate()
+    window.addEventListener(STAGE_LAYOUT_EVENT, onLayout)
+    cleanups.push(() => window.removeEventListener(STAGE_LAYOUT_EVENT, onLayout))
 
     /* ---- Recalcular todo cuando ScrollTrigger recalcula ---- */
     const heightWatch = observeMainHeight(() => {
