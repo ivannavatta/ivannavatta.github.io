@@ -72,8 +72,11 @@ El formulario de Contacto envía con EmailJS, sin backend propio (`src/features/
    - `{{from_email}}`: su email.
    - `{{message}}`: el mensaje.
    - En "Reply To" poné `{{reply_to}}` (es el mismo email) para responder directo al remitente.
+   - En "To Email" poné tu email **fijo** (nunca una variable) y dejá **Auto-Reply** desactivado: así nadie puede usar el formulario para mandarle mails a terceros.
    - Copiá el **Template ID**.
-4. **Account → General** → copiá la **Public Key**. En **Account → Security** conviene limitar los dominios permitidos a `ivannavatta.github.io` (y `localhost` para probar).
+4. **Account → General** → copiá la **Public Key** (es pública por diseño: va en el bundle).
+   - No actives **Use Private Key**: el formulario envía desde el navegador y dejaría de funcionar.
+   - Limitar los dominios permitidos es una función paga de EmailJS. Sin eso, el abuso posible es acotado: el destinatario es fijo (tu email), no hay auto-reply y, en el plan gratis, lo peor es agotar el cupo mensual.
 5. Copiá `.env.example` como `.env` (no se versiona) y completá:
 
 ```env
