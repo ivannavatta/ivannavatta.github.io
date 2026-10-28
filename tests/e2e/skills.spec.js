@@ -463,16 +463,13 @@ test('cada tecla se ve como bloque y su texto se lee sobre el bloque real (píxe
   expect(bad, `Texto de las teclas con contraste insuficiente sobre el bloque real:\n${report.join('\n')}`).toEqual([])
 })
 
-// Con escena viva, la tecla activa es el bloque 3D teñido con --tile-active y ILUMINADO: la cara
-// queda en ≈ rgb(65,128,138) y el texto #eef3f5 baja a ≈ 3,9–4,1:1. Alcanza para texto grande
-// (≥24 px, escritorio: 28 px) pero no para el de tablet (23,7 px) ni el de mobile (18 px), que
-// piden 4,5:1. La teja plana (--tile-active sin luz, movimiento reducido) da 6,3:1.
-const ACTIVE_BUG =
-  'BUG stack-active-contrast: con escena viva, el texto de la tecla activa queda en ≈3,9–4,1:1 sobre el bloque iluminado (pide 4,5:1 por debajo de 24 px)'
+// Con escena viva, la tecla activa es el bloque 3D teñido e ILUMINADO. Con --tile-active la cara
+// quedaba en ≈ rgb(65,128,138) y el texto #eef3f5 bajaba a ≈3,9–4,1:1 (bug stack-active-contrast):
+// pasaba como texto grande en escritorio (28 px) pero no en tablet (23,7 px) ni en mobile (18 px).
+// Corregido: por debajo de 1024 px el bloque usa --tile-active-deep (poses.js).
 
 test('la tecla activa cambia de color y su texto se sigue leyendo (píxeles, bloque elevado)', async ({ page }) => {
   test.setTimeout(90_000)
-  test.fail(['tablet', 'mobile'].includes(test.info().project.name), ACTIVE_BUG)
   const s = stack(page)
   const fine = await page.evaluate(() => matchMedia('(hover: hover) and (pointer: fine)').matches)
   const report = []

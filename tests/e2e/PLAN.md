@@ -178,21 +178,47 @@ Cubre `Button`, `TextLink`, la nav y cualquier componente nuevo sin test propio:
 - [x] Píxeles reales (helper `pixels.js`): con escena viva el botón es transparente y detrás de cada tecla
       se ve un bloque (no el fondo de la sección); texto AA sobre el color real del bloque. En reducido,
       teja plana `--tile`.
-- [ ] (bug abierto `stack-active-contrast`) La tecla activa con escena viva (bloque iluminado ≈
-      rgb(65,128,138)) deja el texto en ≈3,9–4,4:1: pasa como texto grande en escritorio (28 px) pero no en
-      tablet (23,7 px) ni mobile (18 px). Hoy `test.fail` en `tablet` y `mobile`.
+- [x] Tecla activa con escena viva: cambia de color y el texto cumple AA sobre el bloque iluminado
+      (bug `stack-active-contrast` corregido en la ronda 6 con `--tile-active-deep` por debajo de 1024 px).
 - [x] Teclas ≥44 px, dentro del ancho; sin overflow recorriendo la sección con la rueda (3 tamaños).
 - [x] axe y contraste propio en `#stack` con la pose asentada y con una tecla activa (desktop, mobile y
       *-reduced).
 - [x] Reducido: `data-motion="reduced"`, sin `live`; el canvas queda arriba (no fijo); teja `--tile` →
       `--tile-active` al activarse, `:active` sin transform; el panel funciona igual.
 
-### 6. Recorrido (`#recorrido`)
-- `h2` "Recorrido"; lista ordenada (`ol`) con cinco pasos (`h3`): Desarrollo Web, JavaScript,
-  React Js, Programación Backend, Lic. en Gestión de TI.
-- "Ver certificado" (`aria-expanded`): muestra la imagen con alt "Certificado de Coderhouse del
-  curso …", desde `res.cloudinary.com` (permitido por la CSP en `img-src`); Escape lo cierra.
-- Sin violaciones de CSP al cargar los certificados.
+### 6. Recorrido — `education.spec.js` ✅ (ronda 6)
+- [x] `h2` "Recorrido" (`aria-labelledby`), bajada y un `ol` con cinco pasos en orden (`h3`: Desarrollo
+      Web, JavaScript, React Js, Programación Backend, Lic. en Gestión de TI); fecha · horas, título y
+      lugar en ese orden; snapshot ARIA de la región (columnas y certificados cerrados fuera del árbol).
+- [x] Columnas de bloques `aria-hidden` (4 + 3 + 3 + 9 = 19 `data-stage-block`, un acento arriba de React);
+      UADE sin bloques ni certificado.
+- [x] "Ver certificado: <curso>": `button`, `aria-expanded`, `aria-controls="cert-<id>"`, ≥44 px y foco
+      visible. Enter y Espacio abren y cierran, el foco queda en el botón.
+- [x] Escape cierra con el foco en el botón, en otro botón o sin foco. Un solo certificado a la vez
+      (teclado, clic y hover; un MutationObserver confirma que nunca hubo dos).
+- [x] Imagen: alt "Certificado de Coderhouse del curso …", `src` que empieza con
+      `https://res.cloudinary.com/dvcmgnvwi/image/upload/w_480`, carga real y sin violaciones de CSP.
+- [x] La miniatura se pide recién al enfocar el botón, abrir o quedarse con el cursor (0 requests al cargar).
+- [x] Hover (≥1024 con puntero fino): una pasada de <150 ms no abre ni pide la imagen; quedarse abre entre
+      190 y 600 ms después de entrar; se puede pasar al certificado por el puente sin cerrarlo; salir cierra;
+      pasar a otro paso lo reemplaza. Cerrar con el botón o con Escape lo silencia hasta salir del paso.
+- [ ] (bug abierto `path-preview-click`) Un clic sobre la vista previa (el certificado) la cierra: hoy no
+      hace nada. `test.fail` en `desktop` y `desktop-reduced`.
+- [x] Sin hover con 1023 px ni con puntero grueso (tocar abre).
+- [x] Subgrid en 1440 y 1024: cinco columnas; fechas, títulos y lugares en la misma línea y con el mismo
+      alto; botones alineados; columnas sobre la misma base; UADE arranca en la fila de las fechas. El
+      certificado flota (absoluto) sobre su columna, entero en el ancho y sin mover nada.
+- [x] <1024 (tablet y mobile): una columna; el certificado se abre en el flujo, debajo del botón, sin tapar
+      texto ni causar overflow.
+- [x] Tablet y mobile con escena viva: al abrir un certificado, la escena redibuja con el layout nuevo en el
+      mismo cuadro y los bloques 3D quedan detrás de los del DOM (píxeles).
+- [ ] (bug abierto `path-close-lag`) Al cerrar, la escena tarda ~220–280 ms en redibujar (los bloques 3D
+      quedan en la posición vieja): `test.fail` en `tablet` y `mobile`. Se mide con un observador de las
+      llamadas de dibujo de WebGL, no con píxeles (más rápido y determinista).
+- [x] axe y contraste propio en `#recorrido` cerrado y con dos certificados abiertos (desktop, mobile y
+      *-reduced); sin overflow con cada certificado abierto, en los tres tamaños.
+- [x] Reducido: `data-motion="reduced"`, bloques planos (`--ink` y un `--accent`), el canvas no llega a la
+      sección y el certificado se abre por teclado sin transform.
 
 ### 7. Contacto (`#contacto`) — siempre con `stubEmailJs(page)`
 - `h2` "Contacto"; canales: Email (mailto), LinkedIn, GitHub, CV (descarga).
