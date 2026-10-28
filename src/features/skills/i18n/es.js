@@ -1,6 +1,8 @@
 export const skills = {
   title: 'Stack, por capas',
   lead: 'Cada bloque es una tecnología. Pasá el cursor o recorrelos con Tab para ver dónde la usé.',
+  // Pantallas táctiles (sin cursor ni Tab a mano)
+  leadTouch: 'Cada bloque es una tecnología. Tocá uno para ver dónde la usé.',
   detailTitle: 'Dónde la usé',
   detailHint: 'Elegí un bloque para ver en qué proyecto o curso usé esa tecnología.',
 }

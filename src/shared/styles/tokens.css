@@ -33,6 +33,7 @@
   --block-base: #2c4750; /* ladrillos bajo los proyectos, capa superior de figuras */
   --tile: #1b2e36; /* teclas del stack */
   --tile-active: #0b6670; /* tecla activa, almacenes de MyTube */
+  --tile-active-deep: #064f56; /* tecla activa 3D por debajo de 1024 px (más luz): ≥5:1 con el texto */
   --graph-line: #6f8c96; /* aristas de figuras: 3.6:1 sobre --dark-surface */
   --console-bg: #0a1418;
   --field-border: #5b7782; /* borde de campos: 4.6:1 sobre claro, 3.3:1 sobre oscuro */

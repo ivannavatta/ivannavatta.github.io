@@ -51,7 +51,7 @@ export function Skills() {
           <h2 className={styles.title} id="stack-title">
             {t.title}
           </h2>
-          <p className={styles.lead}>{t.lead}</p>
+          <p className={styles.lead}>{fine ? t.lead : t.leadTouch}</p>
           <div className={styles.detail} aria-hidden="true">
             <p className={styles.detailName}>{current ? current.name : t.detailTitle}</p>
             <p className={styles.detailUse}>{current ? current.use : t.detailHint}</p>

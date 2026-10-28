@@ -5,6 +5,9 @@ import { POSES, selectors } from '@/shared/stage'
 import { cssColor } from './tokens'
 
 const BRICK_GAP = 6
+// Por debajo de 1024 px la tecla activa recibe más luz (la cara queda ≈ rgb(64,130,140)): con
+// --tile-active el texto #eef3f5 baja a ≈3,9:1. Ahí se usa un tono más profundo del mismo verde.
+const COMPACT_QUERY = '(max-width: 1023px)'
 const BRICK_ROWS = [10, 9] // hilera de abajo, hilera de arriba (trabada medio ladrillo)
 
 function poseRoot(pose) {
@@ -59,7 +62,9 @@ export function buildPoses() {
     blockBase: cssColor('--block-base'),
     tile: cssColor('--tile'),
     tileActive: cssColor('--tile-active'),
+    tileActiveDeep: cssColor('--tile-active-deep'),
   }
+  const compact = window.matchMedia(COMPACT_QUERY)
   const mono = (pose) => ({ slots: blockSlots(pose), accentSlots: accentSlots(pose), mode: 'split' })
 
   return {
@@ -79,7 +84,10 @@ export function buildPoses() {
       mode: 'solid',
       depth: (r) => Math.min(r.h, 64),
       color: c.tile,
-      hoverColor: c.tileActive,
+      // Se lee en cada cuadro: sigue al ancho actual sin rearmar la escena
+      get hoverColor() {
+        return compact.matches ? c.tileActiveDeep : c.tileActive
+      },
       hover: -1,
     },
     [POSES.path]: {
