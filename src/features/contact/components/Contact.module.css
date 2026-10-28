@@ -1,0 +1,549 @@
+/* ---------- 6. Contacto: una sola pantalla ----------
+   Izquierda: título, pedido y el IN completo al pie de la columna.
+   Derecha: los canales como pines (pad, nombre, valor) y el formulario compacto.
+   El pie cierra la misma pantalla. La sección mide como mínimo una pantalla y su contenido está
+   dimensionado para entrar en ella (1440×900, 1366×768, 1024×768, 768×1024, 375×812). */
+.contact {
+  min-height: 100svh;
+  padding: calc(var(--m) + 72px) var(--m) var(--m);
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.grid {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gap);
+  row-gap: 40px;
+}
+
+.say {
+  grid-column: 1 / span 5;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* aire mínimo entre el texto y el IN */
+.say::after {
+  content: '';
+  order: 3;
+  flex: 0 0 32px;
+}
+
+.title {
+  font-size: var(--step-head);
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+}
+
+.lead {
+  order: 2;
+  margin-top: 28px;
+  max-width: 24ch;
+  font-size: var(--step-lead);
+  line-height: 1.25;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.text {
+  order: 3;
+  margin-top: 16px;
+  max-width: 40ch;
+}
+
+.mono {
+  order: 4;
+  margin-top: auto;
+  align-self: flex-start;
+  height: clamp(160px, 40svh, 380px);
+}
+
+.reach {
+  grid-column: 7 / -1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+/* ---------- Pines: el mismo pad cuadrado de la cabecera; el valor es el link ---------- */
+.pins {
+  display: grid;
+  gap: 4px;
+}
+
+.pin {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 24px;
+}
+
+.pinLink {
+  --label-w: 6.5rem;
+
+  display: grid;
+  grid-template-columns: 8px var(--label-w) auto;
+  align-items: center;
+  column-gap: 16px;
+  min-height: 48px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.pinLink::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background: var(--ink);
+  transition:
+    transform 200ms var(--ease-out),
+    background-color 160ms ease;
+}
+
+.pinLabel {
+  font-size: var(--step-small);
+  color: var(--soft);
+}
+
+.pinValue {
+  font-size: var(--step-lead);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 6px;
+  text-decoration-color: var(--soft);
+  transition:
+    text-decoration-color 200ms ease,
+    color 200ms ease;
+}
+
+.pinLink:active::before {
+  transform: scale(1.5);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pinLink:hover::before {
+    transform: scale(1.5);
+    background: var(--accent);
+  }
+
+  .pinLink:hover .pinValue {
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 2px;
+  }
+}
+
+/* "Copiar email": ancho fijo para que "Copiado" no mueva la fila */
+.pin .copy {
+  min-width: 156px;
+  justify-content: center;
+}
+
+.pin .copyDone {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pin .copyDone:hover {
+    background: var(--accent-hover);
+  }
+}
+
+.reach .write {
+  align-self: flex-start;
+  justify-content: center;
+  min-height: 44px;
+}
+
+/* ---------- Formulario compacto: nombre y email en una fila, mensaje de tres líneas ---------- */
+.form {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px var(--gap);
+}
+
+.form[hidden] {
+  display: none;
+}
+
+.formTitle {
+  grid-column: 1 / -1;
+  margin-bottom: 4px;
+  font-size: var(--step-body);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.formNote {
+  grid-column: 1 / -1;
+  margin-bottom: 4px;
+  font-size: var(--step-small);
+  color: var(--soft);
+}
+
+.field {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+}
+
+.fieldWide {
+  grid-column: 1 / -1;
+}
+
+.field label {
+  font-size: var(--step-small);
+  font-weight: 500;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 11px 14px;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--field-border);
+  border-radius: 0;
+  font-size: 1.0625rem;
+  caret-color: var(--accent);
+  transition: border-color 160ms ease;
+}
+
+.field textarea {
+  min-height: 104px;
+  resize: vertical;
+}
+
+.field input:focus-visible,
+.field textarea:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 0;
+  border-color: var(--accent);
+}
+
+.field [aria-invalid='true'] {
+  border-color: var(--error);
+}
+
+.error {
+  min-height: 1.4em;
+  font-size: var(--step-small);
+  line-height: 1.4;
+  color: var(--error);
+}
+
+/* Honeypot: fuera de pantalla (no display: none, que muchos bots saltean) */
+.trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.formEnd {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 24px;
+}
+
+.send[aria-disabled='true'] {
+  cursor: progress;
+  opacity: 0.7;
+}
+
+.status {
+  flex: 1 1 260px;
+  font-size: var(--step-small);
+  font-weight: 500;
+}
+
+.status:empty {
+  display: none;
+}
+
+.ok {
+  color: var(--accent);
+}
+
+.bad {
+  color: var(--error);
+}
+
+.inlineLink {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+/* ---------- Pie ---------- */
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0 12px;
+  color: var(--soft);
+  font-size: var(--step-small);
+}
+
+.foot .top {
+  font-size: var(--step-small);
+}
+
+/* Escritorio con poca altura (1366×768, 1280×720): misma composición, más apretada */
+@media (min-width: 1024px) and (max-height: 860px) {
+  .contact {
+    padding-top: calc(var(--m) + 64px);
+    gap: 16px;
+  }
+
+  .grid {
+    row-gap: 24px;
+  }
+
+  .reach {
+    gap: 24px;
+  }
+
+  .form {
+    row-gap: 4px;
+  }
+
+  .field {
+    gap: 4px;
+  }
+
+  .lead {
+    margin-top: 20px;
+  }
+
+  .pinLink {
+    min-height: 44px;
+  }
+
+  /* rows=3 mide ~100 px: acá dos líneas y media; se puede agrandar (resize) */
+  .field textarea {
+    height: 76px;
+    min-height: 76px;
+  }
+
+  .mono {
+    height: clamp(140px, 30svh, 380px);
+  }
+
+  .say::after {
+    flex-basis: 24px;
+  }
+
+  .pinValue {
+    font-size: var(--step-body); /* el botón de copiar entra en la misma fila */
+  }
+}
+
+/* Escritorio angosto (1024–1279): la columna de canales arranca una columna antes y la etiqueta
+   se achica, para que "Copiar email" entre en la fila del email */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .reach {
+    grid-column: 6 / -1;
+  }
+
+  .pinLink {
+    --label-w: 4.75rem;
+  }
+
+  .pinValue {
+    font-size: var(--step-body);
+  }
+}
+
+/* El título del formulario queda para lectores de pantalla: los campos y "Enviar mensaje" ya lo explican */
+@media (min-width: 1024px) and (max-height: 760px) {
+  .formTitle {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+
+/* Tablet: título, pedido y el IN arriba; canales y formulario en dos columnas */
+@media (max-width: 1023px) {
+  .say {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: var(--gap);
+    align-items: start;
+  }
+
+  .say::after {
+    content: none;
+  }
+
+  .title,
+  .lead,
+  .text {
+    grid-column: 1;
+  }
+
+  .mono {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+    margin-top: 0;
+    align-self: center;
+    height: clamp(120px, 22svh, 220px);
+  }
+
+  .lead {
+    margin-top: 20px;
+  }
+
+  .reach {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 32px var(--gap);
+  }
+
+  .pins {
+    grid-column: 1 / span 6;
+    align-content: start;
+  }
+
+  .form {
+    grid-column: 7 / -1;
+    grid-template-columns: 1fr;
+  }
+
+  .pinLink {
+    --label-w: 4.75rem;
+  }
+
+  .pinValue {
+    font-size: var(--step-body);
+  }
+
+  .pinMail .copy {
+    margin-left: calc(8px + 4.75rem + 32px);
+  }
+}
+
+/* Mobile: el pedido directo primero. El formulario se abre a pedido para que la pantalla
+   muestre completo lo esencial (título, pedido, canales y pie). */
+@media (max-width: 767px) {
+  .contact {
+    padding-top: calc(var(--bar-h) + 24px); /* debajo de la barra fija */
+    gap: 24px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    row-gap: 24px;
+  }
+
+  .title {
+    align-self: end;
+  }
+
+  .mono {
+    grid-row: 1;
+    height: 88px;
+    align-self: end;
+  }
+
+  .lead {
+    grid-column: 1 / -1;
+    margin-top: 16px;
+    max-width: none;
+  }
+
+  .text {
+    grid-column: 1 / -1;
+    margin-top: 10px;
+  }
+
+  .reach {
+    grid-column: 1;
+    display: flex;
+    gap: 16px;
+  }
+
+  .pins {
+    gap: 0;
+  }
+
+  .pinLink {
+    --label-w: 4.5rem;
+
+    column-gap: 14px;
+    min-height: 44px;
+  }
+
+  .pinMail .copy {
+    margin-left: calc(8px + 4.5rem + 28px);
+    min-height: 44px;
+  }
+
+  .form {
+    grid-template-columns: 1fr;
+    transition:
+      opacity 220ms var(--ease-out),
+      transform 220ms var(--ease-out),
+      display 220ms allow-discrete;
+  }
+
+  @starting-style {
+    .form:not([hidden]) {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+}
+
+@media (max-width: 767px) and (max-height: 800px) {
+  .contact {
+    gap: 16px;
+  }
+
+  .grid {
+    row-gap: 16px;
+  }
+
+  .lead {
+    margin-top: 12px;
+  }
+
+  .mono {
+    height: 72px;
+  }
+}
+
+/* Movimiento reducido: se quedan los cambios de color y opacidad, sin desplazamientos */
+:global(html.reduced) .pinLink:active::before,
+:global(html.reduced) .pinLink:hover::before {
+  transform: none;
+}
+
+@starting-style {
+  :global(html.reduced) .form:not([hidden]) {
+    transform: none;
+  }
+}

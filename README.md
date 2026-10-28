@@ -1,87 +1,80 @@
 # Portfolio · Ivan Navatta
 
-Portfolio personal construido con **React 19 + Vite**, con diseño **minimalista y editorial** (tema claro, tipografía grande), animaciones sutiles con **Motion**, smooth scroll con **Lenis**, sitio bilingüe **ES / EN** y formulario de contacto con **EmailJS**.
+Portfolio personal construido con **React 19 + Vite**. Diseño **"Pieza por pieza"**: un monograma **IN** en 3D hecho de bloques (**Three.js**) que se arma y desarma a lo largo de la página, transiciones guiadas por el scroll (**GSAP ScrollTrigger** + **Lenis**) y formulario de contacto con **EmailJS**. El sitio está en español.
 
 🌐 **En vivo:** https://ivannavatta.github.io
 
 ## Scripts
 
 ```bash
-npm install       # instalar dependencias
-npm run dev       # servidor de desarrollo → http://localhost:5173
-npm run build     # build de producción en /dist
-npm run preview   # previsualizar el build
-npm run lint      # linter (oxlint)
+npm install          # instalar dependencias
+npm run dev          # servidor de desarrollo → http://localhost:5173
+npm run build        # build de producción en /dist (con la CSP real)
+npm run preview      # previsualizar el build
+npm run lint         # linter (oxlint)
+npm run test:e2e     # tests end-to-end con Playwright (build + preview)
+npm run test:e2e:ui  # lo mismo, con la interfaz de Playwright
 ```
+
+`dev` y `build` bajan primero la fuente **General Sans** (`scripts/fetch-fonts.mjs`): su licencia no permite versionarla, así que no está en el repo y se verifica con un SHA-256 fijo. La primera vez hace falta conexión a internet.
 
 ## Arquitectura: Screaming Architecture
 
-Las carpetas "gritan" **qué hace** la aplicación, no con qué está hecha. Cada feature es autocontenida (componentes, hooks, datos, servicios, estilos y traducciones) y expone solo su `index.js`. Las features **no se importan entre sí**; todo lo compartido vive en `shared/`.
+Las carpetas "gritan" **qué hace** la aplicación, no con qué está hecha. Cada feature es autocontenida (componentes, hooks, datos, servicios, estilos y textos) y expone solo su `index.js`. Lo compartido vive en `shared/`.
 
 ```
 src/
-├── app/                      # Composición de la aplicación
-│   ├── App.jsx               # Ordena las features en la página
-│   ├── main.jsx              # Punto de entrada
-│   └── providers/            # Idioma, Motion y smooth scroll
+├── app/                      # App.jsx (orden de las secciones), main.jsx y providers
 ├── features/
-│   ├── hero/                 # Portada con nombre revelado y bloque de código que se tipea
-│   ├── about/                # Sobre mí + tarjeta de perfil + contadores
-│   ├── skills/               # Stack tecnológico por categoría
-│   ├── projects/             # Proyectos, filtros y modal de detalle
-│   ├── education/            # Línea de tiempo de formación + certificados
-│   ├── contact/              # Formulario (EmailJS) + redes
-│   └── navigation/           # Navbar, menú mobile, toggle de idioma
+│   ├── navigation/           # Nav con el IN, links unidos por una traza; menú mobile
+│   ├── hero/                 # Inicio: nombre, bajada, CTAs y pin del scroll
+│   ├── about/                # Perfil: declaración que se revela palabra por palabra
+│   ├── projects/             # Proyectos apilados con figura y "Ver arquitectura"
+│   ├── skills/               # Stack por capas (cada tecnología es un bloque del IN)
+│   ├── education/            # Recorrido: cursos, carrera y certificados
+│   ├── contact/              # Canales, copiar email y formulario (EmailJS)
+│   └── stage/                # Escena 3D: el IN de bloques y sus poses por sección
 └── shared/
-    ├── animations/           # Variants reutilizables de Motion
-    ├── components/           # Button, Section, RevealText, Divider, ArrowLink, Footer, SmoothScroll
-    ├── data/                 # ⭐ profile.js (tus datos), technologies.js, certifications.js
-    ├── hooks/                # useMediaQuery, useYearsCoding, useSmoothScroll...
-    ├── i18n/                 # LanguageProvider + useTranslation
-    └── styles/               # Variables de diseño y estilos globales
-```
-
-Estructura interna de una feature:
-
-```
-features/projects/
-├── components/   # UI de la feature
-├── data/         # Datos propios (projects.js)
-├── hooks/        # Lógica (useProjectFilter)
-├── i18n/         # es.js / en.js
-├── Projects.module.css
-└── index.js      # API pública → export { Projects }
+    ├── components/           # Button, TextLink, Monogram, CircuitTraces...
+    ├── data/                 # ⭐ profile.js (tus datos) y certifications.js
+    ├── hooks/                # useMediaQuery, useFocusTrap
+    ├── scroll/               # Lenis + GSAP ScrollTrigger y preferencia de movimiento
+    ├── stage/                # Contrato entre las secciones y la escena 3D
+    └── styles/               # Tokens de diseño, fuentes y estilos globales
 ```
 
 ## Cómo personalizarlo
 
 | Qué querés cambiar | Archivo |
 | --- | --- |
-| Nombre, carrera, email, redes, foto, año en que empezaste a programar | `src/shared/data/profile.js` |
-| **Proyectos** | `src/features/projects/data/projects.js` |
-| Tecnologías (catálogo con ícono y color) | `src/shared/data/technologies.js` |
-| Agrupación de tecnologías por categoría | `src/features/skills/data/skills.js` |
-| Cursos y certificados | `src/shared/data/certifications.js` |
-| Formación / experiencia | `src/features/education/data/education.js` |
-| Textos de cada sección | `src/features/<feature>/i18n/es.js` y `en.js` |
+| Nombre, carrera, email, redes, año en que empezaste a programar | `src/shared/data/profile.js` |
+| **Proyectos** (links y figura) | `src/features/projects/data/projects.js` |
+| Textos de los proyectos (problema, rol, stack) | `src/features/projects/i18n/es.js` |
+| Tecnologías del Stack y dónde las usaste | `src/features/skills/i18n/es.js` |
+| Cursos, horas e imágenes de certificados | `src/shared/data/certifications.js` |
+| Pasos del Recorrido | `src/features/education/data/steps.js` e `i18n/es.js` |
+| Textos de cada sección | `src/features/<feature>/i18n/es.js` |
 | Colores, tipografías, espaciados | `src/shared/styles/tokens.css` |
-| CV descargable | Reemplazá `public/cv.pdf` |
+| CV descargable | Reemplazá `public/cv.pdf` (versión **sin teléfono**) |
 
-- **Años programando**: se calculan solos a partir de `startYear`, así que el número nunca queda desactualizado.
-- **Foto**: copiá tu imagen a `public/avatar.jpg` y poné `photo: '/avatar.jpg'` en `profile.js`.
-- **Capturas de proyectos**: guardalas en `public/projects/` y usá `image: '/projects/mi-proyecto.png'`. Si no hay imagen, se genera una portada automática.
-- **Proyecto destacado**: con `featured: true` la fila muestra la etiqueta "Destacado".
+- **Años programando**: se calculan solos a partir de `startYear`.
+- **Certificados**: solo se muestran imágenes de la cuenta de Cloudinary `dvcmgnvwi` (es lo que permite la CSP en `vite.config.js`). Si cambiás de cuenta, actualizá `img-src` y el filtro de `education/data/steps.js`.
+- **Repos de proyectos**: si un repositorio todavía es privado, dejá el proyecto sin link (hay un `TODO` en `projects.js` para el TPO).
 
 ## Configurar el formulario de contacto (EmailJS)
 
+El formulario de Contacto envía con EmailJS, sin backend propio (`src/features/contact/services/emailService.js`).
+
 1. Creá una cuenta gratis en [emailjs.com](https://www.emailjs.com/).
 2. **Email Services** → agregá tu Gmail → copiá el **Service ID**.
-3. **Email Templates** → creá un template usando estas variables:
-   - `{{from_name}}`, `{{from_email}}`, `{{message}}`
-   - En "Reply To" poné `{{reply_to}}` para responder directo al remitente.
+3. **Email Templates** → creá un template con las variables que manda el sitio:
+   - `{{from_name}}`: nombre de quien escribe.
+   - `{{from_email}}`: su email.
+   - `{{message}}`: el mensaje.
+   - En "Reply To" poné `{{reply_to}}` (es el mismo email) para responder directo al remitente.
    - Copiá el **Template ID**.
-4. **Account → General** → copiá la **Public Key**.
-5. Copiá `.env.example` como `.env` y completá:
+4. **Account → General** → copiá la **Public Key**. En **Account → Security** conviene limitar los dominios permitidos a `ivannavatta.github.io` (y `localhost` para probar).
+5. Copiá `.env.example` como `.env` (no se versiona) y completá:
 
 ```env
 VITE_EMAILJS_SERVICE_ID=service_xxxxx
@@ -89,7 +82,15 @@ VITE_EMAILJS_TEMPLATE_ID=template_xxxxx
 VITE_EMAILJS_PUBLIC_KEY=xxxxxxxxxxxx
 ```
 
-6. Reiniciá `npm run dev`. Si faltan las claves, el formulario muestra un aviso con tu email como alternativa.
+6. Reiniciá `npm run dev`.
+
+Cómo se comporta:
+
+- **Sin claves** el sitio funciona igual: el formulario avisa que el envío todavía no está activo y ofrece el email. Al enviar, arma el mensaje para abrirlo en el correo. No hace ninguna llamada.
+- Valida al enviar (nombre, email con dominio, mensaje de 10 caracteres o más) y lleva el foco al primer campo con error. Después del primer intento, los errores se actualizan mientras se escribe.
+- Protecciones: `maxLength` en los campos, un campo trampa (honeypot) para bots, `blockHeadless` (no envía desde navegadores automatizados) y `limitRate` (un envío cada 10 s por navegador).
+- Tests e2e: EmailJS siempre se intercepta (`stubEmailJs`). Como `blockHeadless` corta los navegadores automatizados, los tests de envío tienen que simular `navigator.webdriver = false`.
+- La CSP del build ya permite `connect-src https://api.emailjs.com`.
 
 ## Deploy
 
@@ -105,9 +106,13 @@ Para que el formulario de contacto funcione en producción, cargá las credencia
 
 Después volvé a correr el workflow (*Actions → Deploy a GitHub Pages → Run workflow*).
 
+## Tests end-to-end
+
+Los tests viven en `tests/e2e/` (plan y reglas en [`tests/e2e/PLAN.md`](tests/e2e/PLAN.md)). Corren con Chromium en desktop, tablet, mobile y con movimiento reducido, contra el build con la CSP real. Nunca mandan mails: EmailJS siempre se intercepta.
+
 ## Accesibilidad y rendimiento
 
-- Respeta `prefers-reduced-motion`: sin smooth scroll, sin revelados ni tipeo (el código se muestra completo).
-- La vista previa de proyectos que sigue al cursor solo aparece en dispositivos con mouse.
-- Sin librerías 3D: un único bundle liviano.
-- Navegación por teclado, `aria-*` en controles y `lang` del documento según el idioma.
+- Respeta `prefers-reduced-motion`: sin smooth scroll, sin pins ni scrub; el IN queda plano y el contenido estático.
+- WCAG 2.1 AA verificado con axe y con mediciones de contraste sobre el canvas 3D.
+- Navegación completa por teclado, foco visible, objetivos táctiles de 44 px o más y link "Saltar al contenido".
+- CSP estricta en el build: solo recursos propios, imágenes de Cloudinary y `api.emailjs.com`.

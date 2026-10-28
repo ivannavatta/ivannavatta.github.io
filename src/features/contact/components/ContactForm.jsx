@@ -1,138 +1,162 @@
-import { AnimatePresence, motion } from 'motion/react'
-import { FiAlertCircle, FiArrowRight, FiCheck } from 'react-icons/fi'
-import { Button } from '@/shared/components'
-import { profile } from '@/shared/data/profile'
-import { useContactForm } from '../hooks/useContactForm'
-import styles from '../Contact.module.css'
+import { Button } from '@/shared/components/Button/Button'
+import { EMAIL } from '../data/channels'
+import { MAX_LENGTH, useContactForm } from '../hooks/useContactForm'
+import { copy } from '../i18n'
+import styles from './Contact.module.css'
 
-/** Campo con label flotante: el label sube cuando el input tiene foco o contenido. */
-function Field({ id, label, error, errorText, multiline = false, ...props }) {
-  const Input = multiline ? 'textarea' : 'input'
+const t = copy.form
+
+function Field({ id, name, label, error, register, wide = false, multiline = false, ...props }) {
+  const Control = multiline ? 'textarea' : 'input'
+  const errorId = `${id}-error`
   return (
-    <div className={`${styles.field} ${error ? styles.fieldError : ''}`}>
-      <Input
+    <div className={wide ? `${styles.field} ${styles.fieldWide}` : styles.field}>
+      <label htmlFor={id}>{label}</label>
+      <Control
+        ref={register(name)}
         id={id}
-        name={id}
-        placeholder=" "
-        aria-invalid={Boolean(error)}
-        aria-describedby={error ? `${id}-error` : undefined}
+        name={name}
+        maxLength={MAX_LENGTH[name]}
+        aria-invalid={error ? 'true' : 'false'}
+        aria-describedby={errorId}
         {...props}
       />
-      <label htmlFor={id}>{label}</label>
-      <AnimatePresence>
-        {error && (
-          <motion.span
-            id={`${id}-error`}
-            className={styles.errorText}
-            initial={{ opacity: 0, y: -6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-          >
-            {errorText}
-          </motion.span>
-        )}
-      </AnimatePresence>
+      <p className={styles.error} id={errorId}>
+        {error ? t.errors[error] : ''}
+      </p>
     </div>
   )
 }
 
-export function ContactForm({ t }) {
-  const { values, errors, status, handleChange, handleBlur, handleSubmit } = useContactForm()
-  const sending = status === 'sending'
+function mailtoWith(values) {
+  const subject = encodeURIComponent(t.mailSubject(values.name.trim()))
+  const body = encodeURIComponent(values.message.trim())
+  return `mailto:${EMAIL}?subject=${subject}&body=${body}`
+}
 
-  const feedback = {
-    success: { icon: <FiCheck />, text: t.form.success, tone: styles.success },
-    error: { icon: <FiAlertCircle />, text: t.form.error, tone: styles.failure, withEmail: true },
-    'not-configured': {
-      icon: <FiAlertCircle />,
-      text: t.form.notConfigured,
-      tone: styles.warning,
-      withEmail: true,
-    },
-  }[status]
+/**
+ * Formulario compacto: nombre y email en una fila, mensaje de tres líneas.
+ * Envío con EmailJS; sin claves avisa desde el principio y ofrece abrir el mensaje en el correo.
+ */
+export function ContactForm({ id, formRef, hidden }) {
+  const { values, errors, status, sent, register, onChange, onSubmit, configured } = useContactForm()
+  const sending = status === 'sending'
+  const mailLink = (
+    <a className={styles.inlineLink} href={`mailto:${EMAIL}`}>
+      {EMAIL}
+    </a>
+  )
+
+  let message = null
+  let tone = ''
+  if (status === 'success' && sent) {
+    message = t.success(sent.name, sent.email)
+    tone = styles.ok
+  } else if (status === 'failed' || status === 'too-soon') {
+    message = (
+      <>
+        {status === 'failed' ? t.error : t.tooSoon} {mailLink}.
+      </>
+    )
+    tone = styles.bad
+  } else if (status === 'not-configured') {
+    message = (
+      <>
+        {t.notConfiguredOpen}{' '}
+        <a className={styles.inlineLink} href={mailtoWith(values)}>
+          {t.openInMail}
+        </a>
+        .
+      </>
+    )
+  }
 
   return (
-    <form className={styles.form} onSubmit={handleSubmit} noValidate>
-      <div className={styles.row}>
-        <Field
-          id="name"
-          label={t.form.name}
-          value={values.name}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          error={errors.name}
-          errorText={t.errors[errors.name]}
-          autoComplete="name"
-        />
-        <Field
-          id="email"
-          type="email"
-          label={t.form.email}
-          value={values.email}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          error={errors.email}
-          errorText={t.errors[errors.email]}
-          autoComplete="email"
+    <form
+      ref={formRef}
+      className={styles.form}
+      id={id}
+      hidden={hidden}
+      noValidate
+      aria-labelledby={`${id}-title`}
+      onSubmit={onSubmit}
+    >
+      <h3 className={styles.formTitle} id={`${id}-title`}>
+        {t.title}
+      </h3>
+      {!configured && (
+        <p className={styles.formNote}>
+          {t.notConfigured} {mailLink}.
+        </p>
+      )}
+      <Field
+        id={`${id}-name`}
+        name="name"
+        label={t.name}
+        type="text"
+        autoComplete="name"
+        required
+        value={values.name}
+        onChange={onChange}
+        error={errors.name}
+        register={register}
+      />
+      <Field
+        id={`${id}-email`}
+        name="email"
+        label={t.email}
+        type="email"
+        autoComplete="email"
+        inputMode="email"
+        spellCheck={false}
+        required
+        value={values.email}
+        onChange={onChange}
+        error={errors.email}
+        register={register}
+      />
+      <Field
+        id={`${id}-message`}
+        name="message"
+        label={t.message}
+        multiline
+        wide
+        rows={3}
+        required
+        value={values.message}
+        onChange={onChange}
+        error={errors.message}
+        register={register}
+      />
+
+      {/* Honeypot: fuera de pantalla y fuera del orden de Tab. Las personas no lo ven ni lo llenan. */}
+      <div className={styles.trap} aria-hidden="true">
+        <label htmlFor={`${id}-website`}>{t.honeypot}</label>
+        <input
+          id={`${id}-website`}
+          name="website"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          maxLength={200}
+          value={values.website}
+          onChange={onChange}
         />
       </div>
-      <Field
-        id="message"
-        multiline
-        rows={4}
-        label={t.form.message}
-        value={values.message}
-        onChange={handleChange}
-        onBlur={handleBlur}
-        error={errors.message}
-        errorText={t.errors[errors.message]}
-      />
 
-      {/* Honeypot anti-spam: invisible para personas */}
-      <input
-        type="text"
-        name="website"
-        value={values.website}
-        onChange={handleChange}
-        className={styles.honeypot}
-        tabIndex={-1}
-        autoComplete="off"
-        aria-hidden="true"
-      />
-
-      <div className={styles.formFooter}>
+      <div className={styles.formEnd}>
         <Button
           type="submit"
-          disabled={sending}
-          icon={sending ? <span className={styles.spinner} /> : <FiArrowRight />}
+          className={styles.send}
+          aria-disabled={sending || undefined}
+          aria-busy={sending || undefined}
         >
-          {sending ? t.form.sending : t.form.submit}
+          {sending ? t.sending : t.submit}
         </Button>
+        <p className={tone ? `${styles.status} ${tone}` : styles.status} role="status">
+          {message}
+        </p>
       </div>
-
-      <AnimatePresence mode="wait">
-        {feedback && (
-          <motion.p
-            key={status}
-            className={`${styles.feedback} ${feedback.tone}`}
-            role="status"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-          >
-            {feedback.icon}
-            <span>
-              {feedback.text}
-              {feedback.withEmail && (
-                <>
-                  {' '}
-                  <a href={`mailto:${profile.contact.email}`}>{profile.contact.email}</a>
-                </>
-              )}
-            </span>
-          </motion.p>
-        )}
-      </AnimatePresence>
     </form>
   )
 }
