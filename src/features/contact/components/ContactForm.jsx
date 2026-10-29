@@ -19,6 +19,7 @@ function Field({ id, name, label, error, register, wide = false, multiline = fal
         maxLength={MAX_LENGTH[name]}
         aria-invalid={error ? 'true' : 'false'}
         aria-describedby={errorId}
+        data-lenis-prevent={multiline || undefined}
         {...props}
       />
       <p className={styles.error} id={errorId}>

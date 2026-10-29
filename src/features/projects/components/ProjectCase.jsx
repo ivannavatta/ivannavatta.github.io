@@ -56,7 +56,7 @@ export function ProjectCase({ project, caseRef }) {
       </div>
       <div className={styles.side} data-open={open || undefined}>
         <CaseFigure kind={project.figure} copy={c.figure} id={project.id} />
-        <div className={styles.panel} id={panelId} hidden={!open} tabIndex={-1}>
+        <div className={styles.panel} id={panelId} hidden={!open} tabIndex={-1} data-lenis-prevent>
           <h4>{t.architecture}</h4>
           <p>{c.architecture}</p>
           <h4>{t.decisions}</h4>

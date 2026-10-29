@@ -7,6 +7,10 @@ import { REDUCED_MOTION } from './motionPreference'
 import { ScrollContext } from './scrollContext'
 
 const SCROLL_DURATION = 1.4
+// En un dispositivo solo táctil el scroll nativo lo mueve el compositor del navegador, antes de
+// que la escena lea los rectángulos del DOM: en Safari iOS los bloques del IN se despegaban de
+// las teclas del Stack. Con syncTouch, Lenis aplica el scroll en el mismo cuadro que la escena.
+const TOUCH_ONLY = '(hover: none), (pointer: coarse)'
 
 /** Elemento que recibe el foco al llegar: el título de la sección, o la sección misma. */
 function focusTargetOf(element) {
@@ -41,7 +45,7 @@ export function ScrollProvider({ children }) {
     const root = document.documentElement
     let lenis
     try {
-      lenis = new Lenis({ lerp: 0.1, smoothWheel: true })
+      lenis = new Lenis({ lerp: 0.1, smoothWheel: true, syncTouch: window.matchMedia(TOUCH_ONLY).matches })
     } catch (err) {
       console.warn('[IN] Scroll suave no disponible:', err?.message)
       setMotionState(MOTION_STATE.static)

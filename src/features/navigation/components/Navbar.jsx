@@ -91,7 +91,7 @@ export function Navbar() {
         {/* En escritorio esta caja no existe (display: contents); en mobile es el panel del menú.
             Oculta, la nav es inerte salvo el IN: es el primer stop de Tab, y al recibir foco de
             teclado la cabecera aparece y se libera el resto. */}
-        <div className={styles.panel} id="menu" ref={panelRef} inert={hidden || undefined}>
+        <div className={styles.panel} id="menu" ref={panelRef} inert={hidden || undefined} data-lenis-prevent>
           <nav className={styles.nav} aria-label={copy.nav.sections}>
             <ul>
               {NAV_SECTIONS.map(({ id, cta }, i) => {
