@@ -292,10 +292,21 @@ export function startStage({ canvas, traces, seams, mobile, reduced, classes, se
 
     /* ---- Bucle: después de Lenis (que tiene prioridad en el ticker) y de ScrollTrigger ---- */
     let lastY = -1
+    let lastW = window.innerWidth
+    let lastH = window.innerHeight
     const tick = () => {
       const y = window.scrollY
       const moved = y !== lastY
       lastY = y
+      // La barra del navegador mobile cambia el alto de la ventana sin refresh de ScrollTrigger
+      // (ignoreMobileResize): el canvas fijo se estiraría y los bloques se despegarían del HTML.
+      // Se reajusta acá, en el mismo cuadro que se dibuja, para no mostrar un cuadro vacío.
+      const resized = window.innerWidth !== lastW || window.innerHeight !== lastH
+      if (resized) {
+        lastW = window.innerWidth
+        lastH = window.innerHeight
+        scene?.resize()
+      }
       if (moved) {
         surface.sync()
         seamLayer.update(y)

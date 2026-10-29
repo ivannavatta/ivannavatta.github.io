@@ -8,6 +8,10 @@ const LIFT = 8 // px que sube cada caso de atrás: 3 × 8 = 24 < 28 de separaci�
 const SHRINK = 0.045 // cuánto se achica cada caso de atrás
 const TILT = { x: 3, y: 2.4, ease: 0.12 } // grados máximos e inercia de la inclinación
 const RESIZE_DEBOUNCE = 250
+// Mismo criterio que ScrollTrigger (ignoreMobileResize): en un dispositivo solo táctil, un cambio
+// de alto de menos del 25 % sin cambio de ancho es la barra del navegador que entra o sale.
+const TOUCH_ONLY = '(hover: none), (pointer: coarse)'
+const BAR_RESIZE = 0.25
 
 const clamp01 = (v) => (v < 0 ? 0 : v > 1 ? 1 : v)
 const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
@@ -170,13 +174,19 @@ export function useCaseStack({ sectionRef, pinRef, caseRefs, pinnedClass }) {
     })
 
     let timer = 0
-    let lastSize = `${window.innerWidth}x${window.innerHeight}`
+    let lastW = window.innerWidth
+    let lastH = window.innerHeight
     const onResize = () => {
       clearTimeout(timer)
       timer = setTimeout(() => {
-        const size = `${window.innerWidth}x${window.innerHeight}`
-        if (size === lastSize) return
-        lastSize = size
+        const w = window.innerWidth
+        const h = window.innerHeight
+        if (w === lastW && h === lastH) return
+        // La barra del navegador mobile aparece y se va al scrollear: recalcular ahí corta el
+        // scroll y hace saltar la escena. Las secciones usan svh, así que el alto de la página no cambia.
+        if (w === lastW && Math.abs(h - lastH) < h * BAR_RESIZE && window.matchMedia(TOUCH_ONLY).matches) return
+        lastW = w
+        lastH = h
         evaluate()
         refresh() // el alto de la página cambió: recalcular pins, escena y costuras
       }, RESIZE_DEBOUNCE)
