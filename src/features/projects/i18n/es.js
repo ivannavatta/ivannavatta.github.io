@@ -17,6 +17,26 @@ export const projects = {
   },
 }
 
+// "Probar en vivo": el main.py real, con Python 3.14 (Pyodide) en un Web Worker. Textos comunes a
+// todas las terminales; cada caso suma su label y sus ayudas.
+const LIVE_TERMINAL = {
+  status: {
+    loading: 'Python 3.14 en tu navegador',
+    running: 'Python 3.14 en tu navegador · ejecutando main.py',
+    done: 'Programa finalizado · Reiniciar para volver a empezar',
+    error: 'El programa terminó con un error',
+    bootError: 'Error al cargar',
+  },
+  restart: 'Reiniciar',
+  close: 'Cerrar',
+  retry: 'Reintentar',
+  loading: 'Descargando Python (≈ 6 MB, solo la primera vez)…',
+  bootError: 'No se pudo cargar Python. Revisá tu conexión y volvé a intentar.',
+  output: 'Salida del programa',
+  answer: 'Tu respuesta',
+  finished: '[Programa finalizado]',
+}
+
 export const cases = {
   mytube: {
     title: 'MyTube',
@@ -86,24 +106,9 @@ export const cases = {
         '\nEl legajo debe tener 7 dígitos. Volvé a ingresarlo: _\n\nPisos disponibles:\n1 Piso 10-Uade Comunitario\n2 Piso 10-UADEHUB\n3 Piso Silencioso\n\nElegí un piso: _',
       caption: 'Textos reales del programa; el legajo es un ejemplo inválido.',
     },
-    // "Probar en vivo": el main.py real, con Python 3.14 (Pyodide) en un Web Worker
     live: {
+      ...LIVE_TERMINAL,
       label: 'uadeHUB en vivo',
-      status: {
-        loading: 'Python 3.14 en tu navegador',
-        running: 'Python 3.14 en tu navegador · ejecutando main.py',
-        done: 'Programa finalizado · Reiniciar para volver a empezar',
-        error: 'El programa terminó con un error',
-        bootError: 'Error al cargar',
-      },
-      restart: 'Reiniciar',
-      close: 'Cerrar',
-      retry: 'Reintentar',
-      loading: 'Descargando Python (≈ 6 MB, solo la primera vez)…',
-      bootError: 'No se pudo cargar Python. Revisá tu conexión y volvé a intentar.',
-      output: 'Salida del programa',
-      answer: 'Tu respuesta',
-      finished: '[Programa finalizado]',
       hints: [
         { text: 'Escribí y apretá', key: 'Enter' },
         { text: 'Legajo: 7 dígitos' },
@@ -119,11 +124,11 @@ export const cases = {
     role: 'Proyecto para la facultad: carga, actualización y evaluación de empleados por consola.',
     stack: 'Python',
     architecture:
-      'Un programa de consola con un menú de cinco opciones: cargar resultados, agregar empleado, actualizar datos, ver el mejor empleado y salir.',
+      'Un programa de consola con un menú de cinco opciones: mostrar empleados, agregar empleado, actualizar datos, ver el mejor empleado y salir. Los datos viven en memoria, en listas paralelas.',
     decisions: [
       'Autoevaluación de desempeño y potencial en escala de 1 a 5.',
-      'La calificación de la empresa se suma a la autoevaluación.',
-      'Cada empleado puede actualizar un campo o los dos.',
+      'El mejor empleado es el de mayor puntaje: desempeño por potencial.',
+      'Cada empleado puede actualizar un campo o los dos; una respuesta inválida se vuelve a pedir.',
     ],
     figure: {
       y: 'Potencial',
@@ -132,6 +137,16 @@ export const cases = {
         'Matriz de tres por tres: desempeño en el eje horizontal y potencial en el vertical. Marcada, la celda de desempeño alto y potencial alto.',
       mark: '4 · 5',
       caption: 'Ejemplo: autoevaluación con desempeño 4 y potencial 5, en escala de 1 a 5.',
+    },
+    live: {
+      ...LIVE_TERMINAL,
+      label: 'box9 en vivo',
+      hints: [
+        { text: 'Escribí y apretá', key: 'Enter' },
+        { text: 'Para empezar:', key: '1' },
+        { text: 'Calificaciones del 1 al 5' },
+        { text: 'Los empleados viven en memoria y se borran al reiniciar' },
+      ],
     },
   },
 }

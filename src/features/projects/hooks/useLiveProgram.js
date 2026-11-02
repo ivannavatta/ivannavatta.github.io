@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { LIVE_PROGRAMS } from '../live/programs'
 
 const NEAR_BOTTOM = 48 // px: si el usuario subió más que esto para releer, la salida no lo arrastra
 
@@ -6,7 +7,8 @@ const NEAR_BOTTOM = 48 // px: si el usuario subió más que esto para releer, la
 const pyodideURL = () => new URL(`${import.meta.env.BASE_URL}pyodide/`, document.baseURI).href
 
 /**
- * Corre main.py de uadeHUB en un Web Worker (ver live/uadehub.worker.js) y lo conecta con una
+ * Corre el main.py de un programa (`program`, clave de live/programs.js) en un Web Worker (ver
+ * live/runtime.js) y lo conecta con una
  * terminal: la salida se escribe directo en el DOM (sin un render por línea) y el input en línea
  * manda cada respuesta al worker.
  *
@@ -20,7 +22,7 @@ const pyodideURL = () => new URL(`${import.meta.env.BASE_URL}pyodide/`, document
  *
  * phase: 'loading' | 'boot-error' | 'running' | 'done' | 'error'
  */
-export function useLiveProgram({ regionRef, termRef, textRef, inputRef, restartRef, copy }) {
+export function useLiveProgram({ program, regionRef, termRef, textRef, inputRef, restartRef, copy }) {
   const [phase, setPhase] = useState('loading')
   const workerRef = useRef(null)
   const waitingRef = useRef(false)
@@ -73,7 +75,7 @@ export function useLiveProgram({ regionRef, termRef, textRef, inputRef, restartR
 
   const connect = useCallback(() => {
     workerRef.current?.terminate()
-    const worker = new Worker(new URL('../live/uadehub.worker.js', import.meta.url), { type: 'module' })
+    const worker = LIVE_PROGRAMS[program]()
     workerRef.current = worker
     epochRef.current = 0
 
@@ -112,7 +114,7 @@ export function useLiveProgram({ regionRef, termRef, textRef, inputRef, restartR
           setPhase('error')
           return
         case 'boot-error':
-          console.warn('[uadeHUB en vivo] no se pudo cargar Python:', data.message)
+          console.warn(`[${copy.label}] no se pudo cargar Python:`, data.message)
           setPhase('boot-error')
           return
       }
@@ -123,7 +125,7 @@ export function useLiveProgram({ regionRef, termRef, textRef, inputRef, restartR
       setPhase('boot-error')
     }
     worker.postMessage({ type: 'start', indexURL: pyodideURL() })
-  }, [write, canTakeFocus, stopInput, inputRef, termRef, copy])
+  }, [program, write, canTakeFocus, stopInput, inputRef, termRef, copy])
 
   // El input arranca apagado (se prende cuando el programa pide una línea)
   useLayoutEffect(() => {

@@ -6,17 +6,19 @@ const STATE = { loading: 'idle', 'boot-error': 'error', running: 'ready', done: 
 const STATUS = { loading: 'loading', 'boot-error': 'bootError', running: 'running', done: 'done', error: 'error' }
 
 /**
- * "Probar en vivo": una terminal que corre el main.py real de uadeHUB con Python en WebAssembly.
+ * "Probar en vivo": una terminal que corre el main.py real de un proyecto (`program`, ver
+ * live/programs.js) con Python en WebAssembly.
  * Ocupa el lugar de la figura, como el panel de arquitectura. Se carga con React.lazy (y con ella
  * Pyodide) recién cuando se toca el botón; cerrarla la oculta sin perder la sesión.
  */
-export default function LiveTerminal({ id, copy, hidden, onClose }) {
+export default function LiveTerminal({ id, program, copy, hidden, onClose }) {
   const regionRef = useRef(null)
   const termRef = useRef(null)
   const textRef = useRef(null)
   const inputRef = useRef(null)
   const restartRef = useRef(null)
   const { phase, restart, retry, onKeyDown, focusInput } = useLiveProgram({
+    program,
     regionRef,
     termRef,
     textRef,

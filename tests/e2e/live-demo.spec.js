@@ -1,12 +1,12 @@
-// "Probar en vivo" en el caso uadeHUB (src/features/projects/components/live).
+// "Probar en vivo" en los casos uadeHUB y box9 (src/features/projects/components/live).
 //
-// La terminal corre el main.py real de uadeHUB con Pyodide (Python en WebAssembly) en un Web
-// Worker. Pyodide se sirve desde el propio sitio (public/pyodide/, lo copia
-// scripts/copy-pyodide.mjs) y se descarga recién al tocar el botón. Corre bajo la CSP real del
-// build (script-src 'self'): el fixture cspViolations falla el test ante cualquier violación.
+// La terminal corre el main.py real de cada proyecto con Pyodide (Python en WebAssembly) en un Web
+// Worker propio (live/programs.js). Pyodide se sirve desde el propio sitio (public/pyodide/, lo
+// copia scripts/copy-pyodide.mjs) y se descarga recién al tocar el botón. Corre bajo la CSP real
+// del build (script-src 'self'): el fixture cspViolations falla el test ante cualquier violación.
 //
-// Datos semilla: Martina Lopez (1100001) y Tomas Gomez (1100002); Martina tiene reservado hoy el
-// lugar 1 de "privados" en el Piso 10-Uade Comunitario.
+// uadeHUB, datos semilla: Martina Lopez (1100001) y Tomas Gomez (1100002); Martina tiene reservado
+// hoy el lugar 1 de "privados" en el Piso 10-Uade Comunitario. box9 arranca sin empleados.
 import {
   test,
   expect,
@@ -23,10 +23,13 @@ import {
 const BOOT_TIMEOUT = 90_000 // primera carga de Pyodide (~13 MB sin comprimir) con 3 workers en paralelo
 const STEP_TIMEOUT = 15_000
 
-/** @param {import('@playwright/test').Page} page */
-const demo = (page) => {
-  const article = page.locator('#proyectos').getByRole('article', { name: 'uadeHUB', exact: true })
-  const region = page.getByRole('region', { name: 'uadeHUB en vivo' })
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {string} [name] nombre del caso (uadeHUB por defecto)
+ */
+const demo = (page, name = 'uadeHUB') => {
+  const article = page.locator('#proyectos').getByRole('article', { name, exact: true })
+  const region = page.getByRole('region', { name: `${name} en vivo` })
   return {
     article,
     region,
@@ -41,8 +44,8 @@ const demo = (page) => {
 }
 
 /** Abre la demo con el teclado (si el caso todavía no entró en el apilado, el foco lo trae). */
-async function openDemo(page) {
-  const d = demo(page)
+async function openDemo(page, name) {
+  const d = demo(page, name)
   await keyboardFocus(page, d.open)
   await page.keyboard.press('Enter')
   await expect(d.open).toHaveAttribute('aria-expanded', 'true')
@@ -215,4 +218,66 @@ test('axe y contraste AA con la terminal abierta', async ({ page }) => {
   await waitForAnimationsToFinish(page)
   await expectNoA11yViolations(page, { include: '#live-uadehub' })
   await expectReadableContrast(page, '#live-uadehub')
+})
+
+test('box9: valida entradas, agrega empleados, calcula el mejor y sale', async ({ page }) => {
+  test.setTimeout(180_000)
+  const requests = []
+  page.on('request', (r) => {
+    if (/\.worker/.test(r.url())) requests.push(r.url())
+  })
+  const d = await openDemo(page, 'box9')
+  await expect(d.log).toContainText('Desea correr el programa?', { timeout: BOOT_TIMEOUT })
+  await expect(d.region).toContainText('Python 3.14 en tu navegador · ejecutando main.py')
+  await expect(d.input).toBeFocused()
+  await expect(d.figure).toBeHidden()
+  // Solo baja el worker de box9 (con su main.py), no el de uadeHUB
+  expect(requests.some((u) => /box9\.worker/.test(u))).toBe(true)
+  expect(requests.some((u) => /uadehub\.worker/.test(u))).toBe(false)
+
+  // Una respuesta inválida se vuelve a pedir, sin cortar el programa
+  await answer(d, 'hola', 'Valor invalido. Opciones validas: 1, -1')
+  await answer(d, '1', 'Ingrese una opcion:')
+
+  await answer(d, '2', 'Ingrese su nombre y apellido:')
+  await answer(d, 'Ana Pérez', 'Ingrese su performance')
+  await answer(d, '4', 'Ingrese su potencial')
+  await answer(d, '5', 'Ana Pérez, agregado correctamente')
+
+  await answer(d, '2', 'Ingrese su nombre y apellido:')
+  await answer(d, 'Juan Gómez', 'Ingrese su performance')
+  await answer(d, '9', 'Valor invalido. Opciones validas: 1, 2, 3, 4, 5')
+  await answer(d, '5', 'Ingrese su potencial')
+  await answer(d, '5', 'Juan Gómez, agregado correctamente')
+
+  await answer(d, '4', 'El mejor empleado es: Juan Gómez con un puntaje de 25')
+
+  // Reiniciar borra los empleados
+  await d.restart.click()
+  await expect(d.log).toContainText('Desea correr el programa?', { timeout: STEP_TIMEOUT })
+  await expect(d.log).not.toContainText('Ana Pérez')
+  await answer(d, '1', 'Ingrese una opcion:')
+  await answer(d, '4', 'No hay empleados cargados.')
+
+  // Salir: el programa termina y el foco pasa a Reiniciar
+  await answer(d, '5', '[Programa finalizado]')
+  await expect(d.input).toBeHidden()
+  await expect(d.restart).toBeFocused()
+
+  // Cerrar devuelve la figura y el foco al botón
+  await d.close.click()
+  await expect(d.region).toBeHidden()
+  await expect(d.open).toBeFocused()
+  await expect(d.figure).toBeVisible()
+})
+
+test('box9: axe y contraste AA con la terminal abierta', async ({ page }) => {
+  test.setTimeout(150_000)
+  test.skip(!['desktop', 'mobile'].includes(test.info().project.name), 'Una vez por tamaño alcanza')
+  const d = await openDemo(page, 'box9')
+  await expect(d.log).toContainText('Desea correr el programa?', { timeout: BOOT_TIMEOUT })
+  await answer(d, '1', 'Ingrese una opcion:')
+  await waitForAnimationsToFinish(page)
+  await expectNoA11yViolations(page, { include: '#live-box9' })
+  await expectReadableContrast(page, '#live-box9')
 })

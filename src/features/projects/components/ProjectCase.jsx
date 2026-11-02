@@ -107,7 +107,7 @@ export function ProjectCase({ project, caseRef }) {
         </div>
         {project.live && liveMounted && (
           <Suspense fallback={null}>
-            <LiveTerminal id={liveId} copy={c.live} hidden={!liveOpen} onClose={closeLive} />
+            <LiveTerminal id={liveId} program={project.id} copy={c.live} hidden={!liveOpen} onClose={closeLive} />
           </Suspense>
         )}
       </div>

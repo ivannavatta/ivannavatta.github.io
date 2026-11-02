@@ -5,7 +5,7 @@
 // lista. Los casos que no entraron esperan con opacity 0 y pointer-events none, y si reciben foco
 // de teclado el scroll salta hasta ellos. "Ver arquitectura" ↔ "Ver resumen" (aria-expanded).
 // Figuras con nombre accesible. Links con TextLink y aviso de pestaña nueva; el repo de Java es
-// privado y no se muestra; MyTube enlaza su app publicada. uadeHUB suma "Probar en vivo"
+// privado y no se muestra; MyTube enlaza su app publicada. uadeHUB y box9 suman "Probar en vivo"
 // (live-demo.spec.js).
 import {
   test,
@@ -227,7 +227,7 @@ test('Tab recorre los cuatro casos en orden y cada foco queda visible, sin nada 
 
   // Y de vuelta con Shift+Tab: al volver a un caso de atrás, tiene que quedar adelante
   const back = []
-  await w.article('box9').getByRole('button').focus()
+  await w.article('box9').getByRole('button', { name: /^Ver (arquitectura|resumen)$/ }).focus()
   for (let i = 0; i < 30; i++) {
     await page.keyboard.press('Shift+Tab')
     await expect.poll(async () => (await focusedVisibility(page)).opacity).toBe(1)

@@ -32,6 +32,7 @@ export const PROJECTS = [
   {
     id: 'box9',
     figure: 'matrix',
+    live: true,
     links: [{ key: 'repo', href: `${GITHUB}/box9` }],
   },
 ]
