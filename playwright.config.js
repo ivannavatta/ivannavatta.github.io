@@ -15,7 +15,7 @@
 //   desktop 1440x900 · tablet 768x1024 · mobile 375x812 (touch)
 //   desktop-reduced y mobile-reduced: igual, con prefers-reduced-motion: reduce
 import { defineConfig, devices } from '@playwright/test'
-import { BASE_URL, FAKE_EMAILJS, HOST, MAIL_OUT_DIR, MAIL_PORT, MAIL_URL, PORT } from './tests/e2e/helpers/servers.js'
+import { BASE_URL, FAKE_EMAILJS, HOST, MAIL_OUT_DIR, MAIL_PORT, MAIL_URL, NO_EMAILJS, PORT } from './tests/e2e/helpers/servers.js'
 
 const usePreview = process.env.E2E_SERVER !== 'dev'
 const reuse = process.env.E2E_REUSE === '1' || (!usePreview && !process.env.CI)
@@ -88,6 +88,7 @@ export default defineConfig({
         ? `npm run build && npm run preview -- --host ${HOST} --port ${PORT} --strictPort`
         : `npx vite --host ${HOST} --port ${PORT} --strictPort`,
       url: BASE_URL,
+      env: { ...NO_EMAILJS }, // sin claves aunque haya un .env local con las reales
       reuseExistingServer: reuse,
       timeout: usePreview ? 180_000 : 60_000,
       stdout: 'ignore',

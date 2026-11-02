@@ -15,6 +15,16 @@ export const MAIL_URL = `http://${HOST}:${MAIL_PORT}`
 /** Dentro de node_modules (ignorado por git) y separado de dist. */
 export const MAIL_OUT_DIR = 'node_modules/.cache/e2e-dist-mail'
 
+/**
+ * El build normal se testea SIN claves aunque exista un .env local con las reales: las variables
+ * del proceso tienen prioridad sobre el .env en Vite, y vacías cuentan como "sin configurar".
+ */
+export const NO_EMAILJS = {
+  VITE_EMAILJS_SERVICE_ID: '',
+  VITE_EMAILJS_TEMPLATE_ID: '',
+  VITE_EMAILJS_PUBLIC_KEY: '',
+}
+
 export const FAKE_EMAILJS = {
   VITE_EMAILJS_SERVICE_ID: 'service_prueba',
   VITE_EMAILJS_TEMPLATE_ID: 'template_prueba',

@@ -43,9 +43,11 @@
   background: var(--block-base);
 }
 
+/* Dos almacenes lado a lado; si la columna es angosta (mobile), uno debajo del otro:
+   "Cloudflare R2" no entra en media columna a 375 px */
 .stores {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 7.5rem), 1fr));
   gap: 6px;
   margin-top: 6px;
 }

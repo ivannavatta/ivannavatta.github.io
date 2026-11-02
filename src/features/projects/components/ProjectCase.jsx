@@ -1,19 +1,40 @@
-import { useState } from 'react'
+import { lazy, Suspense, useRef, useState } from 'react'
 import { TextLink } from '@/shared/components/TextLink/TextLink'
 import { copy } from '../i18n'
 import { CaseFigure } from './figures/CaseFigure'
 import styles from './Projects.module.css'
 
+// La terminal en vivo (y con ella Pyodide) se descarga recién cuando se va a usar: el bundle
+// inicial no crece. Pasar el cursor o el foco por el botón ya adelanta el JS del componente.
+const loadLiveTerminal = () => import('./live/LiveTerminal')
+const LiveTerminal = lazy(loadLiveTerminal)
+
 /**
- * Un caso: título, año y tipo, problema, rol, stack y repositorios. A la derecha, su figura;
- * "Ver arquitectura" la cambia, en el mismo lugar, por la arquitectura y las decisiones.
+ * Un caso: título, año y tipo, problema, rol, stack y links. A la derecha, su figura;
+ * "Ver arquitectura" la cambia, en el mismo lugar, por la arquitectura y las decisiones, y en los
+ * casos con `live`, "Probar en vivo" la cambia por una terminal que corre el programa real.
+ * Los dos botones se excluyen entre sí (comparten el estado, cada uno con su aria-expanded).
  */
 export function ProjectCase({ project, caseRef }) {
-  const [open, setOpen] = useState(false)
+  const [view, setView] = useState(null) // null | 'arch' | 'live'
+  const [liveMounted, setLiveMounted] = useState(false)
+  const liveButtonRef = useRef(null)
   const t = copy.projects
   const c = copy.cases[project.id]
   const titleId = `t-${project.id}`
   const panelId = `more-${project.id}`
+  const liveId = `live-${project.id}`
+  const archOpen = view === 'arch'
+  const liveOpen = view === 'live'
+
+  const toggleLive = () => {
+    setLiveMounted(true)
+    setView((v) => (v === 'live' ? null : 'live'))
+  }
+  const closeLive = () => {
+    setView(null)
+    liveButtonRef.current?.focus()
+  }
 
   return (
     <article ref={caseRef} className={styles.case} id={`case-${project.id}`} aria-labelledby={titleId}>
@@ -43,20 +64,38 @@ export function ProjectCase({ project, caseRef }) {
               <span className="sr-only"> {t.newTab}</span>
             </TextLink>
           ))}
-          <button
-            className={styles.more}
-            type="button"
-            aria-expanded={open}
-            aria-controls={panelId}
-            onClick={() => setOpen((v) => !v)}
-          >
-            {open ? t.less : t.more}
-          </button>
+          <div className={styles.buttons}>
+            {project.live && (
+              <button
+                ref={liveButtonRef}
+                className={styles.more}
+                type="button"
+                aria-expanded={liveOpen}
+                // Solo apunta a la terminal cuando existe (se monta al primer uso)
+                aria-controls={liveMounted ? liveId : undefined}
+                onClick={toggleLive}
+                onPointerEnter={loadLiveTerminal}
+                onFocus={loadLiveTerminal}
+              >
+                <span className={styles.dot} aria-hidden="true" />
+                {t.live}
+              </button>
+            )}
+            <button
+              className={styles.more}
+              type="button"
+              aria-expanded={archOpen}
+              aria-controls={panelId}
+              onClick={() => setView((v) => (v === 'arch' ? null : 'arch'))}
+            >
+              {archOpen ? t.less : t.more}
+            </button>
+          </div>
         </div>
       </div>
-      <div className={styles.side} data-open={open || undefined}>
+      <div className={styles.side} data-open={view ? true : undefined}>
         <CaseFigure kind={project.figure} copy={c.figure} id={project.id} />
-        <div className={styles.panel} id={panelId} hidden={!open} tabIndex={-1} data-lenis-prevent>
+        <div className={styles.panel} id={panelId} hidden={!archOpen} tabIndex={-1} data-lenis-prevent>
           <h4>{t.architecture}</h4>
           <p>{c.architecture}</p>
           <h4>{t.decisions}</h4>
@@ -66,6 +105,11 @@ export function ProjectCase({ project, caseRef }) {
             ))}
           </ul>
         </div>
+        {project.live && liveMounted && (
+          <Suspense fallback={null}>
+            <LiveTerminal id={liveId} copy={c.live} hidden={!liveOpen} onClose={closeLive} />
+          </Suspense>
+        )}
       </div>
     </article>
   )

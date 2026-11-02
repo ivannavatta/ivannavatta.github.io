@@ -5,7 +5,8 @@
 // lista. Los casos que no entraron esperan con opacity 0 y pointer-events none, y si reciben foco
 // de teclado el scroll salta hasta ellos. "Ver arquitectura" ↔ "Ver resumen" (aria-expanded).
 // Figuras con nombre accesible. Links con TextLink y aviso de pestaña nueva; el repo de Java es
-// privado y no se muestra; MyTube no enlaza el deploy.
+// privado y no se muestra; MyTube enlaza su app publicada. uadeHUB suma "Probar en vivo"
+// (live-demo.spec.js).
 import {
   test,
   expect,
@@ -31,6 +32,7 @@ const CASES = [
 const GITHUB = 'https://github.com/ivannavatta'
 const LINKS = {
   mytube: [
+    ['App en vivo', 'https://mytube-green.vercel.app'],
     ['Repositorio frontend', `${GITHUB}/mytube`],
     ['Repositorio backend', `${GITHUB}/mytube-backend`],
   ],
@@ -125,7 +127,7 @@ test('estructura: h2, bajada, cuatro article con su h3, ficha y botón', async (
   expect(decor.every(Boolean)).toBe(true)
 })
 
-test('links: repositorios con aviso de pestaña nueva; sin el repo privado de Java ni deploys', async ({ page }) => {
+test('links: repositorios y la app de MyTube con aviso de pestaña nueva; sin el repo privado de Java', async ({ page }) => {
   const w = work(page)
   for (const { id, name } of CASES) {
     const links = w.article(name).getByRole('link', { includeHidden: true })
@@ -148,8 +150,8 @@ test('links: repositorios con aviso de pestaña nueva; sin el repo privado de Ja
     .locator(`a[href^="${GITHUB}/"]`)
     .evaluateAll((as) => [...new Set(as.map((a) => a.getAttribute('href').replace(/\/+$/, '')))].sort())
   expect(repoLinks).toEqual([...ALLOWED_REPOS].sort())
-  // Ni el deploy de MyTube
-  await expect(page.locator('a[href*="vercel.app"]')).toHaveCount(0)
+  // El único deploy enlazado es la app de MyTube
+  await expect(page.locator('a[href*="vercel.app"]')).toHaveCount(1)
 })
 
 test('figuras con nombre accesible y su epígrafe', async ({ page }) => {
@@ -319,7 +321,7 @@ for (const size of [
       test.skip(!size.pinned, 'En lista el panel puede seguir debajo del pie: se desplaza normal')
       // stackFits() mide con los paneles cerrados: el panel abierto no puede agrandar el caso
       for (const { id } of CASES) {
-        const btn = page.locator(`#case-${id} button[aria-controls]`)
+        const btn = page.locator(`#case-${id} button[aria-controls^="more-"]`)
         await keyboardFocus(page, btn)
         await page.keyboard.press('Enter')
         await expect(page.locator(`#more-${id}`)).toBeVisible()

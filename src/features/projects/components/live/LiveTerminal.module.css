@@ -1,0 +1,253 @@
+/* ---------- Terminal en vivo (uadeHUB) ----------
+   Ocupa el lugar de la figura, como el panel de arquitectura (Projects.module.css: .side y .panel).
+   Entra en 220 ms y sale en 160 ms, solo opacidad y transform; display se anima de forma discreta. */
+.live {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  background: var(--surface);
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 220ms var(--ease-out),
+    transform 220ms var(--ease-out),
+    display 220ms allow-discrete;
+}
+
+@starting-style {
+  .live:not([hidden]) {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+.live[hidden] {
+  display: none;
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease,
+    display 160ms allow-discrete;
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--step-small);
+  color: var(--soft);
+}
+
+/* Un bloque del IN: gris cargando o terminado, acento corriendo, error en rojo */
+.status {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  background: var(--soft);
+}
+
+.status[data-state='ready'] {
+  background: var(--accent);
+}
+
+.status[data-state='error'] {
+  background: var(--error);
+}
+
+.tool {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: var(--step-small);
+  font-weight: 500;
+  text-decoration: underline 1px var(--soft);
+  text-underline-offset: 5px;
+  transition: text-decoration-color 200ms ease;
+}
+
+.tool:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tool:not(:disabled):hover {
+    text-decoration-color: var(--accent);
+  }
+}
+
+.term {
+  position: relative;
+  min-height: 0;
+  padding: 18px 20px 22px;
+  background: var(--console-bg);
+  overflow: auto;
+  overscroll-behavior: contain;
+  cursor: text;
+  scrollbar-color: var(--block-base) transparent;
+}
+
+.term:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Salida real del programa: monoespaciada y sin ligaduras (=== y -- se leen tal cual) */
+.out {
+  font: 0.875rem/1.6 var(--mono);
+  color: var(--ink);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-variant-ligatures: none;
+}
+
+.out :global(.err) {
+  color: var(--error);
+}
+
+.out :global(.sys) {
+  color: var(--soft);
+}
+
+.out :global(.typed) {
+  color: var(--accent);
+}
+
+.prompt {
+  display: inline;
+}
+
+.prompt input {
+  width: 18ch;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: inherit;
+  font-variant-ligatures: none;
+  color: var(--accent);
+  caret-color: var(--accent);
+}
+
+/* El foco lo marca la terminal entera (.term:focus-within) */
+.prompt input:focus-visible {
+  outline: 0;
+}
+
+.prompt input:disabled {
+  display: none;
+}
+
+/* Carga: una fila de bloques que se va llenando (sin porcentaje inventado) */
+.loading {
+  display: grid;
+  gap: 14px;
+  place-content: center;
+  justify-items: center;
+  height: 100%;
+  text-align: center;
+  color: var(--soft);
+  font-size: var(--step-small);
+}
+
+.bricks {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}
+
+.bricks span {
+  width: 14px;
+  height: 14px;
+  background: var(--block-base);
+  animation: brick 1.2s var(--ease-out) infinite;
+}
+
+.bricks span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.bricks span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.bricks span:nth-child(4) {
+  animation-delay: 0.45s;
+}
+
+/* Con error de carga la fila se queda quieta */
+.loading[data-error] .bricks span {
+  animation: none;
+}
+
+@keyframes brick {
+  0%,
+  100% {
+    background: var(--block-base);
+  }
+  40% {
+    background: var(--accent);
+  }
+}
+
+.hint {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  font-size: var(--step-small);
+  color: var(--soft);
+}
+
+.hint kbd {
+  padding: 1px 6px;
+  background: var(--surface-2);
+  color: var(--ink);
+  font: 500 0.8125rem var(--mono);
+}
+
+/* ---------- Tablet y mobile: debajo del texto, con alto propio ---------- */
+@media (max-width: 1023px) {
+  .live {
+    position: relative;
+    inset: auto;
+    height: min(560px, 72svh);
+  }
+
+  .out {
+    font-size: 0.8125rem;
+  }
+
+  .term {
+    padding: 14px 14px 18px;
+  }
+}
+
+/* ---------- Movimiento reducido (convención del sitio: html.reduced) ---------- */
+:global(html.reduced) .bricks span {
+  animation: none;
+}
+
+:global(html.reduced) .live,
+:global(html.reduced) .live[hidden] {
+  transform: none;
+}
+
+@starting-style {
+  :global(html.reduced) .live:not([hidden]) {
+    transform: none;
+  }
+}

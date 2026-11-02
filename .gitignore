@@ -35,3 +35,6 @@ dist-ssr
 # Variables de entorno (cualquier modo de Vite; solo se versiona el ejemplo)
 .env*
 !.env.example
+
+# Pyodide para "Probar en vivo" de uadeHUB: lo copia scripts/copy-pyodide.mjs desde node_modules
+/public/pyodide/

@@ -32,6 +32,8 @@ function contentSecurityPolicy() {
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), contentSecurityPolicy()],
+  // Workers como módulos ES: el de "Probar en vivo" importa Pyodide (public/pyodide/) en tiempo de ejecución
+  worker: { format: 'es' },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),

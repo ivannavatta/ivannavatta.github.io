@@ -1,0 +1,33 @@
+nombre = Piso 10-Uade Comunitario
+tipo = Coworking
+descripcion = Espacio compartido con escritorios, salas y enchufes
+[privados]
+numero=1, estado=0, enchufe=True, pizarron=False
+numero=2, estado=0, enchufe=True, pizarron=True
+numero=3, estado=0, enchufe=False, pizarron=False
+[salas]
+numero=1, estado=0, enchufe=True, pizarron=True
+numero=2, estado=0, enchufe=False, pizarron=True
+---
+nombre = Piso 10-UADEHUB
+tipo = Oficinas
+descripcion = Espacios cerrados con más privacidad
+[privados]
+numero=1, estado=0, enchufe=True, pizarron=False
+numero=2, estado=0, enchufe=True, pizarron=True
+numero=3, estado=0, enchufe=False, pizarron=False
+[salas]
+numero=1, estado=0, enchufe=True, pizarron=True
+numero=2, estado=0, enchufe=False, pizarron=True
+---
+nombre = Piso Silencioso
+tipo = Laboratorio
+descripcion = Área técnica con mesas y pizarrones
+[privados]
+numero=1, estado=0, enchufe=True, pizarron=False
+numero=2, estado=0, enchufe=True, pizarron=True
+numero=3, estado=0, enchufe=False, pizarron=False
+[salas]
+numero=1, estado=0, enchufe=True, pizarron=True
+numero=2, estado=0, enchufe=False, pizarron=True
+---

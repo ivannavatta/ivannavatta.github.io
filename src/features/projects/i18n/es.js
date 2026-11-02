@@ -4,6 +4,7 @@ export const projects = {
     'Cuatro sistemas: una plataforma de videos full stack, un trabajo de estructuras de datos en Java y dos herramientas en Python para la facultad.',
   facts: { problem: 'Problema', role: 'Rol', stack: 'Stack' },
   more: 'Ver arquitectura',
+  live: 'Probar en vivo',
   less: 'Ver resumen',
   architecture: 'Arquitectura',
   decisions: 'Decisiones',
@@ -12,6 +13,7 @@ export const projects = {
     frontend: 'Repositorio frontend',
     backend: 'Repositorio backend',
     repo: 'Repositorio',
+    app: 'App en vivo',
   },
 }
 
@@ -22,21 +24,21 @@ export const cases = {
     problem: 'Subir y ver videos con cuentas propias: autenticación, archivos pesados y una interfaz que pueda crecer.',
     role: 'Desarrollo completo: frontend, backend, base de datos y deploy.',
     stack:
-      'React 18, TypeScript, MUI, React-Bootstrap, React Router, Express, MongoDB, Mongoose, JWT, bcrypt, Multer, Google Cloud Storage, Vercel',
+      'React 18, TypeScript, MUI, React-Bootstrap, React Router, Express, MongoDB, Mongoose, bcrypt, Cloudflare R2, Vercel',
     architecture:
       'El frontend separa dominio, contexto, servicios externos y la capa de React. El backend sigue controllers, services y useCases, con DAO y DTO sobre Mongoose.',
     decisions: [
-      'Sesión con JWT en cookies y contraseñas con bcrypt.',
-      'Los videos suben con Multer a Google Cloud Storage; la base guarda los datos de cada video.',
+      'Contraseñas guardadas como hash con bcrypt.',
+      'El backend firma una URL y el navegador sube el video directo a Cloudflare R2: el archivo no pasa por Vercel, que limita cada pedido a 4,5 MB. Después, MongoDB guarda sus datos.',
       'DAO y DTO para cambiar la persistencia sin tocar la lógica.',
     ],
     figure: {
       frontend: 'Frontend · React + TypeScript',
       frontendLayers: ['frameworks-ui', 'external services', 'context', 'domain'],
-      link: 'HTTP + JWT en cookie',
+      link: 'HTTP + JSON',
       backend: 'Backend · Express + TypeScript',
       backendLayers: ['controllers', 'services', 'useCases', 'DAO · DTO'],
-      stores: ['MongoDB', 'Cloud Storage'],
+      stores: ['MongoDB', 'Cloudflare R2'],
       caption: 'Capas del frontend y del backend, de la interfaz a los datos.',
     },
   },
@@ -83,6 +85,31 @@ export const cases = {
       after:
         '\nEl legajo debe tener 7 dígitos. Volvé a ingresarlo: _\n\nPisos disponibles:\n1 Piso 10-Uade Comunitario\n2 Piso 10-UADEHUB\n3 Piso Silencioso\n\nElegí un piso: _',
       caption: 'Textos reales del programa; el legajo es un ejemplo inválido.',
+    },
+    // "Probar en vivo": el main.py real, con Python 3.14 (Pyodide) en un Web Worker
+    live: {
+      label: 'uadeHUB en vivo',
+      status: {
+        loading: 'Python 3.14 en tu navegador',
+        running: 'Python 3.14 en tu navegador · ejecutando main.py',
+        done: 'Programa finalizado · Reiniciar para volver a empezar',
+        error: 'El programa terminó con un error',
+        bootError: 'Error al cargar',
+      },
+      restart: 'Reiniciar',
+      close: 'Cerrar',
+      retry: 'Reintentar',
+      loading: 'Descargando Python (≈ 6 MB, solo la primera vez)…',
+      bootError: 'No se pudo cargar Python. Revisá tu conexión y volvé a intentar.',
+      output: 'Salida del programa',
+      answer: 'Tu respuesta',
+      finished: '[Programa finalizado]',
+      hints: [
+        { text: 'Escribí y apretá', key: 'Enter' },
+        { text: 'Legajo: 7 dígitos' },
+        { text: 'Contraseña de admin:', key: 'uade' },
+        { text: 'Los datos viven en tu navegador y se borran al reiniciar' },
+      ],
     },
   },
   box9: {

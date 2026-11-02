@@ -1,6 +1,6 @@
 import styles from './Figures.module.css'
 
-/** MyTube: capas del frontend y del backend, unidas por HTTP + JWT. */
+/** MyTube: capas del frontend y del backend, unidas por HTTP + JSON. */
 export function LayersFigure({ copy }) {
   return (
     <figure className={`${styles.fig} ${styles.layers}`}>

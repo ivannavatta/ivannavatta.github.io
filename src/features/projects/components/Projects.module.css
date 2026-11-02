@@ -112,6 +112,37 @@
   color: var(--accent-ink);
 }
 
+/* "Probar en vivo" y "Ver arquitectura", juntos y separados de los links */
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.more {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* El botón en vivo: un cuadrado de acento, como los bloques del IN */
+.dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  background: var(--accent);
+}
+
+.more[aria-expanded='true'] .dot {
+  background: var(--accent-ink);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .more:not([aria-expanded='true']):hover {
+    background: var(--block-base);
+  }
+}
+
 /* Figura y panel comparten lugar: el panel la reemplaza sin mover el resto del caso */
 .side {
   position: relative;
