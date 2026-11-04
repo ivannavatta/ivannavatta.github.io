@@ -4,9 +4,9 @@
 // casos apilados solo si el ancho es ≥1024, el alto ≥700 y el caso más alto entra entero; si no,
 // lista. Los casos que no entraron esperan con opacity 0 y pointer-events none, y si reciben foco
 // de teclado el scroll salta hasta ellos. "Ver arquitectura" ↔ "Ver resumen" (aria-expanded).
-// Figuras con nombre accesible. Links con TextLink y aviso de pestaña nueva; el repo de Java es
-// privado y no se muestra; MyTube enlaza su app publicada. uadeHUB y box9 suman "Probar en vivo"
-// (live-demo.spec.js).
+// Figuras con nombre accesible. Links con TextLink y aviso de pestaña nueva; MyTube enlaza su app
+// publicada y el TPO de Java su repositorio (ya público). Sistema de transporte, uadeHUB y box9
+// suman "Probar en vivo" (live-demo.spec.js); MyTube no.
 import {
   test,
   expect,
@@ -21,6 +21,11 @@ import {
   expectVisibleFocus,
   findCoveredContent,
   keyboardFocus,
+  waitForScrollSettled,
+  placeAt,
+  startScrollTrace,
+  scrollTrace,
+  expectRevealed,
 } from './helpers/index.js'
 
 const CASES = [
@@ -36,10 +41,13 @@ const LINKS = {
     ['Repositorio frontend', `${GITHUB}/mytube`],
     ['Repositorio backend', `${GITHUB}/mytube-backend`],
   ],
-  transporte: [], // repo privado: no se muestra
+  transporte: [['Repositorio', `${GITHUB}/-UADE-2025-PROGRA-II`]], // el TPO de Java, público desde la ronda 9
   uadehub: [['Repositorio', `${GITHUB}/uadeHUB`]],
   box9: [['Repositorio', `${GITHUB}/box9`]],
 }
+
+/** Casos con "Probar en vivo" (data/projects.js, `live: true`). */
+const LIVE = ['transporte', 'uadehub', 'box9']
 
 const isReducedProject = () => test.info().project.use.reducedMotion === 'reduce'
 
@@ -116,6 +124,14 @@ test('estructura: h2, bajada, cuatro article con su h3, ficha y botón', async (
     await expect(more).toHaveAttribute('aria-expanded', 'false')
     await expect(more).toHaveAttribute('aria-controls', `more-${id}`)
     await expect(page.locator(`#more-${id}`)).toBeHidden()
+    // "Probar en vivo" (live-demo.spec.js): todos menos MyTube, cerrado y sin terminal montada
+    const live = a.getByRole('button', { name: 'Probar en vivo' })
+    await expect(live, name).toHaveCount(LIVE.includes(id) ? 1 : 0)
+    if (LIVE.includes(id)) {
+      await expect(live).toHaveAttribute('aria-expanded', 'false')
+      await expect(live).toHaveAttribute('type', 'button')
+      await expect(page.locator(`#live-${id}`)).toHaveCount(0)
+    }
   }
   // Orden de los casos
   await expect(w.section.getByRole('heading', { level: 3 })).toHaveText(CASES.map((c) => c.name))
@@ -127,7 +143,7 @@ test('estructura: h2, bajada, cuatro article con su h3, ficha y botón', async (
   expect(decor.every(Boolean)).toBe(true)
 })
 
-test('links: repositorios y la app de MyTube con aviso de pestaña nueva; sin el repo privado de Java', async ({ page }) => {
+test('links: repositorios (también el del TPO de Java) y la app de MyTube con aviso de pestaña nueva', async ({ page }) => {
   const w = work(page)
   for (const { id, name } of CASES) {
     const links = w.article(name).getByRole('link', { includeHidden: true })
@@ -141,11 +157,11 @@ test('links: repositorios y la app de MyTube con aviso de pestaña nueva; sin el
       await expect(link).toHaveAttribute('rel', /noreferrer/)
     }
   }
-  // Transporte no enlaza nada (su repositorio es privado)
-  await expect(w.article('Sistema de transporte').locator('a')).toHaveCount(0)
-  // En toda la página, los únicos repositorios enlazados son los permitidos (lista cerrada: no se
-  // nombra ningún repo privado en los tests). El perfil de GitHub, sin ruta, no cuenta.
-  const ALLOWED_REPOS = ['mytube', 'mytube-backend', 'uadeHUB', 'box9'].map((r) => `${GITHUB}/${r}`)
+  // Transporte enlaza solo su repositorio: ningún otro <a> en el caso
+  await expect(w.article('Sistema de transporte').locator('a')).toHaveCount(1)
+  // En toda la página, los únicos repositorios enlazados son los permitidos (lista cerrada: un repo
+  // nuevo tiene que sumarse acá a propósito). El perfil de GitHub, sin ruta, no cuenta.
+  const ALLOWED_REPOS = ['mytube', 'mytube-backend', '-UADE-2025-PROGRA-II', 'uadeHUB', 'box9'].map((r) => `${GITHUB}/${r}`)
   const repoLinks = await page
     .locator(`a[href^="${GITHUB}/"]`)
     .evaluateAll((as) => [...new Set(as.map((a) => a.getAttribute('href').replace(/\/+$/, '')))].sort())
@@ -339,6 +355,139 @@ for (const size of [
         expect(r, `${id}: texto del panel cortado o tapado`).toEqual([])
         await page.keyboard.press('Enter')
       }
+    })
+  })
+}
+
+/* ---------------- "Ver arquitectura" se trae a la vista al abrirse (useRevealOnOpen) ---------------- */
+// Debajo de 1024 px el panel se abre debajo del texto del caso. Si no se ve entero, la página se
+// desplaza lo justo (Lenis en 0,6 s; con movimiento reducido, de un salto) y lo deja debajo de la
+// barra fija. El foco no se mueve: queda en el botón. Con los casos apilados no se mueve nada.
+
+const isNarrowProject = () => (test.info().project.use.viewport?.width ?? 1440) < 1024
+
+test.describe('mobile y tablet: el panel de arquitectura se trae a la vista', () => {
+  test.beforeEach(() => {
+    test.skip(!isNarrowProject(), 'Debajo de 1024 px el panel se abre debajo del texto del caso')
+  })
+
+  test('con el botón en el tercio de abajo, cada panel queda entero bajo la barra y el foco sigue en el botón', async ({ page }) => {
+    const w = work(page)
+    const vh = page.viewportSize().height
+    for (const { id, name } of CASES) {
+      const btn = w.article(name).getByRole('button', { name: /^Ver (arquitectura|resumen)$/ })
+      const panel = page.locator(`#more-${id}`)
+      const box = await placeAt(page, btn, 0.85)
+      expect(box.y, `${name}: el botón quedó en el tercio de abajo`).toBeGreaterThan((vh * 2) / 3)
+      const y0 = await waitForScrollSettled(page)
+
+      await startScrollTrace(page)
+      await btn.click()
+      await expect(btn).toHaveAttribute('aria-expanded', 'true')
+      await expectRevealed(panel, `${name}: panel de arquitectura`)
+      await waitForScrollSettled(page)
+      const trace = await scrollTrace(page)
+      expect(trace.to - y0, `${name}: la página bajó hasta el panel`).toBeGreaterThan(40)
+      if (isReducedProject()) expect(trace.steps, `${name}: reducido, un salto (${JSON.stringify(trace)})`).toBe(0)
+      else expect(trace.steps, `${name}: con movimiento, animado (${JSON.stringify(trace)})`).toBeGreaterThan(3)
+      await expect(btn, `${name}: el foco no se mueve al panel`).toBeFocused()
+      await expect(btn).toBeInViewport() // el botón para cerrarlo sigue a la vista
+
+      await btn.click() // cerrar antes del caso siguiente
+      await expect(panel).toBeHidden()
+    }
+  })
+
+  test('si el panel ya entra entero, la página no se mueve', async ({ page }) => {
+    const w = work(page)
+    const btn = w.article('Sistema de transporte').getByRole('button', { name: 'Ver arquitectura' })
+    await placeAt(page, btn, 0.14)
+    await waitForScrollSettled(page)
+    await startScrollTrace(page)
+    await btn.click()
+    await expect(page.locator('#more-transporte')).toBeVisible()
+    await waitForAnimationsToFinish(page, '#case-transporte')
+    await waitForScrollSettled(page)
+    await expectRevealed(page.locator('#more-transporte'), 'panel de transporte')
+    const trace = await scrollTrace(page)
+    expect(trace.maxDrift, `scrollY se movió (${JSON.stringify(trace)})`).toBeLessThan(1)
+  })
+})
+
+/* Escritorio con los casos apilados: abrir el panel no mueve la página */
+for (const size of [
+  { width: 1024, height: 900 },
+  { width: 1440, height: 900 },
+]) {
+  test.describe(`${size.width}×${size.height} apilado: el panel no mueve la página`, () => {
+    test.use({ viewport: { width: size.width, height: size.height } })
+    test.beforeEach(() => {
+      test.skip(test.info().project.name !== 'desktop', 'Tamaño fijo: corre solo en el proyecto desktop')
+    })
+
+    test('abrir "Ver arquitectura" en cada caso no mueve scrollY', async ({ page }) => {
+      await expect(work(page).spacer, 'hay pin (casos apilados)').toHaveCount(1)
+      for (const { id, name } of CASES) {
+        const btn = page.locator(`#case-${id}`).getByRole('button', { name: /^Ver (arquitectura|resumen)$/ })
+        const panel = page.locator(`#more-${id}`)
+        await keyboardFocus(page, btn) // trae el caso al frente del apilado
+        await waitForAnimationsToFinish(page, '#proyectos')
+        await waitForScrollSettled(page)
+        await startScrollTrace(page)
+        await page.keyboard.press('Enter')
+        await expect(panel).toBeVisible()
+        await waitForAnimationsToFinish(page, `#case-${id}`)
+        await waitForScrollSettled(page)
+        const trace = await scrollTrace(page)
+        expect(trace.maxDrift, `${name}: scrollY se movió con los casos apilados (${JSON.stringify(trace)})`).toBeLessThan(1)
+        await expect(panel, `${name}: el panel entra entero`).toBeInViewport({ ratio: 1 })
+        await page.keyboard.press('Enter') // cerrar
+        await expect(panel).toBeHidden()
+      }
+    })
+  })
+}
+
+/* ---------------- Controles de cada caso (transporte-stack-fit, corregido) ---------------- */
+// Corregido en Projects.module.css (columnas minmax(0, …), gaps y padding de los botones): a 1024
+// los tres controles de transporte entran en una fila y el caso vuelve a entrar en el apilado.
+// Sin pin a 1280×800, 1366×768 y 1536×864 es el comportamiento previo (no es un bug): se anota.
+for (const size of [
+  { width: 1024, height: 900, pinned: true },
+  { width: 1280, height: 800 },
+  { width: 1366, height: 768 },
+  { width: 1440, height: 900, pinned: true },
+  { width: 1536, height: 864 },
+]) {
+  test.describe(`${size.width}×${size.height} controles`, () => {
+    test.use({ viewport: { width: size.width, height: size.height } })
+    test.beforeEach(() => {
+      test.skip(test.info().project.name !== 'desktop', 'Tamaño fijo: corre solo en el proyecto desktop')
+    })
+
+    test('transporte en una fila, botones de 44 px y sin overflow', async ({ page }) => {
+      const pin = await work(page).spacer.count()
+      test.info().annotations.push({ type: 'pin', description: `${size.width}×${size.height}: ${pin ? 'apilado' : 'lista'}` })
+      if (size.pinned) expect(pin, 'con pin').toBe(1)
+
+      const rows = await page.evaluate(() =>
+        Object.fromEntries(
+          [...document.querySelectorAll('#proyectos article')].map((a) => {
+            const controls = [...a.querySelectorAll('a, button[aria-expanded]')].map((el) => el.getBoundingClientRect())
+            const tops = [...new Set(controls.map((r) => Math.round(r.top + r.height / 2)))]
+            const rowsCount = tops.filter((t, i) => tops.findIndex((u) => Math.abs(u - t) < 12) === i).length
+            const buttons = [...a.querySelectorAll('button[aria-expanded]')].map((b) => Math.round(b.getBoundingClientRect().height))
+            return [a.id.replace('case-', ''), { rows: rowsCount, buttons }]
+          }),
+        ),
+      )
+      expect(rows.transporte.rows, `transporte: controles en ${rows.transporte.rows} filas`).toBe(1)
+      if (size.width >= 1536) expect(rows.mytube.rows, 'MyTube en una fila a 1536').toBe(1)
+      for (const [id, r] of Object.entries(rows)) {
+        for (const h of r.buttons) expect(h, `${id}: alto de botón`).toBeGreaterThanOrEqual(44)
+      }
+      await jumpTo(page, '#proyectos')
+      await expectNoHorizontalOverflow(page)
     })
   })
 }

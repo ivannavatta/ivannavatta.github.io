@@ -12,3 +12,4 @@ export { SECTIONS, NAV_LINKS, NAV, NAV_THRESHOLDS, MOBILE_MAX, PROJECTS, EMAIL }
 export { measureTextContrast, expectReadableContrast, SEAM_BLOCKS } from './contrast.js'
 export { findTextUnderSeams, surfaceUnderHeader, borderSweep } from './seams.js'
 export { dominantColor, dominantColors, colorDistance, contrastRatio, parseRgb } from './pixels.js'
+export { placeAt, startScrollTrace, scrollTrace, viewportFit, expectRevealed } from './reveal.js'

@@ -6,6 +6,7 @@
   "scripts": {
     "fonts": "node scripts/fetch-fonts.mjs",
     "pyodide": "node scripts/copy-pyodide.mjs",
+    "transporte": "node scripts/build-transporte.mjs",
     "dev": "node scripts/fetch-fonts.mjs && node scripts/copy-pyodide.mjs && vite",
     "build": "node scripts/fetch-fonts.mjs && node scripts/copy-pyodide.mjs && vite build",
     "lint": "oxlint",

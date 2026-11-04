@@ -17,8 +17,9 @@ export const projects = {
   },
 }
 
-// "Probar en vivo": el main.py real, con Python 3.14 (Pyodide) en un Web Worker. Textos comunes a
-// todas las terminales; cada caso suma su label y sus ayudas.
+// "Probar en vivo": el programa real en un Web Worker. Textos comunes a todas las terminales, con
+// los de carga escritos para Python 3.14 (Pyodide: uadeHUB y box9); cada caso suma su label y sus
+// ayudas, y el TPO de Java (transporte) reemplaza los de carga.
 const LIVE_TERMINAL = {
   status: {
     loading: 'Python 3.14 en tu navegador',
@@ -82,6 +83,25 @@ export const cases = {
         'Grafo de siete terminales conectadas y una suelta; resaltada, una ruta de A a G con dos paradas intermedias.',
       offline: 'sin conexión',
       caption: 'Ruta de A a G con un tope de tres tramos; la terminal sin conexiones queda afuera.',
+    },
+    // Main.java real, compilado a JavaScript con TeaVM (live/transporte.worker.js): sin Pyodide
+    live: {
+      ...LIVE_TERMINAL,
+      status: {
+        ...LIVE_TERMINAL.status,
+        loading: 'Java (TeaVM) en tu navegador',
+        running: 'Java (TeaVM) en tu navegador · ejecutando Main.java',
+      },
+      loading: 'Cargando Main.java, compilado a JavaScript con TeaVM (≈ 75 KB)…',
+      bootError: 'No se pudo cargar el programa. Revisá tu conexión y volvé a intentar.',
+      label: 'Sistema de transporte en vivo',
+      hints: [
+        { text: 'Escribí el número y apretá', key: 'Enter' },
+        { text: 'Probá 3 → 4: caminos de BUE a BRC' },
+        { text: 'Terminales: BUE, ROS, COR, MDZ, NQN, BRC…' },
+        { text: 'Micros: AA-001-AA a EE-015-EE' },
+        { text: 'Los datos se borran al reiniciar' },
+      ],
     },
   },
   uadehub: {

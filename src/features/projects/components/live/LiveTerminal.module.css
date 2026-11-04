@@ -1,4 +1,4 @@
-/* ---------- Terminal en vivo (uadeHUB) ----------
+/* ---------- Terminal en vivo (uadeHUB, box9, Sistema de transporte) ----------
    Ocupa el lugar de la figura, como el panel de arquitectura (Projects.module.css: .side y .panel).
    Entra en 220 ms y sale en 160 ms, solo opacidad y transform; display se anima de forma discreta. */
 .live {

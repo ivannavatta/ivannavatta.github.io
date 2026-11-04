@@ -1,10 +1,11 @@
 import { lazy, Suspense, useRef, useState } from 'react'
 import { TextLink } from '@/shared/components/TextLink/TextLink'
+import { useRevealOnOpen } from '../hooks/useRevealOnOpen'
 import { copy } from '../i18n'
 import { CaseFigure } from './figures/CaseFigure'
 import styles from './Projects.module.css'
 
-// La terminal en vivo (y con ella Pyodide) se descarga recién cuando se va a usar: el bundle
+// La terminal en vivo (y con ella el programa) se descarga recién cuando se va a usar: el bundle
 // inicial no crece. Pasar el cursor o el foco por el botón ya adelanta el JS del componente.
 const loadLiveTerminal = () => import('./live/LiveTerminal')
 const LiveTerminal = lazy(loadLiveTerminal)
@@ -19,6 +20,7 @@ export function ProjectCase({ project, caseRef }) {
   const [view, setView] = useState(null) // null | 'arch' | 'live'
   const [liveMounted, setLiveMounted] = useState(false)
   const liveButtonRef = useRef(null)
+  const panelRef = useRef(null)
   const t = copy.projects
   const c = copy.cases[project.id]
   const titleId = `t-${project.id}`
@@ -26,6 +28,8 @@ export function ProjectCase({ project, caseRef }) {
   const liveId = `live-${project.id}`
   const archOpen = view === 'arch'
   const liveOpen = view === 'live'
+  // En mobile el panel se abre debajo del texto: si queda fuera de pantalla, se trae a la vista
+  useRevealOnOpen({ ref: panelRef, open: archOpen })
 
   const toggleLive = () => {
     setLiveMounted(true)
@@ -95,7 +99,7 @@ export function ProjectCase({ project, caseRef }) {
       </div>
       <div className={styles.side} data-open={view ? true : undefined}>
         <CaseFigure kind={project.figure} copy={c.figure} id={project.id} />
-        <div className={styles.panel} id={panelId} hidden={!archOpen} tabIndex={-1} data-lenis-prevent>
+        <div ref={panelRef} className={styles.panel} id={panelId} hidden={!archOpen} tabIndex={-1} data-lenis-prevent>
           <h4>{t.architecture}</h4>
           <p>{c.architecture}</p>
           <h4>{t.decisions}</h4>

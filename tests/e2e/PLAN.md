@@ -138,7 +138,9 @@ Cubre `Button`, `TextLink`, la nav y cualquier componente nuevo sin test propio:
       `aria-labelledby`, h3, ficha Problema/Rol/Stack y "Ver arquitectura" (`aria-expanded`,
       `aria-controls`); base de ladrillos `aria-hidden`.
 - [x] Links: repositorios con "(se abre en otra pestaña)", `target="_blank"` y `rel` seguro;
-      Transporte sin links (repo privado); ningún link al TPO ni al deploy de MyTube.
+      lista cerrada de repos (Transporte enlaza `-UADE-2025-PROGRA-II` desde la ronda 9); el único
+      deploy enlazado es la app de MyTube.
+- [x] "Probar en vivo" en Transporte, uadeHUB y box9 (no en MyTube), cerrado y sin terminal montada.
 - [x] Figuras con epígrafe; grafo `role="img"` con `<title>` y letras ocultas; consola en
       `pre > code` con `<mark>`; matriz `role="img"` con `aria-label`.
 - [x] "Ver arquitectura" ↔ "Ver resumen" con Enter y Espacio; el foco no se pierde; vuelve la figura.
@@ -147,8 +149,47 @@ Cubre `Button`, `TextLink`, la nav y cualquier componente nuevo sin test propio:
 - [x] Pin con rueda real en 1440×900 y 1024×900 (apila en orden, el último queda adelante, los que
       esperan no capturan el puntero) y lista en 1440×700; la bajada nunca queda tapada; sin overflow.
 - [x] Con el panel abierto en el apilado, el caso entra entero y nada lo tapa.
+- [x] Bug `transporte-stack-fit` (ronda 9) corregido en la ronda 10: a 1024 los tres controles de
+      transporte entran en una fila y hay pin a 1024×900. Test de controles a 1024×900, 1280×800,
+      1366×768, 1440×900 y 1536×864: transporte en una fila (MyTube también a 1536), botones ≥44 px
+      de alto y sin overflow; el estado del pin se anota (sin pin a 1280×800, 1366×768 y 1536×864 es
+      el comportamiento previo y está bien).
+- [x] "Ver arquitectura" se trae a la vista (`useRevealOnOpen`, ronda 10). Mobile, tablet y
+      mobile-reduced: con el botón en el tercio de abajo, cada panel queda entero debajo de la barra
+      fija, animado con Lenis o de un salto en reducido, y el foco sigue en el botón; si ya entra
+      entero, `scrollY` no se mueve. 1024×900 y 1440×900 apilados: abrir el panel de cada caso no
+      mueve `scrollY` (registro de `scrollY` cuadro a cuadro, helper `reveal.js`).
 - [x] Inclinación 3D solo con puntero fino.
 - [x] axe y contraste propio, también con un panel abierto. Reducido: lista, sin pin ni transform.
+
+### 4c. "Probar en vivo" — `live-demo.spec.js` ✅ (rondas 8, 9 y 10)
+Terminal que corre el programa real en un Web Worker (`live/programs.js`), bajo la CSP del build.
+uadeHUB y box9: `main.py` con Pyodide servido desde `public/pyodide/`; Reiniciar le avisa al mismo
+worker. Sistema de transporte: `Main.java` compilado con TeaVM (`transporte.worker.js`, sin Pyodide);
+Reiniciar crea un worker nuevo (`restart: 'respawn'`). Un init script (`trackWorkers`) anota los
+workers creados y terminados.
+- [x] Nada se descarga hasta tocar el botón; después, solo del propio sitio. Transporte: un único
+      script (su worker), ni Pyodide ni los workers de Python.
+- [x] uadeHUB: login con validación, reserva, Reiniciar sin recargar Python, cerrar/reabrir con la
+      sesión y el foco; excluye "Ver arquitectura"; salir pasa el foco a Reiniciar; doble clic en
+      Reiniciar deja un solo `main.py` (regresión `live-restart-race`).
+- [x] box9: validación de entradas, alta de empleados, el mejor, Reiniciar borra, salir y cerrar.
+- [x] Transporte: menú y estado "Java (TeaVM)…"; error de entrada ("x"); DFS BUE → BRC con máximo 2
+      paradas; micros con más asignaciones; alta de AEP y Reiniciar a mitad de otra alta → salida
+      limpia (un solo menú, nada viejo, lo tipeado descartado), 1 worker vivo y AEP ya no existe;
+      doble clic en Reiniciar → un solo menú y la línea llega a un solo programa; salir con 0 →
+      "Saliendo..." y "[Programa finalizado]", Reiniciar desde ahí; cerrar/reabrir conserva la sesión;
+      excluye "Ver arquitectura".
+- [x] Las tres: la terminal entra entera, nada la tapa, sin overflow (también 375 px); axe y
+      contraste AA en `desktop` y `mobile`.
+- [x] Al abrirse, la terminal se trae a la vista (`useRevealOnOpen` + `focusIfWaiting`, ronda 10;
+      era la observación de la ronda 9). Mobile, tablet y mobile-reduced, transporte: con el botón en
+      el tercio de abajo, la terminal queda entera, debajo de la barra y a ~16 px del borde de abajo;
+      animado con Lenis, de un salto en reducido; el input toma el foco y se escribe directo; cerrar,
+      bajar y reabrir con Enter la trae de nuevo y enfoca el programa que esperaba (sin otro worker);
+      si ya entra entera, `scrollY` no se mueve. uadeHUB en mobile: se ve entera mientras carga
+      Pyodide y el input toma el foco al pedir la primera línea. 1024×900 y 1440×900 apilados: abrir
+      la terminal no mueve `scrollY` y el input toma el foco.
 
 ### 4b. Costuras y cabecera — `seams.spec.js` ✅ (ronda 4)
 - [x] Con movimiento, una costura por cada borde claro/oscuro; en reducido, ninguna.

@@ -1,15 +1,17 @@
 import { useRef } from 'react'
 import { useLiveProgram } from '../../hooks/useLiveProgram'
+import { useRevealOnOpen } from '../../hooks/useRevealOnOpen'
 import styles from './LiveTerminal.module.css'
 
 const STATE = { loading: 'idle', 'boot-error': 'error', running: 'ready', done: 'idle', error: 'error' }
 const STATUS = { loading: 'loading', 'boot-error': 'bootError', running: 'running', done: 'done', error: 'error' }
 
 /**
- * "Probar en vivo": una terminal que corre el main.py real de un proyecto (`program`, ver
- * live/programs.js) con Python en WebAssembly.
+ * "Probar en vivo": una terminal que corre el programa real de un proyecto (`program`, ver
+ * live/programs.js): el main.py con Python en WebAssembly o el Main.java compilado a JavaScript.
  * Ocupa el lugar de la figura, como el panel de arquitectura. Se carga con React.lazy (y con ella
- * Pyodide) recién cuando se toca el botón; cerrarla la oculta sin perder la sesión.
+ * el programa) recién cuando se toca el botón; cerrarla la oculta sin perder la sesión.
+ * Al abrirse, si no se ve entera, la página se acomoda para mostrarla (useRevealOnOpen).
  */
 export default function LiveTerminal({ id, program, copy, hidden, onClose }) {
   const regionRef = useRef(null)
@@ -17,7 +19,7 @@ export default function LiveTerminal({ id, program, copy, hidden, onClose }) {
   const textRef = useRef(null)
   const inputRef = useRef(null)
   const restartRef = useRef(null)
-  const { phase, restart, retry, onKeyDown, focusInput } = useLiveProgram({
+  const { phase, restart, retry, onKeyDown, focusInput, focusIfWaiting } = useLiveProgram({
     program,
     regionRef,
     termRef,
@@ -26,6 +28,9 @@ export default function LiveTerminal({ id, program, copy, hidden, onClose }) {
     restartRef,
     copy,
   })
+  // En mobile y tablet se abre debajo del texto: si queda fuera de pantalla, se trae a la vista
+  // y, si el programa ya pidió una línea, el input toma el foco al llegar
+  useRevealOnOpen({ ref: regionRef, open: !hidden, onRevealed: focusIfWaiting })
   const booted = phase !== 'loading' && phase !== 'boot-error'
 
   return (

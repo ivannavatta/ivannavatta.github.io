@@ -3,17 +3,23 @@ import { LIVE_PROGRAMS } from '../live/programs'
 
 const NEAR_BOTTOM = 48 // px: si el usuario subió más que esto para releer, la salida no lo arrastra
 
-/** Pyodide se sirve desde el propio sitio (scripts/copy-pyodide.mjs), respetando la base de Vite. */
+/**
+ * Pyodide se sirve desde el propio sitio (scripts/copy-pyodide.mjs), respetando la base de Vite.
+ * Va en cada 'start'; el worker de Java (transporte) no lo usa.
+ */
 const pyodideURL = () => new URL(`${import.meta.env.BASE_URL}pyodide/`, document.baseURI).href
 
 /**
- * Corre el main.py de un programa (`program`, clave de live/programs.js) en un Web Worker (ver
- * live/runtime.js) y lo conecta con una
+ * Corre un programa (`program`, clave de live/programs.js) en un Web Worker y lo conecta con una
  * terminal: la salida se escribe directo en el DOM (sin un render por línea) y el input en línea
- * manda cada respuesta al worker.
+ * manda cada respuesta al worker. Los de Python corren con Pyodide (live/runtime.js); el de Java,
+ * compilado a JavaScript con TeaVM (live/transporte.worker.js). El protocolo es el mismo.
  *
  * El worker se crea al montar: el componente que usa este hook se carga con React.lazy recién
- * cuando se toca "Probar en vivo", así Pyodide no se descarga antes.
+ * cuando se toca "Probar en vivo", así el programa (y Pyodide) no se descargan antes.
+ *
+ * Reiniciar: según programs.js, se le avisa al worker ('message') o se crea uno nuevo
+ * ('respawn'). En los dos casos la terminal se limpia y no vuelve la pantalla de carga.
  *
  * Foco: el input toma el foco solo si el usuario está usando la demo (el foco está en ella o en
  * su botón) y la terminal se ve; si se fue a otra parte de la página mientras cargaba, no lo
@@ -75,11 +81,13 @@ export function useLiveProgram({ program, regionRef, termRef, textRef, inputRef,
 
   const connect = useCallback(() => {
     workerRef.current?.terminate()
-    const worker = LIVE_PROGRAMS[program]()
+    const worker = LIVE_PROGRAMS[program].create()
     workerRef.current = worker
     epochRef.current = 0
 
     worker.onmessage = ({ data }) => {
+      // Un worker descartado (reinicio por 'respawn', reintento) no escribe más en la terminal
+      if (workerRef.current !== worker) return
       if (data && 'epoch' in data && data.epoch !== epochRef.current) return
       switch (data?.type) {
         case 'ready':
@@ -114,7 +122,7 @@ export function useLiveProgram({ program, regionRef, termRef, textRef, inputRef,
           setPhase('error')
           return
         case 'boot-error':
-          console.warn(`[${copy.label}] no se pudo cargar Python:`, data.message)
+          console.warn(`[${copy.label}] no se pudo cargar el programa:`, data.message)
           setPhase('boot-error')
           return
       }
@@ -122,6 +130,7 @@ export function useLiveProgram({ program, regionRef, termRef, textRef, inputRef,
     // El script del worker no cargó (sin red, por ejemplo): mismo estado que un error de carga
     worker.onerror = (e) => {
       e.preventDefault()
+      if (workerRef.current !== worker) return
       setPhase('boot-error')
     }
     worker.postMessage({ type: 'start', indexURL: pyodideURL() })
@@ -165,9 +174,15 @@ export function useLiveProgram({ program, regionRef, termRef, textRef, inputRef,
       input.disabled = true
     }
     setPhase('running')
+    // Java: worker nuevo con los datos de prueba (connect lo arranca; tarda lo que tarda el
+    // módulo en salir de la caché, así que la pantalla de carga no vuelve)
+    if (LIVE_PROGRAMS[program].restart === 'respawn') {
+      connect()
+      return
+    }
     epochRef.current += 1
     workerRef.current?.postMessage({ type: 'restart', epoch: epochRef.current })
-  }, [textRef, inputRef])
+  }, [program, connect, textRef, inputRef])
 
   /** Click en la terminal: enfoca el input, salvo que el usuario esté seleccionando texto. */
   const focusInput = useCallback(() => {
@@ -175,11 +190,22 @@ export function useLiveProgram({ program, regionRef, termRef, textRef, inputRef,
     if (input && !input.disabled && !window.getSelection()?.toString()) input.focus({ preventScroll: true })
   }, [inputRef])
 
+  /**
+   * La terminal terminó de entrar en pantalla (useRevealOnOpen): si el programa pidió una línea
+   * mientras todavía no se veía, el input no tomó el foco; se lo damos ahora, con las mismas
+   * condiciones (el usuario sigue en la demo y la terminal se ve).
+   */
+  const focusIfWaiting = useCallback(() => {
+    const input = inputRef.current
+    if (!input || input.disabled || !waitingRef.current || document.activeElement === input) return
+    if (canTakeFocus()) input.focus({ preventScroll: true })
+  }, [inputRef, canTakeFocus])
+
   /** Error de carga: worker nuevo (un import fallido puede quedar en la caché de módulos). */
   const retry = useCallback(() => {
     setPhase('loading')
     connect()
   }, [connect])
 
-  return { phase, restart, retry, onKeyDown, focusInput }
+  return { phase, restart, retry, onKeyDown, focusInput, focusIfWaiting }
 }

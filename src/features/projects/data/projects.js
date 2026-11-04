@@ -20,8 +20,8 @@ export const PROJECTS = [
   {
     id: 'transporte',
     figure: 'graph',
-    // TODO: sumar el link al repositorio del TPO cuando sea público ({ key: 'repo', href: … })
-    links: [],
+    live: true,
+    links: [{ key: 'repo', href: `${GITHUB}/-UADE-2025-PROGRA-II` }],
   },
   {
     id: 'uadehub',
